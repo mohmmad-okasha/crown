@@ -109,7 +109,7 @@
                                         <td>{{ booking.book_date }}</td>
                                         <td>{{ $t(booking.guest_name) }}</td>
                                         <td>{{ $t(booking.hotel) }}</td>
-                                        <td>{{ $t(booking.dates) }}</td>
+                                        <td>{{ $t(booking.dates.substr(0, 20)) }}</td>
                                         <td>{{ $t(booking.room_id) }}</td>
                                         <td>{{ $t(booking.room_type) }}</td>
                                         <td>{{ $t(booking.status) }}</td>
