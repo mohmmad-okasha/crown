@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static %}
+
+<h1>about</h1>
+<img src="{% static '1.jpg' %}" alt="">
+<form  method="POST">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="ok">
+</form>
+
+
+
+
+{% endblock content %}

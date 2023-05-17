@@ -1,0 +1,52 @@
+ {% extends 'base.html' %}
+
+<!-- <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script> -->
+{% block content %}
+<div id="search-app">the message:{{query}}</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const SearchApp = {
+        data() {
+            return {
+                query: '1',
+                company_size: '',
+                jobs: []
+            }
+        },
+        delimiters: ['[[', ']]'],
+        methods: {
+            performSearch() {
+                var data = {
+                    'query': this.query,
+                    'company_size': this.company_size
+                }
+
+                fetch('/jobs/api/search/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    body: JSON.stringify(data)
+                })
+                .then((response) => {
+                    return response.json()
+                })
+                .then((result) => {
+                    console.log(result.jobs)
+                    this.jobs = result.jobs
+                })
+                .catch((error) => {
+                    console.log('Error', error)
+                })
+            }
+        }
+    }
+
+    Vue.createApp(SearchApp).mount('#search-app')
+</script>
+{% endblock %}
+

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<h1>dashboard</h1>
+
+<div id="app">
+  {{ users }}
+ <br>
+ [[ message ]]
+  {% comment %} <app-count :message="123"></app-count>
+  <app-count :message="message"></app-count> {% endcomment %}
+
+</div>
+
+
+{% endblock content %}
+
+
+
+
+
+{% block scripts %}
+
+<script>
+  {% comment %} Vue.component('app-count',{
+    delimiters: ['[[', ']]'],
+    data: function () {
+      return {
+        name:'ahmad',
+        count:0,
+      }
+    },
+    template: '<p @click="count++">hi  [[ name ]]  the count =  [[count]] [[message]] .</p>',
+    props:['message']
+  }) {% endcomment %}
+
+{% comment %} var vm = new Vue({
+  el:'#app',
+  delimiters: ['[[', ']]'],
+  data:{
+    message:'ok',
+  },
+}) {% endcomment %}
+
+
+
+    // const { createApp } = Vue
+  
+    // createApp({
+    //   data() {
+    //     return {
+    //       message: 'Hello Vue!'
+    //     }
+    //   }
+    // }).mount('#app2')
+</script>
+  
+{% endblock %}

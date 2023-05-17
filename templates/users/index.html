@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- Table Card -->
+<div class="col-xl-12">
+    <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Users Table</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Actions:</div>
+                    <a class="dropdown-item" href="{% url 'users:add' %}"><i class="bi bi-file-earmark-plus"></i> New</a>
+                    <div class="dropdown-divider"></div>
+                </div>
+            </div>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+            <form class="site-form-table" method="post" action="{% url 'users:index' %}">
+                {% csrf_token %}
+                <table id="table" class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">name</th>
+                            <th scope="col">email</th>
+                            <th scope="col">image</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for u in users %}
+                        <tr>
+                            <th scope="row" id="id">{{u.id}}</th>
+                            <td >{{u.name}}</td>
+                            <td>{{u.email}}</td>
+                            <td><img src="{{ u.img.url }}" width="50" height="30"></td>
+                            <td>
+                                <a href="{% url 'users:delete' u.id %}" title="delete" class="btn btn-danger btn-circle btn-sm">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <!-- to get id of selected record -->
+                <input hidden type="text" id="row_id">
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<!-- Data Card -->
+<div class="col-xl-12">
+    <div class="card shadow mb-4">
+        <!-- Card Header - Dropdown -->
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-primary">Users Data</h6>
+            <div class="dropdown no-arrow">
+                <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                    <div class="dropdown-header">Actions:</div>
+                    <a class="dropdown-item" href="{% url 'users:update_user' u_id %}"><i class="bi bi-pencil-square"></i> Edit</a>
+                    <div class="dropdown-divider"></div>
+
+                </div>
+            </div>
+        </div>
+        <!-- Card Body -->
+        <div class="card-body">
+            
+            {% verbatim %}
+
+            <div id="app">
+                {{ message }}
+                <button @click="sayok2">ok</button>
+
+            </div>
+            {% endverbatim %}
+            <form class="site-form" method="post" action="{% url 'users:index' %}">
+                {% csrf_token %}
+
+                {{form}}
+
+                <a href="{% url 'users:update_user' u_id %}">edit</a>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+
+
+{% endblock content %}
+
+{% block scripts %}
+<script>
+    
+    const { createApp } = Vue
+    createApp({
+      data() {
+        return {
+          message: 'Hello Vue2'
+        }
+      },
+      methods: {
+        sayok: function(){
+            this.message= 'Date()'
+        },
+        sayok2: function(){
+            this.message= Date()
+        },
+      }
+    }).mount('#app')
+  </script>
+
+  <script>
+    //to change the selected row color and send the id to text input
+    $("#table tr").click(function(){
+        $(this).addClass('selected').siblings().removeClass('selected');    
+        //var id=$(this).find('th:first').html();
+        var id=$(this).find('th:first').html();
+        document.getElementById("row_id").value=id;
+
+        //alert(id)
+    });
+</script>
+{% endblock %}
+
+

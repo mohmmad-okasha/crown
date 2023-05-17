@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form class="site-form" method="post" action="{% url 'users:add' %}">
+    <h1 class="h3 mb-3 fw-normal">Add User</h1>
+
+    {% csrf_token %}
+
+    {% comment %} to save the after login distenation {% endcomment %}
+    {% if request.GET.next %}
+    <input type="hidden" name="next" value="{{request.GET.next}}"
+    {% endif %}
+    <input type="submit" value="save">
+    <input type="button" onclick="location.href={% url 'users:index' %};" value="cancel">
+    {{form}}
+</form>
+
+
+
+{% endblock content %}
