@@ -490,6 +490,8 @@ export default {
         async update_booking(id) {
             try {
                 if (this.check_form()) {
+                    // convert the dates array to string to save it in db
+                    this.booking.dates = this.booking.dates.toString();
                     var response = await fetch(domain_url + "/backend/bookings/" + id + "/", {
                         method: "PUT",
                         headers: { "Content-Type": "application/json", },

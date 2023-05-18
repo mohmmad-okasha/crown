@@ -348,15 +348,6 @@ export default {
                     });
 
 
-
-
-
-                    var response = await fetch(domain_url + "/backend/rooms/", {
-                        method: "post",
-                        headers: { "Content-Type": "application/json", },
-                        body: JSON.stringify(this.room),
-                    });
-
                     if (!response.ok) {
                         // handle the error
                         var errorMessage = "Error: " + response.status + " " + response.statusText;

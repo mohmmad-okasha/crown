@@ -225,3 +225,8 @@ div.vpd-day[disabled] > span{
    color: #ececec !important;
 }
 
+
+
+#content-wrapper{
+   max-height: 100vh !important;
+}
