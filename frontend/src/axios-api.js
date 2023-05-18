@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const domain_url = 'http://127.0.0.1:8000';
+const domain_url = 'https://7840-16-16-199-164.ngrok-free.app';
 
 const my_api = axios.create({
     baseURL: domain_url,
