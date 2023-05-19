@@ -35,11 +35,20 @@ body {
    font-weight: bold !important;
 }
 
+
 /* for date selector */
 .vpd-dir-ltr .vpd-actions,
 .vpd-dir-ltr .vpd-addon-list-content,
 .vpd-dir-ltr .vpd-content {
-   margin-left: 15%;
+   margin-left: 13%;
+}
+
+@media only screen and (max-device-width: 640px) {
+.vpd-dir-ltr .vpd-actions,
+.vpd-dir-ltr .vpd-addon-list-content,
+.vpd-dir-ltr .vpd-content {
+   margin-left: 0%;
+}
 }
 
 .vpd-header {
