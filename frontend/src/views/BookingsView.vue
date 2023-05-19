@@ -38,9 +38,10 @@
                             </thead>
                             <tbody>
                                 <tr v-for="r in this.booked_rooms" :key="r.room">
-                                    <td >{{ r.room }}</td> <!-- room id + hotel -->
+                                    <td>{{ r.room }}</td> <!-- room id + hotel -->
                                     <td v-for="ii in 31" :key="ii">
-                                        <button v-for="d in r.dates.split(',')" :key="d" v-show="ii==d.slice(0, 2)" :title="r.room" type="button" class="btn btn-danger"></button>
+                                        <button v-for="d in r.dates.split(',')" :key="d" v-show="ii == d.slice(0, 2)"
+                                            :title="r.room" type="button" class="btn btn-danger"></button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -500,7 +501,6 @@ export default {
                     );
                     swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
                     this.max_id = this.booking.id
-                    await this.uploadImage();
                     this.get_Bookings();
                     this.closeModal();
                     this.edit_mode = false;
@@ -569,6 +569,7 @@ export default {
             // const sortedDates = [...this.enable_dates].sort((a, b) => a - b);
             // this.min_date = sortedDates[0];
             // this.max_date = sortedDates[sortedDates.length - 1];
+
             let min = this.enable_dates[0];
             let max = this.enable_dates[0];
             for (let i = 0; i < this.enable_dates.length; i++) {
@@ -578,6 +579,7 @@ export default {
             this.min_date = min;
             this.max_date = max;
             this.filter_enabled_dates();
+
         },
 
         get_booked_dates() {
@@ -627,6 +629,10 @@ export default {
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
+            if(this.edit_mode){
+                this.disable_dates = this.disable_dates.filter( ( el ) => !this.booking.dates.includes( el ) );
+            }
+
         },
 
         open_add_modal() {
@@ -637,10 +643,12 @@ export default {
         },
 
         open_edit_modal() {
-            this.disable_dates=[];
+            //return
+            this.disable_dates = [];
             this.edit_mode = true;
             //$('#modal_label').html('Edit booking');
             $('#addModal').modal('toggle');
+
         },
 
         closeModal() {
@@ -649,13 +657,19 @@ export default {
         },
 
         async row_click(index) {
-            this.enable_dates = this.booking.dates;
-            this.enable_dates = this.enable_dates.split(",");// convert text to array then datepicker can read dates
-            this.booking.dates = this.booking.dates.split(",");// 
-
-            //this.findMinMaxDate();
-            this.active_index = index; //to change row color
             await this.get_booking(index);
+
+
+            //this.enable_dates = this.booking.dates;
+            //this.enable_dates = this.enable_dates.split(",");// convert text to array then datepicker can read dates
+            this.booking.dates = this.booking.dates.split(",");// 
+            await this.get_room_type(this.booking.room_id);
+            await this.findMinMaxDate();
+
+
+
+
+            this.active_index = index; //to change row color
         },
 
         clear_form() {
