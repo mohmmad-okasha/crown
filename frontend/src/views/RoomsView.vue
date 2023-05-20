@@ -1,5 +1,4 @@
 <template>
-    <!-- &nbsp; -->
     <div class="RoomsView">
 
         <!-- context-menu -->
@@ -19,8 +18,6 @@
                 </li>
             </ul>
         </div>
-
-
 
         <!-- Table Card -->
         <div class="col-xl-12 center">
@@ -172,7 +169,7 @@
                             <label for="dates">{{ $t("Select Date") }}</label>
                             <div class="form-group card" id="dates" style="width: 100%;">
                                 <div class="card-body">
-                                    <date-picker v-model="room.dates" multiple clearable inline :auto-submit="true"
+                                    <date-picker v-model="room.dates" range clearable inline :auto-submit="true"
                                         custom-input="none" color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY"
                                         locale="en" />
                                 </div>
@@ -208,7 +205,6 @@
             </div>
         </div>
 
-
     </div>
 </template>
 
@@ -228,12 +224,10 @@ export default {
     components: {
         NavBar,
         datePicker: VuePersianDatetimePicker
-
     },
 
     data() {
         return {
-            dateArray: [],
             validate: false, //for check forms
             base_url: window.location.origin + '/media/rooms/',//for images 
             previewImage: null,// to show selected image before save
@@ -261,6 +255,7 @@ export default {
     },
 
     async mounted() {
+        // get user name to save in any record
         this.room.user = localStorage.getItem('user_name')
 
         //to remove modal background on auto vue js reload
@@ -268,10 +263,10 @@ export default {
         while (elements.length > 0) {
             elements[0].parentNode.removeChild(elements[0]);
         }////
+
         await this.get_Rooms();
         await this.get_hotels();
         //await this.get_room();
-
     },
 
     computed: {
@@ -347,7 +342,6 @@ export default {
                         body: JSON.stringify(this.room),
                     });
 
-
                     if (!response.ok) {
                         // handle the error
                         var errorMessage = "Error: " + response.status + " " + response.statusText;
@@ -359,9 +353,6 @@ export default {
                         await this.get_max_id();
                         this.closeModal();
                     }
-
-
-
 
 
                 }

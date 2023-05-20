@@ -1,5 +1,4 @@
 <template>
-    <!-- &nbsp; -->
     <div class="BookingsView">
 
         <!-- context-menu -->
@@ -224,7 +223,7 @@
                             <div v-show="this.booking.room_id" class="form-group card" id="dates" style="width: 100%;">
                                 <div class="card-body">
                                     <date-picker v-model="booking.dates" :min="min_date" :max="max_date"
-                                        :disable="disable_dates" multiple clearable locale="en" inline :auto-submit="true"
+                                        :disable="disable_dates" range clearable locale="en" inline :auto-submit="true"
                                         custom-input="none" color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY" />
                                 </div>
                             </div>
@@ -344,10 +343,12 @@ export default {
             rooms: [],
             hotels: [],
             dates: [],
+            test: [],
             range_dates: [],
             enable_dates: [],
             disable_dates: [],
             booked_dates: [],
+            all_booked_dates: [],
             // monitoring
             booked_rooms: [],
             pended_rooms: [],
@@ -357,6 +358,7 @@ export default {
             booking: {
                 book_date: new Date().toISOString().slice(0, 16),
                 dates: "",
+                all_dates: [],
                 guest_name: "",
                 hotel: "",
                 room_id: "",
@@ -553,8 +555,10 @@ export default {
                 method: "get",
                 url: domain_url + "/backend/get_room_dates/", params: { room_id: value, hotel: this.booking.hotel },
                 auth: { username: "admin", password: "123", },
-            }).then((response) => (this.enable_dates = response.data[0].split(",")));
+            }).then((response) => (this.get_room_range(response.data[0])));
         },
+
+
 
         // for monitoring
         get_booked_rooms() {
@@ -565,23 +569,6 @@ export default {
             }).then((response) => (this.booked_rooms = response.data.booked_rooms));
         },
 
-        findMinMaxDate() {
-            // const sortedDates = [...this.enable_dates].sort((a, b) => a - b);
-            // this.min_date = sortedDates[0];
-            // this.max_date = sortedDates[sortedDates.length - 1];
-
-            let min = this.enable_dates[0];
-            let max = this.enable_dates[0];
-            for (let i = 0; i < this.enable_dates.length; i++) {
-                if (this.enable_dates[i] > max) { max = this.enable_dates[i] }
-                if (this.enable_dates[i] < min) { min = this.enable_dates[i] }
-            }
-            this.min_date = min;
-            this.max_date = max;
-            this.filter_enabled_dates();
-
-        },
-
         get_booked_dates() {
             if (this.booking.room_id && this.booking.hotel) {
 
@@ -590,12 +577,95 @@ export default {
                     method: "get",
                     url: domain_url + "/backend/get_booked_dates/", params: { room_id: this.booking.room_id, hotel: this.booking.hotel },
                     //auth: { username: "admin", password: "123", },
-                }).then((response) => (this.booked_dates = response.data[0].replace(', ', ',').split(",")));
+                    //}).then((response) => (this.booked_dates = response.data[0].replace(', ', ',').split(",")));
+                }).then((response) => (this.booked_dates = response.data[0].split(', ')));
             }
         },
 
-        async filter_enabled_dates() {
+        findMinMaxDate() {
+            //get min & max date , if one date set min=max to enable this range in datepiker
+            this.min_date = this.booking.dates[0];
+            this.max_date = this.booking.dates[1];
+            if (!this.max_date) { this.max_date = this.min_date }
+            this.filter_enabled_dates();
+        },
 
+        get_room_range(range) {
+            //to get min & max for this room
+            this.min_date = range.split(",")[0];
+            this.max_date = range.split(",")[1];
+            this.filter_enabled_dates();
+        },
+
+        async filter_enabled_dates() {
+            // to get booked dates for this room and diable it
+            try {
+                await this.get_booked_dates();
+            } catch (error) { }
+
+            this.all_booked_dates = [];
+            this.disable_dates = [];
+
+            //get all dates in the range
+            this.booked_dates.forEach((element) => {
+
+                const minDateParts = element.split(',')[0].split('/');
+                const maxDateParts = element.split(',')[1].split('/');
+                const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+
+                const currentDate = new Date(startDate);
+                while (currentDate < endDate) {
+                    this.all_booked_dates.push(currentDate.toLocaleDateString("en-GB"));
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+            });
+
+            //copy all dates from all_booked_dates to disable_dates
+            this.all_booked_dates.forEach(element => this.disable_dates.push(element));
+
+            // to enable edit booked dates
+            if (this.edit_mode) {
+                //get all dates in the range
+                this.booking.all_dates = [];
+
+                const minDateParts = this.booking.dates[0].split('/');
+                const maxDateParts = this.booking.dates[1].split('/');
+                const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+
+                const currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    this.booking.all_dates.push(currentDate.toLocaleDateString("en-GB"));
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                this.disable_dates = this.disable_dates.filter((el) => !this.booking.all_dates.includes(el));
+            }
+
+
+        },
+
+
+
+        findMinMaxDate_old() {
+
+            let min = this.enable_dates[0];
+            let max = this.enable_dates[0];
+            for (let i = 0; i < this.enable_dates.length; i++) {
+                if (this.enable_dates[i] > max) { max = this.enable_dates[i] }
+                if (this.enable_dates[i] < min) { min = this.enable_dates[i] }
+            }
+
+
+
+            this.min_date = min;
+            this.max_date = max;
+            this.filter_enabled_dates();
+
+        },
+        async filter_enabled_dates_old() {
             // to get all dates in the range then push not needed dates to disabled_dates
             const minDateParts = this.min_date.split('/');
             const maxDateParts = this.max_date.split('/');
@@ -613,6 +683,7 @@ export default {
             // to get booked dates for this room and diable it
             try {
                 await this.get_booked_dates();
+                this.booked_dates.sort();
             } catch (error) { }
 
             const currentDate = new Date(startDate);
@@ -629,9 +700,13 @@ export default {
                 currentDate.setDate(currentDate.getDate() + 1);
             }
 
-            if(this.edit_mode){
-                this.disable_dates = this.disable_dates.filter( ( el ) => !this.booking.dates.includes( el ) );
+
+            // to enable edit booked dates
+            if (this.edit_mode) {
+                this.disable_dates = this.disable_dates.filter((el) => !this.booking.dates.includes(el));
             }
+
+
 
         },
 
@@ -665,9 +740,6 @@ export default {
             this.booking.dates = this.booking.dates.split(",");// 
             await this.get_room_type(this.booking.room_id);
             await this.findMinMaxDate();
-
-
-
 
             this.active_index = index; //to change row color
         },
