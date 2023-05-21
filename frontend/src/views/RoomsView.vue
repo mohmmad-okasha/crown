@@ -73,7 +73,7 @@
                                         <td>{{ $t(r.hotel) }}</td>
                                         <td>{{ $t(r.room_id) }}</td>
                                         <td>{{ $t(r.room_type) }}</td>
-                                        <td>{{ $t(r.dates.substr(0, 20)) }}</td>
+                                        <td>{{ $t(r.range.substr(0, 21)) }}</td>
                                         <td>{{ $t(r.notes) }}</td>
                                         <td>{{ $t(r.user) }}</td>
 
@@ -169,7 +169,7 @@
                             <label for="dates">{{ $t("Select Date") }}</label>
                             <div class="form-group card" id="dates" style="width: 100%;">
                                 <div class="card-body">
-                                    <date-picker v-model="room.dates" range clearable inline :auto-submit="true"
+                                    <date-picker v-model="room.range" range clearable inline :auto-submit="true"
                                         custom-input="none" color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY"
                                         locale="en" />
                                 </div>
@@ -228,6 +228,7 @@ export default {
 
     data() {
         return {
+            saving: false,
             validate: false, //for check forms
             base_url: window.location.origin + '/media/rooms/',//for images 
             previewImage: null,// to show selected image before save
@@ -239,10 +240,12 @@ export default {
                 hotel: "",
                 room_id: "",
                 room_type: "",
-                dates: [],
+                range: [],
                 notes: "",
                 user: "",
             },
+            range_dates: [],
+
             edit_mode: false,
             max_id: 0,
             isContextMenuActive: false,
@@ -283,59 +286,80 @@ export default {
         },
     },
 
+    watch: {
+        //on room.range changed get all dates in range then save all dates in range_dates to save on room dates table
+        'room.range': function (newValue) {
+            if (!this.saving) {
+
+                let min_date = newValue[0];
+                let max_date = newValue[1];
+
+                const minDateParts = min_date.split('/');
+                const maxDateParts = max_date.split('/');
+                const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+
+                const currentDate = new Date(startDate);
+                this.range_dates = [];
+                while (currentDate <= endDate) {
+                    this.range_dates.push(currentDate.toLocaleDateString("en-GB"));
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+            }
+        }
+    },
+
     methods: {
-
-        showContextMenu(event) {
-            event.preventDefault();
-            this.isContextMenuActive = true;
-            this.menuStyle.top = `${event.clientY}px`;
-            this.menuStyle.left = `${event.clientX}px`;
-            this.menuStyle.display = 'block';
-            // Add a click listener to the window object to hide the context menu
-            window.addEventListener('click', this.hideContextMenu);
-        },
-
-        hideContextMenu() {
-            this.isContextMenuActive = false;
-            this.menuStyle.display = 'none';
-            // Remove the click listener from the window object
-            window.removeEventListener('click', this.hideContextMenu);
-        },
-
-        PrintDiv(id) {
-            var divToPrint = document.getElementById(id);
-            var popupWin = window.open('', '_blank', 'width=100000,height=10000');
-            document.getElementById('head_txt').style.display = "block";
-            document.getElementById('head_txt').innerHTML = this.$t("Rooms");
-            popupWin.document.write('<link href="static/css/sb-admin-2.min.css" rel="stylesheet">');
-            popupWin.document.write('<link href="static/css/reports.css" rel="stylesheet">');
-            popupWin.document.write('<style>body{background-color:white !important;}</style>');
-            popupWin.document.write('<iframe src="static/parts/report_head.html" width="100%" height="200px" frameBorder="0"></iframe>');
-            popupWin.document.write('<html><body onload="window.print()"> ' + divToPrint.innerHTML + '</html>');
-            document.getElementById('head_txt').style.display = "none";
-            popupWin.document.close();
-        },
-
-        get_Rooms() {
-            // we using return first of the function for 'await' 
-            return my_api.get('/backend/rooms/')
-                .then((response) => (this.Rooms = response.data))
-                .catch(err => { alert(err) });
-        },
-
-        get_hotels() {
-            return axios({
-                method: "get",
-                url: domain_url + "/backend/get_hotels/",
-                //auth: { username: "admin", password: "123", },
-            }).then((response) => (this.hotels = response.data[0]));
-        },
 
         async save_room() {
             try {
                 if (this.check_form()) {
+                    this.saving = true;
+
+                    // convert the range array to string to save it in db
+                    this.room.range = this.room.range.toString();
+                    var response = await fetch(domain_url + "/backend/rooms/", {
+                        method: "post",
+                        headers: { "Content-Type": "application/json", },
+                        body: JSON.stringify(this.room),
+                    });
+
+                    if (!response.ok) {
+                        // handle the error
+                        var errorMessage = "Error: " + response.status + " " + response.statusText;
+                        swal(errorMessage, { icon: 'error' });
+                    } else {
+                        // Request was successful
+                        await this.get_max_id();
+                        alert(this.max_id);
+                        this.range_dates.forEach((element) => {
+                            fetch(domain_url + "/backend/room_dates/", {
+                                method: "post",
+                                body: JSON.stringify({ 'room_id': this.max_id, 'date': element }),
+                                headers: {
+                                    'Content-Type': 'application/json;charset=UTF-8'
+                                }
+                            });
+                        });
+
+
+                        swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
+                        this.get_Rooms();
+                        await this.get_max_id();
+                        this.closeModal();
+                    }
+                    this.saving = false;
+
+                }
+            } catch (error) { console.error(); }
+        },
+
+        async save_room_old() {
+            try {
+                if (this.check_form()) {
                     // convert the dates array to string to save it in db
-                    this.room.dates = this.room.dates.toString();
+                    this.room.range = this.room.range.toString();
                     var response = await fetch(domain_url + "/backend/rooms/", {
                         method: "post",
                         headers: { "Content-Type": "application/json", },
@@ -353,8 +377,6 @@ export default {
                         await this.get_max_id();
                         this.closeModal();
                     }
-
-
                 }
             } catch (error) { console.error(); }
         },
@@ -363,7 +385,7 @@ export default {
             try {
                 if (this.check_form()) {
                     // convert the dates array to string to save it in db
-                    this.room.dates = this.room.dates.toString();
+                    this.room.range = this.room.range.toString();
 
                     var response = await fetch(domain_url + "/backend/rooms/" + id + "/", {
                         method: "PUT",
@@ -423,6 +445,53 @@ export default {
             }).then((response) => (this.room = response.data[0]));
         },
 
+        showContextMenu(event) {
+            event.preventDefault();
+            this.isContextMenuActive = true;
+            this.menuStyle.top = `${event.clientY}px`;
+            this.menuStyle.left = `${event.clientX}px`;
+            this.menuStyle.display = 'block';
+            // Add a click listener to the window object to hide the context menu
+            window.addEventListener('click', this.hideContextMenu);
+        },
+
+        hideContextMenu() {
+            this.isContextMenuActive = false;
+            this.menuStyle.display = 'none';
+            // Remove the click listener from the window object
+            window.removeEventListener('click', this.hideContextMenu);
+        },
+
+        PrintDiv(id) {
+            var divToPrint = document.getElementById(id);
+            var popupWin = window.open('', '_blank', 'width=100000,height=10000');
+            document.getElementById('head_txt').style.display = "block";
+            document.getElementById('head_txt').innerHTML = this.$t("Rooms");
+            popupWin.document.write('<link href="static/css/sb-admin-2.min.css" rel="stylesheet">');
+            popupWin.document.write('<link href="static/css/reports.css" rel="stylesheet">');
+            popupWin.document.write('<style>body{background-color:white !important;}</style>');
+            popupWin.document.write('<iframe src="static/parts/report_head.html" width="100%" height="200px" frameBorder="0"></iframe>');
+            popupWin.document.write('<html><body onload="window.print()"> ' + divToPrint.innerHTML + '</html>');
+            document.getElementById('head_txt').style.display = "none";
+            popupWin.document.close();
+        },
+
+        get_Rooms() {
+            // we using return first of the function for 'await' 
+            return my_api.get('/backend/rooms/')
+                .then((response) => (this.Rooms = response.data))
+                .catch(err => { alert(err) });
+        },
+
+        get_hotels() {
+            return axios({
+                method: "get",
+                url: domain_url + "/backend/get_hotels/",
+                //auth: { username: "admin", password: "123", },
+            }).then((response) => (this.hotels = response.data[0]));
+        },
+
+
         get_max_id() {
             return axios({
                 method: "get",
@@ -461,14 +530,14 @@ export default {
             this.active_index = index; //to change row color
             await this.get_room(index);
 
-            this.room.dates = this.room.dates.split(",");// convert text to array
+            this.room.range = this.room.range.split(",");// convert text to array
         },
 
         clear_form() {
             this.room.hotel = '';
             this.room.room_id = '';
             this.room.room_type = '';
-            this.room.dates = [];
+            this.room.range = [];
             this.room.notes = '';
             this.validate = false;
         },
@@ -480,7 +549,7 @@ export default {
                 this.room.hotel &&
                 this.room.room_id &&
                 this.room.room_type &&
-                this.room.dates
+                this.room.range
             ) {
                 return true
             } else {

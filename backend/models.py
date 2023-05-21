@@ -26,9 +26,9 @@ class Bookings(models.Model):
 
 class Rooms(models.Model):
     hotel = models.CharField(max_length=50)
-    room_id = models.CharField(max_length=50)
+    room_id = models.CharField(max_length=50)  
     room_type = models.CharField(max_length=50)
-    dates = models.CharField(max_length=1000)
+    range = models.CharField(max_length=1000)
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)
 
@@ -36,26 +36,17 @@ class Rooms(models.Model):
         return self.room_id #to change object name in admin table
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["hotel", "room_id"],
-                name="unique_room_for_hotel",
-            ),
-        ]
         ordering= ['id'] #to Sort the values
 
 #####################################################################################
 
 class Room_dates(models.Model):
-    room_id=models.IntegerField(max_length=100)
-    date = models.DateField(max_length=50)
+    room_id = models.ForeignKey(Rooms, on_delete=models.CASCADE)
+    date = models.CharField(max_length=50)
 
-
-    def __str__(self):
-        return self.room_id #to change object name in admin table
 
     class Meta:
-        ordering= ['date'] #to Sort the values
+        ordering = ['date']
 
 #####################################################################################
 

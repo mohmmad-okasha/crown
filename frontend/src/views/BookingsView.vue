@@ -343,8 +343,6 @@ export default {
             rooms: [],
             hotels: [],
             dates: [],
-            test: [],
-            range_dates: [],
             enable_dates: [],
             disable_dates: [],
             booked_dates: [],
@@ -352,6 +350,8 @@ export default {
             // monitoring
             booked_rooms: [],
             pended_rooms: [],
+            range_dates: [],
+            split_booked_rooms:[],
             //
             min_date: '',
             max_date: '',
@@ -386,6 +386,29 @@ export default {
         enable_dates: function (newValue) {
             this.findMinMaxDate()
         },
+        booked_rooms: function (newValue) {
+
+            this.booked_rooms.forEach((element) => {
+                console.log('/  '+element.dates.split(' / '))
+            });
+
+            //get all dates in the range
+            this.split_booked_rooms.forEach((element) => {
+                console.log(element.dates.split(',')[0])
+                console.log(element.dates.split(',')[1].split(' / ')[0])
+                // const minDateParts = element.dates.split(',')[0].split(' / ');
+                // const maxDateParts = element.dates.split(',')[1].split(' / ');
+                
+                // const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                // const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+
+                // const currentDate = new Date(startDate);
+                // while (currentDate < endDate) {
+                //     this.range_dates.push(currentDate.toLocaleDateString("en-GB"));
+                //     currentDate.setDate(currentDate.getDate() + 1);
+                // }
+            });
+        },
     },
 
     async mounted() {
@@ -413,6 +436,8 @@ export default {
                 this.get_Bookings();
             }
         },
+
+
     },
 
     methods: {
@@ -559,7 +584,6 @@ export default {
         },
 
 
-
         // for monitoring
         get_booked_rooms() {
             return axios({
@@ -648,7 +672,6 @@ export default {
         },
 
 
-
         findMinMaxDate_old() {
 
             let min = this.enable_dates[0];
@@ -733,7 +756,6 @@ export default {
 
         async row_click(index) {
             await this.get_booking(index);
-
 
             //this.enable_dates = this.booking.dates;
             //this.enable_dates = this.enable_dates.split(",");// convert text to array then datepicker can read dates

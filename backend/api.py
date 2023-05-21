@@ -144,8 +144,31 @@ def get_booked_dates(request):
 #####################################################################################
 @api_view(['GET'])
 def get_booked_rooms(request):
-    booked = Bookings.objects.raw("select id,(hotel || '/' || room_id) as room, GROUP_CONCAT(dates, ',') AS all_dates from backend_bookings where status='Booked' group by room")
-    pending = Bookings.objects.raw("select id,(hotel || '/' || room_id) as room, GROUP_CONCAT(dates, ',') AS all_dates from backend_bookings where status='Pending' group by room")
+    booked = Bookings.objects.raw("select id,(hotel || ' / ' || room_id) as room, GROUP_CONCAT(dates, ' / ') AS all_dates from backend_bookings where status='Booked' group by room")
+    pending = Bookings.objects.raw("select id,(hotel || ' / ' || room_id) as room, GROUP_CONCAT(dates, ' / ') AS all_dates from backend_bookings where status='Pending' group by room")
+    
+    # Convert RawQuerySet to list of dictionaries
+    booked_rooms = []
+    for booking in booked:
+        booked_rooms.append({
+            'id': booking.id,
+            'room': booking.room,
+            'dates': booking.all_dates
+        })
+    pending_rooms = []
+    for booking in pending:
+        pending_rooms.append({
+            'id': booking.id,
+            'room': booking.room,
+            'dates': booking.all_dates
+        })
+    
+    return Response({"booked_rooms": booked_rooms,"pending_rooms": pending_rooms})
+
+##################################################################################################################
+@api_view(['GET'])
+def get_open_rooms(request):
+    open = Bookings.objects.raw("select id,(hotel || ' / ' || room_id) as room, GROUP_CONCAT(dates, ',') AS all_dates from backend_bookings where status!='Booked' group by room")
     
     # Convert RawQuerySet to list of dictionaries
     booked_rooms = []
