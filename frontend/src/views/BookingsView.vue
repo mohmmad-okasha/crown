@@ -37,13 +37,14 @@
                             </thead>
                             <tbody>
 
-                                <!-- <tr v-for="r in this.booked_rooms" :key="r.room">
-                                    <td>{{ r.room }}</td> 
+                                <tr v-for="r in this.all_rooms_booked_dates" :key="r.name">
+                                    <td>{{ r.name }}</td> 
                                     <td v-for="ii in 31" :key="ii">
-                                        <button v-for="d in r.dates.split(',')" :key="d" v-show="ii == d.slice(0, 2)"
-                                            :title="r.room" type="button" class="btn btn-danger"></button>
+                                        <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)"
+                                            :title="r.name" type="button" class="btn btn-danger"></button>
                                     </td>
-                                </tr> -->
+                                </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -446,30 +447,30 @@ export default {
             // });
 
             this.booking_rows.forEach(item => {
-  const minDateParts = item.dates.split(',')[0].split('/');
-  const maxDateParts = item.dates.split(',')[1].split('/');
-  const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
-  const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+                const minDateParts = item.dates.split(',')[0].split('/');
+                const maxDateParts = item.dates.split(',')[1].split('/');
+                const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
 
-  const currentDate = new Date(startDate);
-  const datesArray = [];
+                const currentDate = new Date(startDate);
+                const datesArray = [];
 
-  while (currentDate <= endDate) {
-    datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
-    currentDate.setDate(currentDate.getDate() + 1);
-  }
-  
-  const existingEntry = this.all_rooms_booked_dates.find(entry => entry.name === item.room_id + ' - ' + item.hotel);
-  
-  if (existingEntry) {
-    existingEntry.dates = existingEntry.dates.concat(datesArray);
-  } else {
-    this.all_rooms_booked_dates.push({
-      name: item.room_id + ' - ' + item.hotel,
-      dates: datesArray
-    });
-  }
-});
+                while (currentDate <= endDate) {
+                    datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+
+                const existingEntry = this.all_rooms_booked_dates.find(entry => entry.name === item.room_id + ' - ' + item.hotel);
+
+                if (existingEntry) {
+                    existingEntry.dates = existingEntry.dates.concat(datesArray);
+                } else {
+                    this.all_rooms_booked_dates.push({
+                        name: item.room_id + ' - ' + item.hotel,
+                        dates: datesArray
+                    });
+                }
+            });
 
 
 
