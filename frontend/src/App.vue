@@ -317,7 +317,8 @@ export default {
     const diffInMs = Math.abs(date2 - date1);
     const diffInMinutes = Math.floor((diffInMs / 1000) / 60);
 
-    if (diffInMinutes > 60) {
+    //auto logout
+    if (diffInMinutes > 600) {
       localStorage.setItem('access_token', '');
       localStorage.setItem('token_time', 0)
       //this.auth.logged_in = '';

@@ -1,6 +1,8 @@
 from json import dumps
 import os
 from os import path
+
+from django.http import JsonResponse
 from .models import Flights
 from .models import Flight_dates
 from .models import Accounts
@@ -84,12 +86,10 @@ def get_max_id(request):
 
 @api_view(['GET'])
 def get_rooms(request):
-    # rooms = Rooms.objects.values('room_id','dates')
-    # return Response({ rooms })
     hotel = request.query_params['hotel']
-    rooms = Rooms.objects.values('room_id').filter(hotel=hotel)
-    return Response ({rooms})
-
+    rooms = Rooms.objects.filter(hotel=hotel).values('room_id')
+    unique_rooms = set(room['room_id'] for room in rooms)
+    return Response(list(unique_rooms))
 
 #####################################################################################
 
@@ -105,22 +105,49 @@ def get_hotels(request):
 # to get room type
 
 @api_view(['GET'])
-def get_room_type(request):
+def get_room_info(request):
     room_id = request.query_params['room_id']
     hotel = request.query_params['hotel']
 
-    room_type = Rooms.objects.values_list('room_type',flat=True).filter(room_id=room_id).filter(hotel=hotel)
-    return Response ({room_type})
+    room_info = Rooms.objects.filter(room_id=room_id, hotel=hotel).first()
+    #room_dates = Rooms.objects.values_list('range',flat=True).filter(room_id=room_id, hotel=hotel)
 
+    return Response({"id": room_info.id,"type": room_info.room_type,"range": room_info.range,"notes": room_info.notes})
+
+#####################################################################################
+# to get room id
+
+@api_view(['GET'])
+def get_room_id(request):
+    room_id = request.query_params['room_id']
+    hotel = request.query_params['hotel']
+    dates = request.query_params['dates']
+
+    room = Rooms.objects.filter(room_id=room_id, hotel=hotel, dates=dates).first()
+    if room:
+        return JsonResponse({'room_id': room.id})
+    else:
+        return JsonResponse({'room_id': None})
 
 #####################################################################################
 
+@api_view(['GET'])
+def get_room_dates_old(request):
+    room_id = str(request.query_params['room_id'])
+    hotel = request.query_params['hotel']
+
+    room_dates = Rooms.objects.values_list('dates',flat=True).filter(room_id=room_id).filter(hotel=hotel)
+    return Response ({room_dates[0]})
+
+
+#####################################################################################
 @api_view(['GET'])
 def get_room_dates(request):
     room_id = str(request.query_params['room_id'])
     hotel = request.query_params['hotel']
 
-    room_dates = Rooms.objects.values_list('dates',flat=True).filter(room_id=room_id).filter(hotel=hotel)
+    room_dates = Room_dates.objects.values_list('date',flat=True).filter(room_id_id=room_id).filter(hotel=hotel)
+    
     return Response ({room_dates[0]})
 
 
@@ -311,7 +338,6 @@ class rooms(ModelViewSet, mixins.DestroyModelMixin):
         return self.update(request, *args, **kwargs)
 
 #####################################################################################
-
 
 class room_dates(ModelViewSet, mixins.DestroyModelMixin):
 

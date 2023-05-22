@@ -319,6 +319,7 @@ export default {
 
                     // convert the range array to string to save it in db
                     this.room.range = this.room.range.toString();
+                    // save room info
                     var response = await fetch(domain_url + "/backend/rooms/", {
                         method: "post",
                         headers: { "Content-Type": "application/json", },
@@ -331,8 +332,8 @@ export default {
                         swal(errorMessage, { icon: 'error' });
                     } else {
                         // Request was successful
+                        //save range dates to table
                         await this.get_max_id();
-                        alert(this.max_id);
                         this.range_dates.forEach((element) => {
                             fetch(domain_url + "/backend/room_dates/", {
                                 method: "post",
@@ -342,7 +343,6 @@ export default {
                                 }
                             });
                         });
-
 
                         swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
                         this.get_Rooms();
@@ -399,6 +399,19 @@ export default {
                         swal(errorMessage, { icon: 'error' });
                     } else {
                         // Request was successful
+
+                        //delete old dates and save the new
+                        this.range_dates.forEach((element) => {
+                            fetch(domain_url + "/backend/room_dates/", {
+                                method: "post",
+                                body: JSON.stringify({ 'room_id': this.max_id, 'date': element }),
+                                headers: {
+                                    'Content-Type': 'application/json;charset=UTF-8'
+                                }
+                            });
+                        });
+
+
                         swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
                         this.max_id = this.room.id
                         this.get_Rooms();
