@@ -36,6 +36,7 @@
                                 </tr>
                             </thead>
                             <tbody>
+
                                 <!-- <tr v-for="r in this.booked_rooms" :key="r.room">
                                     <td>{{ r.room }}</td> 
                                     <td v-for="ii in 31" :key="ii">
@@ -320,7 +321,9 @@ export default {
             hotels: [],//used in new & update form
             range: '',
             booked_dates: [],
-            all_booked_dates: [],//all dates in booked_dates ranges
+            all_booked_dates: [],//all dates in booked_dates ranges for selected room
+            all_rooms_booked_dates: [],//all dates in booked_dates ranges for all room
+
             min_date: '',
             max_date: '',
             disable_dates: [],
@@ -379,6 +382,7 @@ export default {
         this.this_row.user = localStorage.getItem('user_name'); //to get logged in user name
         await this.get_booking_rows();
         await this.get_hotels();
+        await this.get_monitor();
 
         //to remove modal background on auto vue js reload
         const elements = document.getElementsByClassName("modal-backdrop fade show");
@@ -396,7 +400,7 @@ export default {
                 return axios({
                     method: "get",
                     url: domain_url + "/backend/bookings/?search=" + data,
-                }).then((response) => (this.Bookings = response.data));
+                }).then((response) => (this.this_row = response.data));
             } else {
                 this.get_booking_rows();
             }
@@ -426,11 +430,49 @@ export default {
             }
         },
 
-
         get_hotels() {
             return my_api.get('/backend/get_hotels/')
                 .then((response) => (this.hotels = response.data))
                 .catch(err => { alert(err) });
+        },
+
+        async get_monitor() {
+
+            // this.booking_rows.forEach(item => {
+            //     this.all_rooms_booked_dates.push({
+            //         name: item.room_id + ' - '+ item.hotel,
+            //         dates: item.dates
+            //     });
+            // });
+
+            this.booking_rows.forEach(item => {
+  const minDateParts = item.dates.split(',')[0].split('/');
+  const maxDateParts = item.dates.split(',')[1].split('/');
+  const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+  const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+
+  const currentDate = new Date(startDate);
+  const datesArray = [];
+
+  while (currentDate <= endDate) {
+    datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
+    currentDate.setDate(currentDate.getDate() + 1);
+  }
+  
+  const existingEntry = this.all_rooms_booked_dates.find(entry => entry.name === item.room_id + ' - ' + item.hotel);
+  
+  if (existingEntry) {
+    existingEntry.dates = existingEntry.dates.concat(datesArray);
+  } else {
+    this.all_rooms_booked_dates.push({
+      name: item.room_id + ' - ' + item.hotel,
+      dates: datesArray
+    });
+  }
+});
+
+
+
         },
 
         // end page load *******************************
@@ -459,8 +501,7 @@ export default {
             if (this.this_row.room_id && this.this_row.hotel) {
                 this.booked_dates = [];
                 await axios({
-                    method: "get",
-                    url: domain_url + "/backend/get_booked_dates/", params: { room_id: this.this_row.room_id, hotel: this.this_row.hotel },
+                    method: "get", url: domain_url + "/backend/get_booked_dates/", params: { room_id: this.this_row.room_id, hotel: this.this_row.hotel },
                 }).then((response) => (this.booked_dates = response.data[0].split(', ')));
 
                 this.all_booked_dates = [];
@@ -478,10 +519,8 @@ export default {
                         currentDate.setDate(currentDate.getDate() + 1);
                     }
                 });
-                console.log();
                 //copy all dates from all_booked_dates to disable_dates
                 this.all_booked_dates.forEach(element => this.disable_dates.push(element));
-
             }
         },
 
