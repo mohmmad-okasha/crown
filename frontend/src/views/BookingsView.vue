@@ -198,7 +198,7 @@
                                             </div>
                                         </div>
                                         <div class="col">
-                                            <label for="guests"> {{ $t("Number of Kids") }}</label>
+                                            <label for="guests"> {{ $t("Number of Kidss") }}</label>
                                             <input id="guests" v-model="this_row.kids_number" min="0" max="10"
                                                 :class="{ 'is-invalid': this.this_row.kids_number < 0 && this.validate, 'is-valid': this.this_row.kids_number && this.validate }"
                                                 type="number" class="form-control">
