@@ -5,13 +5,15 @@ from django.db import models
 
 class Bookings(models.Model):
     book_date = models.DateTimeField(max_length=50)
-    guest_name = models.CharField(max_length=50)
+    persons_number = models.IntegerField(max_length=50)
+    persons_names = models.CharField(max_length=200)
+    kids_number = models.IntegerField(max_length=50,default=0)
+    kids_names = models.CharField(max_length=200,blank=True)
     hotel = models.CharField(max_length=50)
     dates = models.CharField(max_length=100)
     room_id = models.CharField(max_length=50)
     room_type = models.CharField(max_length=50)
     status = models.CharField(max_length=50)
-    guests=models.CharField(max_length=100,blank=True)
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)
 
@@ -28,6 +30,7 @@ class Rooms(models.Model):
     hotel = models.CharField(max_length=50)
     room_id = models.CharField(max_length=50)  
     room_type = models.CharField(max_length=50)
+    persons = models.IntegerField(max_length=50)#persons number
     range = models.CharField(max_length=1000)
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)

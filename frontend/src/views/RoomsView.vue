@@ -160,6 +160,9 @@
                                     :class="{ 'is-invalid': !this.room.room_type && this.validate, 'is-valid': this.room.room_type && this.validate }">
                                     <option :value="$t('Single')">{{ $t("Single") }} </option>
                                     <option :value="$t('Double')">{{ $t("Double") }} </option>
+                                    <option :value="$t('Triple')">{{ $t("Triple") }} </option>
+                                    <option :value="$t('Quad')">{{ $t("Quad") }} </option>
+                                    <option :value="$t('Five')">{{ $t("Five") }} </option>
                                 </select>
                                 <div v-if="!this.room.room_type && this.validate" class="invalid-feedback hidden">
                                     {{ $t("Please Select the room type") }}
@@ -240,6 +243,7 @@ export default {
                 hotel: "",
                 room_id: "",
                 room_type: "",
+                persons: 0,
                 range: [],
                 notes: "",
                 user: "",
@@ -319,6 +323,8 @@ export default {
 
                     // convert the range array to string to save it in db
                     this.room.range = this.room.range.toString();
+
+                    this.get_persons();
                     // save room info
                     var response = await fetch(domain_url + "/backend/rooms/", {
                         method: "post",
@@ -504,7 +510,6 @@ export default {
             }).then((response) => (this.hotels = response.data[0]));
         },
 
-
         get_max_id() {
             return axios({
                 method: "get",
@@ -519,6 +524,27 @@ export default {
                 url: domain_url + "/backend/get_room_type/?room_id=" + value,
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.room.room_type = response.data[0]));
+        },
+
+        get_persons(){
+            
+            switch (this.room.room_type) {
+                        case 'Single':
+                            this.room.persons=1;
+                            break;
+                        case 'Double':
+                            this.room.persons=2;
+                            break;
+                        case 'Triple':
+                            this.room.persons=3;
+                            break;
+                        case 'Quad':
+                            this.room.persons=4;
+                            break;
+                        case 'Five':
+                            this.room.persons=5;
+                            break;
+                    }
         },
 
         open_add_modal() {

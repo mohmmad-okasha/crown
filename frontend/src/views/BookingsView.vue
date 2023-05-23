@@ -31,17 +31,17 @@
                         <table class="table-sm table ">
                             <thead>
                                 <tr>
-                                    <th>Hotel/Room</th>
+                                    <th>Room - Hotel</th>
                                     <th v-for="i in 31" :key="i" scope="col">{{ i }}</th>
                                 </tr>
                             </thead>
                             <tbody>
 
                                 <tr v-for="r in this.all_rooms_booked_dates" :key="r.name">
-                                    <td>{{ r.name }}</td> 
+                                    <td>{{ r.name }}</td>
                                     <td v-for="ii in 31" :key="ii">
-                                        <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)"
-                                            :title="r.name" type="button" class="btn btn-danger"></button>
+                                        <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)" :title="r.name"
+                                            type="button" class="btn btn-danger"></button>
                                     </td>
                                 </tr>
 
@@ -89,16 +89,16 @@
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">{{ $t("book_date") }}</th>
-                                        <th scope="col">{{ $t("guest_name") }}</th>
-                                        <th scope="col">{{ $t("hotel") }}</th>
-                                        <th scope="col">{{ $t("dates") }}</th>
-                                        <th scope="col">{{ $t("room_id") }}</th>
-                                        <th scope="col">{{ $t("room_type") }}</th>
-                                        <th scope="col">{{ $t("status") }}</th>
-                                        <th scope="col">{{ $t("guests") }}</th>
-                                        <th scope="col">{{ $t("notes") }}</th>
-                                        <th scope="col">{{ $t("user") }}</th>
+                                        <th scope="col">{{ $t("Dook Date") }}</th>
+                                        <th scope="col">{{ $t("Guest") }}</th>
+                                        <th scope="col">{{ $t("Hotel") }}</th>
+                                        <th scope="col">{{ $t("Dates") }}</th>
+                                        <th scope="col">{{ $t("Room ID") }}</th>
+                                        <th scope="col">{{ $t("Room Type") }}</th>
+                                        <th scope="col">{{ $t("Status") }}</th>
+                                        <th scope="col">{{ $t("Guests") }}</th>
+                                        <th scope="col">{{ $t("Notes") }}</th>
+                                        <th scope="col">{{ $t("User") }}</th>
                                         <th scope="col" class="no_print">{{ $t("Actions") }}</th>
                                     </tr>
                                 </thead>
@@ -111,7 +111,7 @@
                                         <td>{{ booking.book_date }}</td>
                                         <td>{{ $t(booking.guest_name) }}</td>
                                         <td>{{ $t(booking.hotel) }}</td>
-                                        <td>{{ $t(booking.dates.substr(0, 20)) }}</td>
+                                        <td>{{ $t(booking.dates) }}</td>
                                         <td>{{ $t(booking.room_id) }}</td>
                                         <td>{{ $t(booking.room_type) }}</td>
                                         <td>{{ $t(booking.status) }}</td>
@@ -156,9 +156,6 @@
             </div>
         </div>
 
-        <!-- to get search value from navbar -->
-        <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
-
         <!-- modal -->
         <div class="modal  fade" id="addModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
             aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -184,12 +181,50 @@
                                 </div>
                             </div>
 
-                            <div class="form-group">
-                                <label for="guest_name">{{ $t("guest name") }}</label>
-                                <input id="guest_name" v-model="this_row.guest_name" type="text" class="form-control"
-                                    :class="{ 'is-invalid': !this.this_row.guest_name && this.validate, 'is-valid': this.this_row.guest_name && this.validate }">
-                                <div v-if="!this.this_row.guest_name && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select guest_name") }}
+                            <div class="card form-group">
+                                <div class="card-header">
+                                    {{ $t("Guests") }}
+                                </div>
+                                <div class="card-body">
+
+                                    <div class="row g-3 form-group">
+                                        <div class="col">
+                                            <label for="guests"> {{ $t("Number of Persons") }}</label>
+                                            <input id="guests" v-model="this_row.persons_number" min="0" max="10"
+                                                :class="{ 'is-invalid': !this.this_row.persons_number && this.validate, 'is-valid': this.this_row.persons_number && this.validate }"
+                                                type="number" class="form-control">
+                                            <div v-if="!this.this_row.persons_number && this.validate"
+                                                class="invalid-feedback hidden">
+                                                {{ $t("Please Enter The Number of Persons") }}
+                                            </div>
+                                        </div>
+                                        <div class="col">
+                                            <label for="guests"> {{ $t("Number of Kids") }}</label>
+                                            <input id="guests" v-model="this_row.kids_number" min="0" max="10"
+                                                :class="{ 'is-invalid': !this.this_row.kids_number && this.validate, 'is-valid': this.this_row.kids_number && this.validate }"
+                                                type="number" class="form-control">
+                                            <div v-if="!this.this_row.kids_number && this.validate"
+                                                class="invalid-feedback hidden">
+                                                {{ $t("Please Enter The Number of Persons") }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="this_row.persons_number > 0">
+                                    <div v-for=" i in parseInt(this_row.persons_number)" :key="i" class="form-group">
+                                        <label>{{ $t("Person Name ") + i }}</label>
+                                        <input  v-model="this_row.persons_names[i-1]" type="text"
+                                            class="form-control">
+                                    </div>
+                                    </div>
+
+                                    <div v-if="this_row.kids_number > 0">
+                                    <div v-for=" i in parseInt(this_row.kids_number)" :key="i" class="form-group">
+                                        <label>{{ $t("Kids Name ") + i }}</label>
+                                        <input v-model="this_row.kids_names[i-1]" type="text"
+                                            class="form-control">
+                                    </div>
+                                    </div>
+
                                 </div>
                             </div>
 
@@ -227,16 +262,6 @@
                                     <date-picker v-model="this_row.dates" :min="min_date" :max="max_date"
                                         :disable="disable_dates" range clearable locale="en" inline :auto-submit="true"
                                         custom-input="none" color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY" />
-                                </div>
-                            </div>
-
-                            <div class="form-group ">
-                                <label for="guests"> {{ $t("guests") }}</label>
-                                <input id="guests" v-model="this_row.guests"
-                                    :class="{ 'is-invalid': !this.this_row.guests && this.validate, 'is-valid': this.this_row.guests && this.validate }"
-                                    type="number" class="form-control">
-                                <div v-if="!this.this_row.guests && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Enter The guests") }}
                                 </div>
                             </div>
 
@@ -284,6 +309,10 @@
             </div>
         </div>
 
+        <!-- to get search value from navbar -->
+        <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
+
+
     </div>
 </template>
 
@@ -324,7 +353,6 @@ export default {
             booked_dates: [],
             all_booked_dates: [],//all dates in booked_dates ranges for selected room
             all_rooms_booked_dates: [],//all dates in booked_dates ranges for all room
-
             min_date: '',
             max_date: '',
             disable_dates: [],
@@ -332,7 +360,6 @@ export default {
             //////
             this_row: {
                 book_date: new Date().toISOString().slice(0, 16),
-                guest_name: "",
                 hotel: "",
                 room_id: "",
                 room_type: "",
@@ -341,6 +368,10 @@ export default {
                 guests: "",
                 status: "",
                 notes: "",
+                persons_number: 0,
+                persons_names: [],
+                kids_number: 0,
+                kids_names: [],
                 user: "",
             },
             //////
@@ -359,6 +390,11 @@ export default {
     ////////////////////
     watch: {
         'this_row.hotel': function (newValue) {
+            if (this.edit_mode || this.add_mode) {
+                this.get_rooms()
+            }
+        },
+        'this_row.persons_number': function (newValue) {
             if (this.edit_mode || this.add_mode) {
                 this.get_rooms()
             }
@@ -439,13 +475,7 @@ export default {
 
         async get_monitor() {
 
-            // this.booking_rows.forEach(item => {
-            //     this.all_rooms_booked_dates.push({
-            //         name: item.room_id + ' - '+ item.hotel,
-            //         dates: item.dates
-            //     });
-            // });
-
+            //get all booked dates for all rooms
             this.booking_rows.forEach(item => {
                 const minDateParts = item.dates.split(',')[0].split('/');
                 const maxDateParts = item.dates.split(',')[1].split('/');
@@ -455,7 +485,7 @@ export default {
                 const currentDate = new Date(startDate);
                 const datesArray = [];
 
-                while (currentDate <= endDate) {
+                while (currentDate < endDate) {
                     datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
                     currentDate.setDate(currentDate.getDate() + 1);
                 }
@@ -481,15 +511,15 @@ export default {
 
         // insert form *******************************
 
-        async get_rooms() {
-            try {
-                const response = await axios.get(`${domain_url}/backend/get_rooms/?hotel=${this.this_row.hotel}`);
-                this.rooms = response.data;
-            } catch (error) {
-                console.error("Error fetching rooms:", error);
-            }
-        },
 
+
+        get_rooms() {
+            return axios({
+                method: "get",
+                url: domain_url + "/backend/get_rooms/", params: { hotel: this.this_row.hotel, persons: this.this_row.persons_number },
+                //auth: { username: "admin", password: "123", },
+            }).then((response) => (this.rooms = response.data));
+        },
         get_room_info(value) {
             return axios({
                 method: "get",
@@ -564,13 +594,15 @@ export default {
         },
 
         clear_form() {
-            this.this_row.guest_name = '';
+            this.this_row.persons_names = [];
+            this.this_row.kids_names = [];
+            this.this_row.persons_number = '';
+            this.this_row.kids_number = '';
             this.this_row.hotel = '';
             this.this_row.dates = '';
             this.this_row.room_id = '';
             this.this_row.room_type = '';
             this.this_row.status = '';
-            this.this_row.guests = '';
             this.this_row.notes = '';
             this.enable_dates = [];
             this.disable_dates = [];
@@ -590,6 +622,9 @@ export default {
                 if (this.check_form()) {
                     // convert the dates array to string to save it in db
                     this.this_row.dates = this.this_row.dates.toString();
+                    this.this_row.persons_names = this.this_row.persons_names.join(',');
+                    this.this_row.kids_names = this.this_row.kids_names.join(',');
+                    alert (this.this_row.persons_names)
                     var response = await fetch(domain_url + "/backend/bookings/", {
                         method: "post",
                         headers: { "Content-Type": "application/json", },
@@ -645,6 +680,8 @@ export default {
         async row_click(index) {
             await this.get_booking(index);//get this row data
             this.this_row.dates = Array.from(this.this_row.dates.split(","));
+            this.this_row.persons_names = Array.from(this.this_row.persons_names.split(","));
+            this.this_row.kids_names = Array.from(this.this_row.kids_names.split(","));
             this.get_room_info(this.this_row.room_id);
             //await this.get_room_info(this.this_row.room_id);
             //await this.findMinMaxDate();
@@ -656,13 +693,14 @@ export default {
 
             if (
                 this.this_row.book_date &&
-                this.this_row.guest_name &&
+                this.this_row.persons_number &&
+                this.this_row.persons_names &&
+                this.this_row.kids_number &&
                 this.this_row.hotel &&
                 this.this_row.dates &&
                 this.this_row.room_id &&
                 this.this_row.room_type &&
-                this.this_row.status &&
-                this.this_row.guests
+                this.this_row.status 
             ) {
                 return true
             } else {
@@ -678,7 +716,6 @@ export default {
                 console.error("Error fetching max ID:", error);
             }
         },
-
 
 
         // context menu ***************************
