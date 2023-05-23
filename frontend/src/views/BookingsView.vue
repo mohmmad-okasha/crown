@@ -210,20 +210,31 @@
                                         </div>
                                     </div>
                                     <div v-if="this_row.persons_number > 0">
-                                    <div v-for=" i in parseInt(this_row.persons_number)" :key="i" class="form-group">
-                                        <label>{{ $t("Person Name ") + i }}</label>
-                                        <input  v-model="this_row.persons_names[i-1]" type="text"
-                                            class="form-control">
-                                    </div>
+                                        <div v-for=" i in parseInt(this_row.persons_number)" :key="i" class="form-group">
+                                            <label>{{ $t("Person Name ") + i }}</label>
+                                            <input v-model="this_row.persons_names[i - 1]" type="text" class="form-control"
+                                            :class="{ 'is-invalid': !this_row.persons_names[i-1] && validate, 'is-valid': this_row.persons_names[i-1] && validate }"
+                                            >
+                                            <div v-if="!this_row.persons_names[i - 1] && validate"
+                                                class="invalid-feedback hidden">
+                                                {{ $t("Please Enter The Name of Person") + i }}
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div v-if="this_row.kids_number > 0">
-                                    <div v-for=" i in parseInt(this_row.kids_number)" :key="i" class="form-group">
-                                        <label>{{ $t("Kids Name ") + i }}</label>
-                                        <input v-model="this_row.kids_names[i-1]" type="text"
-                                            class="form-control">
+                                        <div v-for=" i in parseInt(this_row.kids_number)" :key="i" class="form-group">
+                                            <label>{{ $t("Person Name ") + i }}</label>
+                                            <input v-model="this_row.kids_names[i - 1]" type="text" class="form-control"
+                                            :class="{ 'is-invalid': !this_row.kids_names[i-1] && validate, 'is-valid': this_row.kids_names[i-1] && validate }"
+                                            >
+                                            <div v-if="!this_row.kids_names[i - 1] && validate"
+                                                class="invalid-feedback hidden">
+                                                {{ $t("Please Enter The Name of Kids") + i }}
+                                            </div>
+                                        </div>
                                     </div>
-                                    </div>
+
 
                                 </div>
                             </div>
@@ -511,8 +522,6 @@ export default {
 
         // insert form *******************************
 
-
-
         get_rooms() {
             return axios({
                 method: "get",
@@ -520,6 +529,7 @@ export default {
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.rooms = response.data));
         },
+
         get_room_info(value) {
             return axios({
                 method: "get",
@@ -624,7 +634,7 @@ export default {
                     this.this_row.dates = this.this_row.dates.toString();
                     this.this_row.persons_names = this.this_row.persons_names.join(',');
                     this.this_row.kids_names = this.this_row.kids_names.join(',');
-                    alert (this.this_row.persons_names)
+                    alert(this.this_row.persons_names)
                     var response = await fetch(domain_url + "/backend/bookings/", {
                         method: "post",
                         headers: { "Content-Type": "application/json", },
@@ -700,7 +710,7 @@ export default {
                 this.this_row.dates &&
                 this.this_row.room_id &&
                 this.this_row.room_type &&
-                this.this_row.status 
+                this.this_row.status
             ) {
                 return true
             } else {
