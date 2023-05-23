@@ -132,13 +132,13 @@ def get_room_id(request):
 
 #####################################################################################
 
-@api_view(['GET'])
-def get_room_dates_old(request):
-    room_id = str(request.query_params['room_id'])
-    hotel = request.query_params['hotel']
+# @api_view(['GET'])
+# def get_room_dates_old(request):
+#     room_id = str(request.query_params['room_id'])
+#     hotel = request.query_params['hotel']
 
-    room_dates = Rooms.objects.values_list('dates',flat=True).filter(room_id=room_id).filter(hotel=hotel)
-    return Response ({room_dates[0]})
+#     room_dates = Rooms.objects.values_list('dates',flat=True).filter(room_id=room_id).filter(hotel=hotel)
+#     return Response ({room_dates[0]})
 
 
 #####################################################################################
@@ -150,7 +150,6 @@ def get_room_dates(request):
     room_dates = Room_dates.objects.values_list('date',flat=True).filter(room_id_id=room_id).filter(hotel=hotel)
     
     return Response ({room_dates[0]})
-
 
 #####################################################################################
 
@@ -196,25 +195,17 @@ def get_booked_rooms(request):
 ##################################################################################################################
 @api_view(['GET'])
 def get_open_rooms(request):
-    open = Bookings.objects.raw("select id,(hotel || ' / ' || room_id) as room, GROUP_CONCAT(dates, ',') AS all_dates from backend_bookings where status!='Booked' group by room")
-    
-    # Convert RawQuerySet to list of dictionaries
-    booked_rooms = []
-    for booking in booked:
-        booked_rooms.append({
-            'id': booking.id,
-            'room': booking.room,
-            'dates': booking.all_dates
-        })
-    pending_rooms = []
-    for booking in pending:
-        pending_rooms.append({
-            'id': booking.id,
-            'room': booking.room,
-            'dates': booking.all_dates
-        })
-    
-    return Response({"booked_rooms": booked_rooms,"pending_rooms": pending_rooms})
+    rooms = Rooms.objects.all()
+    response_data = []
+
+    for room in rooms:
+        room_data = {
+            'name': room.room_id +' - '+ room.hotel,
+            'dates': list(room.room_dates_set.values_list('date', flat=True))
+        }
+        response_data.append(room_data)
+
+    return JsonResponse(response_data, safe=False)
 
 ##################################################################################################################
 

@@ -27,6 +27,7 @@ class Bookings(models.Model):
 #####################################################################################
 
 class Rooms(models.Model):
+    id = models.AutoField(primary_key=True)
     hotel = models.CharField(max_length=50)
     room_id = models.CharField(max_length=50)  
     room_type = models.CharField(max_length=50)
