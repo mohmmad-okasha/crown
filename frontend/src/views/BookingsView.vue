@@ -378,7 +378,7 @@ export default {
                 notes: "",
                 persons_number: 1,
                 persons_names: [],
-                kids_number: 0,
+                kids_number: '',
                 kids_names: [],
                 user: "",
             },
@@ -646,7 +646,7 @@ export default {
 
             $('#addModal').modal('toggle');
         },
-
+  
         clear_form() {
             this.this_row.persons_names = [];
             this.this_row.kids_names = [];
