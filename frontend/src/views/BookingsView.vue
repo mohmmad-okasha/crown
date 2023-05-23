@@ -651,7 +651,7 @@ export default {
             this.this_row.persons_names = [];
             this.this_row.kids_names = [];
             this.this_row.persons_number = 1;
-            this.this_row.kids_number = 0;
+            this.this_row.kids_number = '';
             this.this_row.hotel = '';
             this.this_row.dates = '';
             this.this_row.room_id = '';
