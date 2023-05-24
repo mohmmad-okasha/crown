@@ -290,7 +290,13 @@
                                 <textarea class="form-control" v-model="this_row.notes" id="cutomer_notes"
                                     rows="1"></textarea>
                             </div>
-
+                            <div class="form-check">
+                                <input v-model="print" class="form-check-input" type="checkbox" value=""
+                                    id="flexCheckChecked" checked>
+                                <label class="form-check-label" for="flexCheckChecked">
+                                    Print
+                                </label>
+                            </div>
                         </form>
 
                     </div>
@@ -318,6 +324,104 @@
 
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
+
+
+
+        <!-- Data Card -->
+        <div v-show="this.this_row.id" class="col-xl-12 center">
+            <div class="card shadow mb-4">
+                <!-- Card Header - Dropdown -->
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">{{ $t("Bookings Data") }} </h6>
+                    <div class="dropdown no-arrow">
+                    </div>
+                </div>
+                <div id="booking_data" class="card-body">
+                    <h1>Booking #{{ this.this_row.id }}</h1>
+                    <p><b>Booking Date:</b> {{ this.this_row.book_date }} <b>User:</b> {{ this.this_row.user }}</p>
+
+                    <div class="container text-center">
+                        <div class="row">
+                            <div class="col">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Persons Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(person, index) in this.this_row.persons_names" :key="index">
+                                            <td>{{ person }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Kids Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(kids, index) in this.this_row.kids_names" :key="index">
+                                            <td>{{ kids }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col">
+                                <div class="col-auto">
+                                    <label class="col-form-label"><b>Hotel:</b> {{ this.this_row.hotel }}</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="col-auto">
+                                    <label class="col-form-label"><b>Room:</b> {{ this.this_row.room_id }}</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="col-auto">
+                                    <label class="col-form-label"><b>Room Type:</b> {{ this.this_row.room_type }}</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="col-auto">
+                                    <label class="col-form-label"><b>Status:</b> {{ this.this_row.status }}</label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col">
+                                <div class="col-auto">
+                                    <label class="col-form-label"><b>Date Range:</b> {{ 'From :' + this.this_row.dates[0] +
+                                        ' To :' +
+                                        this.this_row.dates[1] }}</label>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="col-auto">
+                                    <label class="col-form-label"><b>Notes:</b> {{ this.this_row.notes }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br><hr>
+                    <button type="button" title="print" @click="PrintDiv('booking_data')"
+                        class="btn btn-primary on-hover-sm no_print">
+                        <i class="fa fa-print"></i></button>
+                </div>
+            </div>
+        </div>
+
+
+        <div>
+
+        </div>
 
 
     </div>
@@ -349,6 +453,7 @@ export default {
 
     data() {
         return {
+            print: true, //to print after save
             validate: false, //for check forms
             active_index: null,//current id
             edit_mode: false,//edit form open
@@ -469,9 +574,6 @@ export default {
     },
 
     created() {
-
-
-
     },
 
     ////////////////////
@@ -609,6 +711,20 @@ export default {
             }
         },
 
+        PrintDiv(id) {
+            var divToPrint = document.getElementById(id);
+            var popupWin = window.open('', '_blank', 'width=100000,height=10000');
+            document.getElementById('head_txt').style.display = "block";
+            document.getElementById('head_txt').innerHTML = this.$t("Flights");
+            popupWin.document.write('<link href="static/css/sb-admin-2.min.css" rel="stylesheet">');
+            popupWin.document.write('<link href="static/css/reports.css" rel="stylesheet">');
+            popupWin.document.write('<style>body{background-color:white !important;}</style>');
+            popupWin.document.write('<iframe src="static/parts/report_head.html" width="100%" height="200px" frameBorder="0"></iframe>');
+            popupWin.document.write('<html><body onload="window.print()"> ' + divToPrint.innerHTML + '</html>');
+            document.getElementById('head_txt').style.display = "none";
+            popupWin.document.close();
+        },
+
         // end insert form *******************************
 
 
@@ -646,7 +762,7 @@ export default {
 
             $('#addModal').modal('toggle');
         },
-  
+
         clear_form() {
             this.this_row.persons_names = [];
             this.this_row.kids_names = [];
@@ -674,6 +790,9 @@ export default {
         async save_booking() {
             try {
                 if (this.check_form()) {
+                    if (this.print) {
+                        this.PrintDiv('booking_data');
+                    }
                     // convert the dates array to string to save it in db
                     if (this.this_row.dates.length > 1) { this.this_row.dates = this.this_row.dates.toString(); }
                     this.this_row.persons_names = this.this_row.persons_names.join(',');
@@ -685,6 +804,7 @@ export default {
                     });
 
                     swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
+
                     this.get_booking_rows();
                     this.get_max_id();
                     this.closeModal();
@@ -710,6 +830,9 @@ export default {
         async update_booking(id) {
             try {
                 if (this.check_form()) {
+                    if (this.print) {
+                        await this.PrintDiv('booking_data');
+                    }
                     // convert the dates array to string to save it in db
                     this.this_row.dates = this.this_row.dates.toString();
                     var response = await fetch(domain_url + "/backend/bookings/" + id + "/", {
@@ -746,7 +869,7 @@ export default {
 
             if (
                 this.this_row.book_date &&
-                this.this_row.persons_number > 1 &&
+                this.this_row.persons_number &&
                 this.this_row.persons_names &&
                 //this.this_row.kids_number >0 &&
                 this.this_row.hotel &&
@@ -757,6 +880,7 @@ export default {
             ) {
                 return true
             } else {
+                alert(false)
                 return false
             }
         },
