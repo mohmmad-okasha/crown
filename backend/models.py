@@ -9,6 +9,7 @@ class Bookings(models.Model):
     persons_names = models.CharField(max_length=200)
     kids_number = models.IntegerField(max_length=50,default=0)
     kids_names = models.CharField(max_length=200,blank=True)
+    kids_ages = models.CharField(max_length=200,blank=True)
     hotel = models.CharField(max_length=50)
     dates = models.CharField(max_length=100)
     room_id = models.CharField(max_length=50)

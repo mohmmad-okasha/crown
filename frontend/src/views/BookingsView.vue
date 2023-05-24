@@ -85,7 +85,7 @@
                         <div id="main_table" class="table-responsive">
                             <table class="table table-hover">
                                 <thead class="sticky_header">
-                                    <tr> 
+                                    <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">{{ $t("Booking on") }}</th>
                                         <th scope="col">{{ $t("Names") }}</th>
@@ -107,8 +107,8 @@
                                         :class="{ 'selected': booking.id === active_index }">
                                         <th scope="row" id="id">{{ booking.id }}</th>
                                         <td>{{ booking.book_date }}</td>
-                                        <td>{{ $t(booking.persons_names +' , '+ booking.kids_names) }}</td>
-                                        <td>{{ $t(booking.persons_number+booking.kids_number) }}</td>
+                                        <td>{{ $t(booking.persons_names + ' , ' + booking.kids_names) }}</td>
+                                        <td>{{ $t(booking.persons_number + booking.kids_number) }}</td>
                                         <td>{{ $t(booking.hotel) }}</td>
                                         <td>{{ $t(booking.dates) }}</td>
                                         <td>{{ $t(booking.room_id) }}</td>
@@ -207,9 +207,10 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div v-if="this_row.persons_number > 0">
                                         <div v-for=" i in parseInt(this_row.persons_number)" :key="i" class="form-group">
-                                            <label>{{ $t("Person Name ") + i }}</label>
+                                            <label>{{ $t("Full Name Of Person") + i }}</label>
                                             <input v-model="this_row.persons_names[i - 1]" type="text" class="form-control"
                                                 :class="{ 'is-invalid': !this_row.persons_names[i - 1] && validate, 'is-valid': this_row.persons_names[i - 1] && validate }">
                                             <div v-if="!this_row.persons_names[i - 1] && validate"
@@ -221,12 +222,28 @@
 
                                     <div v-if="this_row.kids_number > 0">
                                         <div v-for=" i in parseInt(this_row.kids_number)" :key="i" class="form-group">
-                                            <label>{{ $t("Kids Name ") + i }}</label>
-                                            <input v-model="this_row.kids_names[i - 1]" type="text" class="form-control"
-                                                :class="{ 'is-invalid': !this_row.kids_names[i - 1] && validate, 'is-valid': this_row.kids_names[i - 1] && validate }">
-                                            <div v-if="!this_row.kids_names[i - 1] && validate"
-                                                class="invalid-feedback hidden">
-                                                {{ $t("Please Enter The Name of Kids") + i }}
+                                            <div class="row">
+                                                <div class="col">
+                                                    <label>{{ $t("Kids Name ") + i }}</label>
+                                                    <input v-model="this_row.kids_names[i - 1]" type="text"
+                                                        class="form-control"
+                                                        :class="{ 'is-invalid': !this_row.kids_names[i - 1] && validate, 'is-valid': this_row.kids_names[i - 1] && validate }">
+                                                    <div v-if="!this_row.kids_names[i - 1] && validate"
+                                                        class="invalid-feedback hidden">
+                                                        {{ $t("Please Enter The Name of Kids") + i }}
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <label>{{ $t("Kids Age ") + i }}</label>
+                                                    <input v-model="this_row.kids_ages[i - 1]" type="text"
+                                                        class="form-control"
+                                                        :class="{ 'is-invalid': !this_row.kids_ages[i - 1] && validate, 'is-valid': this_row.kids_ages[i - 1] && validate }">
+                                                    <div v-if="!this_row.kids_ages[i - 1] && validate"
+                                                        class="invalid-feedback hidden">
+                                                        {{ $t("Please Enter The Name of Kids") + i }}
+                                                    </div>
+                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
@@ -327,7 +344,7 @@
 
 
         <!-- Data Card -->
-        <div v-show="this.this_row.id" class="col-xl-12 center">
+        <div v-show="this.this_row.persons_names.length>0" class="col-xl-12 center">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -365,6 +382,20 @@
                                     <tbody>
                                         <tr v-for="(kids, index) in this.this_row.kids_names" :key="index">
                                             <td>{{ kids }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="col">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Kids Age</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(age, index) in this.this_row.kids_ages" :key="index">
+                                            <td>{{ age }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -486,6 +517,7 @@ export default {
                 persons_names: [],
                 kids_number: '',
                 kids_names: [],
+                kids_ages: [],
                 user: "",
             },
             //////
@@ -798,6 +830,7 @@ export default {
                     if (this.this_row.dates.length > 1) { this.this_row.dates = this.this_row.dates.toString(); }
                     this.this_row.persons_names = this.this_row.persons_names.join(',');
                     this.this_row.kids_names = this.this_row.kids_names.join(',');
+                    this.this_row.kids_ages = this.this_row.kids_ages.join(',');
                     var response = await fetch(domain_url + "/backend/bookings/", {
                         method: "post",
                         headers: { "Content-Type": "application/json", },
@@ -836,6 +869,9 @@ export default {
                     }
                     // convert the dates array to string to save it in db
                     this.this_row.dates = this.this_row.dates.toString();
+                    this.this_row.persons_names = this.this_row.persons_names.join(',');
+                    this.this_row.kids_names = this.this_row.kids_names.join(',');
+                    this.this_row.kids_ages = this.this_row.kids_ages.join(',');
                     var response = await fetch(domain_url + "/backend/bookings/" + id + "/", {
                         method: "PUT",
                         headers: { "Content-Type": "application/json", },
@@ -859,6 +895,7 @@ export default {
             this.this_row.dates = Array.from(this.this_row.dates.split(","));
             this.this_row.persons_names = Array.from(this.this_row.persons_names.split(","));
             this.this_row.kids_names = Array.from(this.this_row.kids_names.split(","));
+            this.this_row.kids_ages = Array.from(this.this_row.kids_ages.split(","));
             this.get_room_info(this.this_row.room_id);
             //await this.get_room_info(this.this_row.room_id);
             //await this.findMinMaxDate();
@@ -881,7 +918,6 @@ export default {
             ) {
                 return true
             } else {
-                alert(false)
                 return false
             }
         },
