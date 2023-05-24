@@ -12,7 +12,7 @@
                     <i class="fa fa-pen-to-square"></i>
                     {{ $t("Edit") }}
                 </li>
-                <li class="dropdown-item">
+                <li class="dropdown-item" @click="PrintDiv('booking_data')">
                     <i class="fa fa-print"></i>
                     {{ $t("Print") }}
                 </li>
@@ -27,16 +27,15 @@
                     <h6 class="m-0 font-weight-bold text-primary">{{ $t("Bookings Monitor") }} </h6>
                 </div>
                 <div id="table" class="card-body">
-                    <div class="table-responsive">
+                    <div id="monitor_table" class="table-responsive">
                         <table class="table-sm table ">
-                            <thead>
+                            <thead class="sticky_header">
                                 <tr>
                                     <th>Room - Hotel</th>
                                     <th v-for="i in 31" :key="i" scope="col">{{ i }}</th>
                                 </tr>
                             </thead>
                             <tbody>
-
                                 <tr v-for="r in this.all_rooms_booked_dates" :key="r.name">
                                     <td>{{ r.name }}</td>
                                     <td v-for="ii in 31" :key="ii" :id="r.name + '_' + ii.toString().padStart(2, '0')">
@@ -83,19 +82,19 @@
                 <div id="table" class="card-body">
                     <div class="card-header cnter" style="display: none;" id="head_txt"></div>
                     <form class="site-form-table">
-                        <div class="table-responsive">
+                        <div id="main_table" class="table-responsive">
                             <table class="table table-hover">
-                                <thead>
-                                    <tr>
+                                <thead class="sticky_header">
+                                    <tr> 
                                         <th scope="col">#</th>
-                                        <th scope="col">{{ $t("Dook Date") }}</th>
-                                        <th scope="col">{{ $t("Guest") }}</th>
+                                        <th scope="col">{{ $t("Booking on") }}</th>
+                                        <th scope="col">{{ $t("Names") }}</th>
+                                        <th scope="col">{{ $t("Number") }}</th>
                                         <th scope="col">{{ $t("Hotel") }}</th>
-                                        <th scope="col">{{ $t("Dates") }}</th>
+                                        <th scope="col">{{ $t("Duration") }}</th>
                                         <th scope="col">{{ $t("Room ID") }}</th>
                                         <th scope="col">{{ $t("Room Type") }}</th>
                                         <th scope="col">{{ $t("Status") }}</th>
-                                        <th scope="col">{{ $t("Guests") }}</th>
                                         <th scope="col">{{ $t("Notes") }}</th>
                                         <th scope="col">{{ $t("User") }}</th>
                                         <th scope="col" class="no_print">{{ $t("Actions") }}</th>
@@ -108,13 +107,13 @@
                                         :class="{ 'selected': booking.id === active_index }">
                                         <th scope="row" id="id">{{ booking.id }}</th>
                                         <td>{{ booking.book_date }}</td>
-                                        <td>{{ $t(booking.guest_name) }}</td>
+                                        <td>{{ $t(booking.persons_names +' , '+ booking.kids_names) }}</td>
+                                        <td>{{ $t(booking.persons_number+booking.kids_number) }}</td>
                                         <td>{{ $t(booking.hotel) }}</td>
                                         <td>{{ $t(booking.dates) }}</td>
                                         <td>{{ $t(booking.room_id) }}</td>
                                         <td>{{ $t(booking.room_type) }}</td>
                                         <td>{{ $t(booking.status) }}</td>
-                                        <td>{{ $t(booking.guests) }}</td>
                                         <td>{{ $t(booking.notes) }}</td>
                                         <td>{{ $t(booking.user) }}</td>
 
@@ -136,7 +135,7 @@
                                                         <i class="fa fa-pen-to-square"></i>
                                                         {{ $t("Edit") }}
                                                     </a>
-                                                    <a class="dropdown-item">
+                                                    <a class="dropdown-item" @click="PrintDiv('booking_data')">
                                                         <i class="fa fa-print"></i>
                                                         {{ $t("Print") }}
                                                     </a>
@@ -332,7 +331,7 @@
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">{{ $t("Bookings Data") }} </h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ $t("Details") }} </h6>
                     <div class="dropdown no-arrow">
                     </div>
                 </div>
@@ -410,10 +409,12 @@
                             </div>
                         </div>
                     </div>
-                    <br><hr>
-                    <button type="button" title="print" @click="PrintDiv('booking_data')"
-                        class="btn btn-primary on-hover-sm no_print">
-                        <i class="fa fa-print"></i></button>
+
+                    <div class="modal-footer">
+                        <button type="button" title="print" @click="PrintDiv('booking_data')"
+                            class="btn btn-primary on-hover-sm no_print">
+                            <i class="fa fa-print"></i></button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -566,7 +567,7 @@ export default {
                 return axios({
                     method: "get",
                     url: domain_url + "/backend/bookings/?search=" + data,
-                }).then((response) => (this.this_row = response.data));
+                }).then((response) => (this.booking_rows = response.data));
             } else {
                 this.get_booking_rows();
             }

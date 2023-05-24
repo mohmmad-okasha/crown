@@ -258,7 +258,7 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
             queryset = queryset.filter(id=id)
         search = self.request.query_params.get('search')
         if search is not None:
-            queryset = queryset.filter(Q(id__contains=search) | Q(status__contains=search) )
+            queryset = queryset.filter(Q(id__contains=search) | Q(status__contains=search) | Q(room_id__contains=search) | Q(hotel__contains=search) | Q(room_type__contains=search) | Q(notes__contains=search)| Q(user__contains=search) )
         return queryset
 
     def put(self, request, *args, **kwargs):

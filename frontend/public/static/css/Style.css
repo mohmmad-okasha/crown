@@ -2,6 +2,20 @@ body {
    background-color: darkgray;
 }
 
+#main_table{
+   height: 36vh !important;
+}
+#monitor_table{
+   height: 18vh !important;
+}
+
+/* .sticky_header{
+   position:sticky;
+   top: 0 ;
+   background-color: #ffffff;
+   z-index: 1;
+} */
+
 .hand-mouse {
    cursor: pointer;
 }
