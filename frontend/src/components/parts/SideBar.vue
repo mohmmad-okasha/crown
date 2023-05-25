@@ -32,10 +32,27 @@
 
       <!-- Nav Item - Pages Collapse Menu -->
       <li class="nav-item">
-        <a class="nav-link collapsed" href="" aria-expanded="true" aria-controls="collapseTwo">
+        <a class="nav-link collapsed" href="#" aria-expanded="true" aria-controls="collapseTwo">
           <i class="fa fa-user"></i>
           <span>{{ this.user_name }}</span>
         </a>
+      </li>
+
+      <!-- Booking Menu -->
+      <li class="nav-item">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#booking_menu"
+          aria-expanded="true" aria-controls="booking_menu">
+          <i class="fas fa fa-hotel"></i>
+          <span>{{ $t("Booking") }}</span>
+        </a>
+        <div id="booking_menu" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <router-link tag="a" class="collapse-item" to="/available_hotel"> {{ $t("Available Hotel") }} </router-link>
+            <router-link tag="a" class="collapse-item" to="/rooms"> {{ $t("Rooms") }} </router-link>
+            <router-link tag="a" class="collapse-item" to="/bookings"> {{ $t("Bookings") }} </router-link>
+
+          </div>
+        </div>
       </li>
 
       <li class="nav-item">

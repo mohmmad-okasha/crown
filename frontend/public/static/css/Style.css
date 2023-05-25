@@ -5,9 +5,7 @@ body {
 #main_table{
    height: 36vh !important;
 }
-#monitor_table{
-   height: 18vh !important;
-}
+
 
 /* .sticky_header{
    position:sticky;
