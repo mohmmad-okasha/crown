@@ -195,13 +195,48 @@ def get_booked_rooms(request):
 ##################################################################################################################
 @api_view(['GET'])
 def get_open_rooms(request):
-    rooms = Rooms.objects.all()
+    hotel = str(request.query_params['hotel'])
+    room_type = str(request.query_params['room_type'])
+
+    if(hotel and room_type):
+        rooms = Rooms.objects.filter(hotel=hotel).filter(room_type=room_type).all()
+    elif(hotel):
+        rooms = Rooms.objects.filter(hotel=hotel).all()
+    else:
+        rooms = Rooms.objects.all()
+    
     response_data = []
 
     for room in rooms:
         room_data = {
             'name': room.room_id +' - '+ room.hotel,
             'dates': list(room.room_dates_set.values_list('date', flat=True))
+        }
+        response_data.append(room_data)
+
+    return JsonResponse(response_data, safe=False)
+
+##################################################################################################################
+
+
+
+@api_view(['GET'])
+def get_close_rooms(request):
+    hotel = str(request.query_params['hotel'])
+    room_type = str(request.query_params['room_type'])
+
+    if(hotel and room_type):
+        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates from backend_bookings where status='Booked' group by room")
+    elif(hotel):
+        rooms = Bookings.objects.filter(hotel=hotel).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates from backend_bookings where status='Booked' group by room")
+    else:
+        rooms = Bookings.objects.raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates from backend_bookings where status='Booked' group by room")
+    response_data = []
+
+    for room in rooms:
+        room_data = {
+            'name': room.room,
+            'dates': room.all_dates
         }
         response_data.append(room_data)
 

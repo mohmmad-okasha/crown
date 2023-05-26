@@ -38,6 +38,7 @@ urlpatterns += [
     path("get_room_info/", api.get_room_info, name="get_room_info"),
 
     path("get_open_rooms/", api.get_open_rooms, name="get_open_rooms"),
+    path("get_close_rooms/", api.get_close_rooms, name="get_close_rooms"),
 
     path("get_room_id/", api.get_room_id, name="get_room_type"),
 
