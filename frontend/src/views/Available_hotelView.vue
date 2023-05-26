@@ -101,15 +101,14 @@ export default {
         }
     },
     async mounted() {
-
         await this.get_hotels();
         await this.get_monitor();
+        await this.create_closed();
         //to remove modal background on auto vue js reload
         const elements = document.getElementsByClassName("modal-backdrop fade show");
         while (elements.length > 0) {
             elements[0].parentNode.removeChild(elements[0]);
         }////
-
     },
     ////////////////////
     computed: {
@@ -124,44 +123,29 @@ export default {
                 //this.get_booking_rows();
             }
         },
-
     },
     watch: {
-        date_range: function (newValue) {
-            let min_date = newValue[0];
-            let max_date = newValue[1];
-
-            const minDateParts = min_date.split('/');
-            const maxDateParts = max_date.split('/');
-            const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
-            const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
-
-            const currentDate = new Date(startDate);
-            this.all_range_dates = [];
-            while (currentDate <= endDate) {
-                this.all_range_dates.push(currentDate.toLocaleDateString("en-GB"));
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-
-
-            // Filter out-of-range dates
-            const filteredDates = this.open_dates[1].dates.filter(date => {
-                const parts = date.split('/');
-                const cDate = new Date(parts[2], parts[1] - 1, parts[0]);
-                return cDate >= startDate && cDate <= endDate;
-            });
-
-            this.test = filteredDates
-
+        date_range: async function (newValue) {
+            await this.get_monitor();
+            // const currentDate = new Date(startDate);
+            // this.all_range_dates = [];
+            // while (currentDate <= endDate) {
+            //     this.all_range_dates.push(currentDate.toLocaleDateString("en-GB"));
+            //     currentDate.setDate(currentDate.getDate() + 1);
+            // }
+            await this.filter_dates();
+            this.create_closed();
         },
-
         hotel: async function (newValue) {
-            await this.get_monitor()
+            await this.get_monitor();
+            await this.filter_dates();
+            this.create_closed();
         },
         room_type: async function (newValue) {
-            await this.get_monitor()
+            await this.get_monitor();
+            await this.filter_dates();
+            this.create_closed();
         },
-
         close_dates: function (newValue) {//to get all dates in the booked ranges
             newValue.forEach(item => {
                 const datesArray = [];
@@ -171,10 +155,7 @@ export default {
                     const maxDateParts = r.split(',')[1].split('/');
                     const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
                     const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
-
                     const currentDate = new Date(startDate);
-
-
                     while (currentDate < endDate) {
                         datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
                         currentDate.setDate(currentDate.getDate() + 1);
@@ -185,33 +166,37 @@ export default {
         }
     },
     ////////////////////
+
     methods: {
 
-        // page load **********************************
-        get_hotels() {
-            return my_api.get('/backend/get_hotels/')
-                .then((response) => (this.hotels = response.data))
-                .catch(err => { alert(err) });
+        filter_dates() {// remove any date out of selected range
+            if (this.date_range.length > 0) {
+                let min_date = this.date_range[0];
+                let max_date = this.date_range[1];
+                const minDateParts = min_date.split('/');
+                const maxDateParts = max_date.split('/');
+                const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+
+                // Filter out-of-range dates we loop in all dates 
+                this.open_dates.forEach(item => {
+                    item.dates = item.dates.filter(date => {
+                        const parts = date.split('/');
+                        const cDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                        return cDate >= startDate && cDate <= endDate;
+                    });
+                });
+                this.close_dates.forEach(item => {
+                    item.dates = item.dates.filter(date => {
+                        const parts2 = date.split('/');
+                        const cDate2 = new Date(parts2[2], parts2[1] - 1, parts2[0]);
+                        return cDate2 >= startDate && cDate2 <= endDate;
+                    });
+                });
+            }
         },
 
-        async get_monitor() {
-            this.close_dates = [];
-            this.open_dates = [];
-            await this.get_open_rooms();
-            await this.get_close_rooms();
-
-            for (let roomBooked of this.close_dates) {
-                let roomBookedId = roomBooked.room_id;
-                let roomBookedHotel = roomBooked.hotel;
-                let roomBookedDates = roomBooked.dates;
-                for (let room of this.open_dates) {
-                    if (room.room_id === roomBookedId && room.hotel === roomBookedHotel) {
-                        room.dates = room.dates.filter(date => !roomBookedDates.includes(date));
-                    }
-                }
-            };
-
-
+        create_closed() {
             //loop on open rooms dates and create button on monitoring table
             this.close_dates.forEach(item => {
                 try {
@@ -226,6 +211,28 @@ export default {
             });
         },
 
+        // page load **********************************
+        get_hotels() {
+            return my_api.get('/backend/get_hotels/')
+                .then((response) => (this.hotels = response.data))
+                .catch(err => { alert(err) });
+        },
+        async get_monitor() {
+            this.close_dates = [];
+            this.open_dates = [];
+            await this.get_open_rooms();
+            await this.get_close_rooms();
+            for (let roomBooked of this.close_dates) {// to remove booked dates from open dates
+                let roomBookedId = roomBooked.room_id;
+                let roomBookedHotel = roomBooked.hotel;
+                let roomBookedDates = roomBooked.dates;
+                for (let room of this.open_dates) {
+                    if (room.room_id === roomBookedId && room.hotel === roomBookedHotel) {
+                        room.dates = room.dates.filter(date => !roomBookedDates.includes(date));
+                    }
+                }
+            };
+        },
         get_open_rooms() {
             return axios({
                 method: "get",
@@ -233,7 +240,6 @@ export default {
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.open_dates = response.data));
         },
-
         get_close_rooms() {
             return axios({
                 method: "get",
@@ -258,7 +264,6 @@ export default {
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.this_row.room_type = response.data.type, this.room_id_id = response.data.id, this.range = response.data.range));
         },
-
         // end insert form *******************************
     },
 }
