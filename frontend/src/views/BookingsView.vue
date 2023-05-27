@@ -19,36 +19,6 @@
             </ul>
         </div>
 
-        <!-- Rooms Monitor -->
-        <div class="col-xl-12 center">
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">{{ $t("Bookings Monitor") }} </h6>
-                </div>
-                <div id="table" class="card-body">
-                    <div id="monitor_table" class="table-responsive">
-                        <table class="table-sm table ">
-                            <thead class="sticky_header">
-                                <tr>
-                                    <th>Room - Hotel</th>
-                                    <th v-for="i in 31" :key="i" scope="col">{{ i }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="r in this.all_rooms_booked_dates" :key="r.name">
-                                    <td>{{ r.name }}</td>
-                                    <td v-for="ii in 31" :key="ii" :id="r.name + '_' + ii.toString().padStart(2, '0')">
-                                        <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)" :title="r.name"
-                                            type="button" class="btn btn-danger"></button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <!-- Table Card -->
         <div class="col-xl-12 center">
