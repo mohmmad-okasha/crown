@@ -161,12 +161,12 @@ export default {
                     const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
                     const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
                     const currentDate = new Date(startDate);
-                    while (currentDate < endDate) {
+                    while (currentDate <= endDate) {
                         datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
                         currentDate.setDate(currentDate.getDate() + 1);
                     }
                 })
-                item.dates = datesArray
+                item.dates = [...new Set(datesArray)]//remove dublicated dates from array
             })
         }
     },
@@ -226,15 +226,32 @@ export default {
             //loop on open rooms dates and create button on monitoring table
             this.close_dates.forEach(item => {
                 try {
-                    item.dates.forEach(d => {// loop on all dates for all rooms
+                    item.dates.forEach(function(d, idx, array){// loop on all dates for all rooms
                         var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
                         var button = document.createElement("button");
+                        if (idx === array.length - 1){ 
+                            button.className = "btn btn-danger tow_color";
+                        }else{
                         button.className = "btn btn-danger";
+                        }
                         div.appendChild(button);
+
                     });
                 } catch (error) {
                 }
             });
+            
+            // this.close_dates.forEach(item => {
+            //     try {
+            //         item.dates.forEach(d => {// loop on all dates for all rooms
+            //             var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
+            //             var button = document.createElement("button");
+            //             button.className = "btn btn-danger";
+            //             div.appendChild(button);
+            //         });
+            //     } catch (error) {
+            //     }
+            // });
         },
 
         // page load **********************************

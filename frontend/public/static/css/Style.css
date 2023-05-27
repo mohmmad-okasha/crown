@@ -2,7 +2,7 @@ body {
    background-color: darkgray;
 }
 
-#main_table{
+#main_table {
    height: 36vh !important;
 }
 
@@ -57,11 +57,12 @@ body {
 
 /* mobile screen */
 @media only screen and (max-device-width: 640px) {
-.vpd-dir-ltr .vpd-actions,
-.vpd-dir-ltr .vpd-addon-list-content,
-.vpd-dir-ltr .vpd-content {
-   margin-left: 0%;
-}
+
+   .vpd-dir-ltr .vpd-actions,
+   .vpd-dir-ltr .vpd-addon-list-content,
+   .vpd-dir-ltr .vpd-content {
+      margin-left: 0%;
+   }
 }
 
 .vpd-header {
@@ -240,15 +241,23 @@ body {
    background-color: var(--back_color) !important;
 }
 
-div[disabled] > span{
-   color: #ececec !important;
-}
-div.vpd-day[disabled] > span{
+div[disabled]>span {
    color: #ececec !important;
 }
 
+div.vpd-day[disabled]>span {
+   color: #ececec !important;
+}
 
 
-#content-wrapper{
+
+#content-wrapper {
    max-height: 100vh !important;
+}
+
+.tow_color {
+   background: linear-gradient(-90deg, #1cc88a 50%, #e74a3b 50%);
+   border: 0px;
+   height: 14px;
+   width: 26px;
 }
