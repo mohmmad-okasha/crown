@@ -15,11 +15,16 @@
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Date Range") }}</label>
                                 </div>
                                 <div class="col-3">
-                                    <input type="text" class="custom-input form-control" placeholder="Range"
+                                    <!-- <input type="text" class="custom-input form-control" placeholder="Range"
                                         aria-label="Range">
                                     <date-picker v-model="date_range" range clearable locale="en" :auto-submit="true"
                                         color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY"
-                                        display-format="jYYYY-jMM-jDD" custom-input=".custom-input" />
+                                        display-format="jYYYY-jMM-jDD" custom-input=".custom-input" /> -->
+                                    <input type="text" class="custom-input form-control" placeholder="Range"
+                                        aria-label="Range">
+                                    <date-picker v-model="date_range" type="year-month" clearable locale="en"
+                                        :auto-submit="true" color="#098290" input-format="MM/YYYY" format="MM/YYYY"
+                                        display-format="jYYYY-jMM" custom-input=".custom-input" />
                                 </div>
                                 <div class="col-auto">
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Hotel") }}</label>
@@ -170,30 +175,51 @@ export default {
     methods: {
 
         filter_dates() {// remove any date out of selected range
-            if (this.date_range.length > 0) {
-                let min_date = this.date_range[0];
-                let max_date = this.date_range[1];
-                const minDateParts = min_date.split('/');
-                const maxDateParts = max_date.split('/');
-                const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
-                const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+            if (this.date_range) {
+                let month = this.date_range.split('/')[0];
+                let year = this.date_range.split('/')[1];
+                month = parseInt(month, 10).toString();//to remove 0 from month start with 0 like 05 , 09 
 
                 // Filter out-of-range dates we loop in all dates 
                 this.open_dates.forEach(item => {
                     item.dates = item.dates.filter(date => {
                         const parts = date.split('/');
-                        const cDate = new Date(parts[2], parts[1] - 1, parts[0]);
-                        return cDate >= startDate && cDate <= endDate;
+                        const cDate = new Date(parts[2], parts[1] , parts[0]);
+                        return cDate.getFullYear() == year && cDate.getMonth() == month;
                     });
                 });
                 this.close_dates.forEach(item => {
                     item.dates = item.dates.filter(date => {
                         const parts2 = date.split('/');
-                        const cDate2 = new Date(parts2[2], parts2[1] - 1, parts2[0]);
-                        return cDate2 >= startDate && cDate2 <= endDate;
+                        const cDate2 = new Date(parts2[2], parts2[1] , parts2[0]);
+                        return cDate2.getFullYear() == year && cDate2.getMonth() == month;
                     });
                 });
             }
+            // if (this.date_range.length > 0) {
+            //     let min_date = this.date_range[0];
+            //     let max_date = this.date_range[1];
+            //     const minDateParts = min_date.split('/');
+            //     const maxDateParts = max_date.split('/');
+            //     const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+            //     const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+
+            //     // Filter out-of-range dates we loop in all dates 
+            //     this.open_dates.forEach(item => {
+            //         item.dates = item.dates.filter(date => {
+            //             const parts = date.split('/');
+            //             const cDate = new Date(parts[2], parts[1] - 1, parts[0]);
+            //             return cDate >= startDate && cDate <= endDate;
+            //         });
+            //     });
+            //     this.close_dates.forEach(item => {
+            //         item.dates = item.dates.filter(date => {
+            //             const parts2 = date.split('/');
+            //             const cDate2 = new Date(parts2[2], parts2[1] - 1, parts2[0]);
+            //             return cDate2 >= startDate && cDate2 <= endDate;
+            //         });
+            //     });
+            // }
         },
 
         create_closed() {
