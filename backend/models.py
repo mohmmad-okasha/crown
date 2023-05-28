@@ -24,14 +24,34 @@ class Bookings(models.Model):
     class Meta:
         ordering= ['id'] #to Sort the values
 
+#####################################################################################
+
+class Hotels(models.Model):
+    id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=50)
+    country = models.CharField(max_length=50)  
+    city = models.CharField(max_length=50)
+    area = models.CharField(max_length=50,blank=True)
+    rate = models.CharField(max_length=50)
+    allotment = models.IntegerField(max_length=50)
+    notes=models.CharField(max_length=100,blank=True)
+    user = models.CharField(max_length=50,blank=True)
+
+    def __str__(self):
+        return self.name #to change object name in admin table
+
+    class Meta:
+        ordering= ['id'] #to Sort the values
 
 #####################################################################################
 
 class Rooms(models.Model):
     id = models.AutoField(primary_key=True)
-    hotel = models.CharField(max_length=50)
+    hotel = models.ForeignKey(Hotels, on_delete=models.CASCADE)
     room_id = models.CharField(max_length=50)  
+    room_categ = models.CharField(max_length=50,blank=True)#ROOM CATEGORY
     room_type = models.CharField(max_length=50)
+    meals = models.CharField(max_length=50,blank=True)
     persons = models.IntegerField(max_length=50)#persons number
     range = models.CharField(max_length=1000)
     notes=models.CharField(max_length=100,blank=True)
@@ -42,13 +62,11 @@ class Rooms(models.Model):
 
     class Meta:
         ordering= ['id'] #to Sort the values
-
 #####################################################################################
 
 class Room_dates(models.Model):
     room_id = models.ForeignKey(Rooms, on_delete=models.CASCADE)
     date = models.CharField(max_length=50)
-
 
     class Meta:
         ordering = ['date']
