@@ -23,6 +23,12 @@ class flight_dates_serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 #####################################################################################
+class hotels_serializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Hotels
+        fields = '__all__'
+
+#####################################################################################
 class rooms_serializer(serializers.ModelSerializer):
     class Meta:
         model = models.Rooms

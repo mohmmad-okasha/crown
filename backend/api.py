@@ -365,6 +365,26 @@ class rooms(ModelViewSet, mixins.DestroyModelMixin):
         return self.update(request, *args, **kwargs)
 
 #####################################################################################
+class hotels(ModelViewSet, mixins.DestroyModelMixin):
+
+    queryset = Hotels.objects.all()
+    serializer_class = serializers.hotels_serializer
+
+    def get_queryset(self):
+        queryset = Hotels.objects.all()
+        id = self.request.query_params.get('id')
+        if id is not None:
+            queryset = queryset.filter(id=id)
+        search = self.request.query_params.get('search')
+        if search is not None:
+            queryset = queryset.filter(Q(name__contains=search) | Q(rate__contains=search)|Q(notes__contains=search)| Q(area__contains=search) | Q(country__contains=search) | Q(
+                city__contains=search) )
+        return queryset
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+#####################################################################################
 
 class room_dates(ModelViewSet, mixins.DestroyModelMixin):
 

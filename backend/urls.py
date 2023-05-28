@@ -7,6 +7,7 @@ from . import api
 router = routers.DefaultRouter()
 router.register('flights', api.flights)
 router.register('bookings', api.bookings)
+router.register('hotels', api.hotels)
 router.register('rooms', api.rooms)
 router.register('room_dates', api.room_dates)
 router.register('accounts', api.accounts)
@@ -38,6 +39,7 @@ urlpatterns += [
     path("get_room_info/", api.get_room_info, name="get_room_info"),
 
     path("get_open_rooms/", api.get_open_rooms, name="get_open_rooms"),
+
     path("get_close_rooms/", api.get_close_rooms, name="get_close_rooms"),
 
     path("get_room_id/", api.get_room_id, name="get_room_type"),
