@@ -68,11 +68,10 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr @contextmenu="showContextMenu" v-for="r in this.Hotels" :key="r.hotel_id"
+                                    <tr @contextmenu="showContextMenu" v-for="r in this.hotels_rows" :key="r.hotel_id"
                                         @click="row_click(r.id)" @click.right="row_click(r.id)" @dblclick="open_edit_modal"
                                         role="button" :class="{ 'selected': r.id === active_index }">
                                         <th scope="row" id="id">{{ r.id }}</th>
-                                        <td>{{ $t(r.id) }}</td>
                                         <td>{{ $t(r.name) }}</td>
                                         <td>{{ $t(r.country) }}</td>
                                         <td>{{ $t(r.city) }}</td>
@@ -140,7 +139,7 @@
 
                             <div class="row">
 
-                                <div class="form-group col-auto">
+                                <div class="form-group col-md">
                                     <label for="name"> {{ $t("name") }}</label>
                                     <input id="name" v-model="hotel.name"
                                         :class="{ 'is-invalid': !this.hotel.name && this.validate, 'is-valid': this.hotel.name && this.validate }"
@@ -150,7 +149,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group col-auto">
+                                <div class="form-group col-md">
                                     <label for="country"> {{ $t("country") }}</label>
                                     <select id="country" v-model="hotel.country"
                                         :class="{ 'is-invalid': !this.hotel.country && this.validate, 'is-valid': this.hotel.country && this.validate }"
@@ -165,7 +164,7 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group col-auto">
+                                <div class="form-group col-md">
                                     <label for="city"> {{ $t("city") }}</label>
                                     <input id="city" v-model="hotel.city"
                                         :class="{ 'is-invalid': !this.hotel.city && this.validate, 'is-valid': this.hotel.city && this.validate }"
@@ -177,7 +176,7 @@
                                 </div>
 
 
-                                <div class="form-group col-auto">
+                                <div class="form-group col-md">
                                     <label for="area"> {{ $t("area") }}</label>
                                     <input id="area" v-model="hotel.area"
                                         :class="{ 'is-invalid': !this.hotel.area && this.validate, 'is-valid': this.hotel.name && this.validate }"
@@ -188,29 +187,42 @@
                                 </div>
                             </div>
 
-                            <div class="form-group col-auto">
-                                <label for="rate">{{ $t("rate") }}</label>
-                                <select id="rate" v-model="hotel.rate" type="text" class="form-control"
-                                    :class="{ 'is-invalid': !this.hotel.rate && this.validate, 'is-valid': this.hotel.rate && this.validate }">
-                                    <option :value="$t('5 Star')">{{ $t("5 Star") }} </option>
-                                    <option :value="$t('4 Star')">{{ $t("4 Star") }} </option>
-                                    <option :value="$t('3 Star')">{{ $t("3 Star") }} </option>
-                                    <option :value="$t('2 Star')">{{ $t("2 Star") }} </option>
-                                    <option :value="$t('1 Star')">{{ $t("1 Star") }} </option>
-                                </select>
-                                <div v-if="!this.hotel.rate && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select the rate") }}
+                            <div class="row">
+                                <div class="form-group col-md">
+                                    <label for="rate">{{ $t("rate") }}</label>
+                                    <select id="rate" v-model="hotel.rate" type="text" class="form-control"
+                                        :class="{ 'is-invalid': !this.hotel.rate && this.validate, 'is-valid': this.hotel.rate && this.validate }">
+                                        <option :value="$t('5 Star')">{{ $t("5 Star") }} </option>
+                                        <option :value="$t('4 Star')">{{ $t("4 Star") }} </option>
+                                        <option :value="$t('3 Star')">{{ $t("3 Star") }} </option>
+                                        <option :value="$t('2 Star')">{{ $t("2 Star") }} </option>
+                                        <option :value="$t('1 Star')">{{ $t("1 Star") }} </option>
+                                    </select>
+                                    <div v-if="!this.hotel.rate && this.validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select the rate") }}
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-md">
+                                    <label for="allotment"> {{ $t("allotment") }}</label>
+                                    <input type="number" min="0" class="form-control" v-model="hotel.allotment"
+                                        id="allotment">
+                                </div>
+
+                                <div class="form-group col-md-6">
+                                    <label for="hotel_notes"> {{ $t("Notes") }}</label>
+                                    <textarea class="form-control" v-model="hotel.notes" id="hotel_notes"
+                                        rows="1"></textarea>
                                 </div>
                             </div>
 
-                            <div class="form-group col-auto">
-                                <label for="allotment"> {{ $t("allotment") }}</label>
-                                <input type="number" min="0" class="form-control" v-model="hotel.allotment" id="allotment">
-                            </div>
+                            <div v-show="this.hotel.allotment > 0" class="card form-group">
+                                <div class="card-header">
+                                    {{ $t("Rooms") }}
+                                </div>
+                                <div class="card-body">
 
-                            <div class="form-group col-auto">
-                                <label for="hotel_notes"> {{ $t("Notes") }}</label>
-                                <textarea class="form-control" v-model="hotel.notes" id="hotel_notes" rows="1"></textarea>
+                                </div>
                             </div>
 
                         </form>
@@ -382,9 +394,9 @@ export default {
                     this.saving = true;
 
                     // convert the range array to string to save it in db
-                    this.hotel.range = this.hotel.range.toString();
+                    //this.hotel.range = this.hotel.range.toString();
 
-                    this.get_persons();
+                    //this.get_persons();
                     // save hotel info
                     var response = await fetch(domain_url + "/backend/hotels/", {
                         method: "post",
@@ -399,16 +411,16 @@ export default {
                     } else {
                         // Request was successful
                         //save range dates to table
-                        await this.get_max_id();
-                        this.range_dates.forEach((element) => {
-                            fetch(domain_url + "/backend/hotel_dates/", {
-                                method: "post",
-                                body: JSON.stringify({ 'hotel_id': this.max_id, 'date': element }),
-                                headers: {
-                                    'Content-Type': 'application/json;charset=UTF-8'
-                                }
-                            });
-                        });
+                        // await this.get_max_id();
+                        // this.range_dates.forEach((element) => {
+                        //     fetch(domain_url + "/backend/hotel_dates/", {
+                        //         method: "post",
+                        //         body: JSON.stringify({ 'hotel_id': this.max_id, 'date': element }),
+                        //         headers: {
+                        //             'Content-Type': 'application/json;charset=UTF-8'
+                        //         }
+                        //     });
+                        // });
 
                         swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
                         this.get_Hotels();
@@ -421,31 +433,6 @@ export default {
             } catch (error) { console.error(); }
         },
 
-        async save_hotel_old() {
-            try {
-                if (this.check_form()) {
-                    // convert the dates array to string to save it in db
-                    this.hotel.range = this.hotel.range.toString();
-                    var response = await fetch(domain_url + "/backend/hotels/", {
-                        method: "post",
-                        headers: { "Content-Type": "application/json", },
-                        body: JSON.stringify(this.hotel),
-                    });
-
-                    if (!response.ok) {
-                        // handle the error
-                        var errorMessage = "Error: " + response.status + " " + response.statusText;
-                        swal(errorMessage, { icon: 'error' });
-                    } else {
-                        // Request was successful
-                        swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
-                        this.get_Hotels();
-                        await this.get_max_id();
-                        this.closeModal();
-                    }
-                }
-            } catch (error) { console.error(); }
-        },
 
         async update_hotel(id) {
             try {
@@ -499,7 +486,6 @@ export default {
                             var response = await fetch(domain_url + '/backend/hotels/' + id + '/', {
                                 method: "delete",
                                 headers: { "Content-Type": "application/json", },
-
                             });
                             if (!response.ok) {
                                 // handle the error
@@ -508,7 +494,9 @@ export default {
                             } else {
                                 // Request was successful
                                 swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
-                                await this.get_Hotels(); this.closeModal();
+                                this.clear_form();
+                                await this.get_Hotels();
+                                this.closeModal();
                             }
 
                         }
@@ -554,8 +542,6 @@ export default {
             document.getElementById('head_txt').style.display = "none";
             popupWin.document.close();
         },
-
-
 
         get_max_id() {
             return axios({
@@ -620,10 +606,12 @@ export default {
         },
 
         clear_form() {
-            this.hotel.hotel = '';
-            this.hotel.hotel_id = '';
-            this.hotel.hotel_type = '';
-            this.hotel.range = [];
+            this.hotel.name = '';
+            this.hotel.country = '';
+            this.hotel.city = '';
+            this.hotel.area = '';
+            this.hotel.rate = '';
+            this.hotel.allotment = '';
             this.hotel.notes = '';
             this.validate = false;
         },
@@ -632,10 +620,9 @@ export default {
             this.validate = true; //to change inputs color 'red/green'
 
             if (
-                this.hotel.hotel &&
-                this.hotel.hotel_id &&
-                this.hotel.hotel_type &&
-                this.hotel.range
+                this.hotel.name &&
+                this.hotel.country &&
+                this.hotel.rate
             ) {
                 return true
             } else {
