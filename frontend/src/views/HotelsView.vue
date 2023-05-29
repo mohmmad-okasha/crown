@@ -104,10 +104,7 @@
                                                         {{ $t("Print") }}
                                                     </a>
                                                 </div>
-                                                <a class="" @click="open_details_modal">
-                                                    <i class="fa fa-pen-to-square"></i>
-                                                    {{ $t("Edit") }}
-                                                </a>
+
                                             </div>
 
                                         </td>
@@ -122,42 +119,7 @@
             </div>
         </div>
 
-        <!-- Table Card -->
-        <div class="col-xl-12 center">
-            <div class="card shadow mb-4">
-                <div id="rooms_table" class="card-body">
-                    <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th scope="col">#</th>
-                                        <th scope="col">{{ $t("room_id") }}</th>
-                                        <th scope="col">{{ $t("room_categ") }}</th>
-                                        <th scope="col">{{ $t("room_type") }}</th>
-                                        <th scope="col">{{ $t("meals") }}</th>
-                                        <th scope="col">{{ $t("persons") }}</th>
-                                        <th scope="col">{{ $t("range") }}</th>
-                                        <th scope="col">{{ $t("notes") }}</th>
-                                        <th scope="col" class="no_print">{{ $t("Actions") }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr v-for="ro in this.hotel.room" :key="ro.room_id" role="button">
-                                        <th scope="row" id="id">{{ ro.id }}</th>
-                                        <td>{{ $t(ro.room_id) }}</td>
-                                        <td>{{ $t(ro.room_categ) }}</td>
-                                        <td>{{ $t(ro.room_type) }}</td>
-                                        <td>{{ $t(ro.meals) }}</td>
-                                        <td>{{ $t(ro.persons) }}</td>
-                                        <td>{{ $t(ro.range) }}</td>
-                                        <td>{{ $t(ro.notes) }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                </div>
-            </div>
-        </div>
+
 
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
@@ -371,28 +333,7 @@
             </div>
         </div>
 
-        <!-- details modal -->
-        <div class="modal  fade" id="detailsModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
-            aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modal_label">{{ hotel.name }}</h5>
-                        <button type="button" class="close on-hover" @click="this.close_details_Modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">
 
-                        <h1>Hotel: <input type="text" v-model="hotel.name"></h1>
-                        <p><b>Country:</b> {{ this.hotel.country }} <b> City:</b> {{ this.hotel.city }}</p>
-                        <p><b>Area:</b> {{ this.hotel.area }} <b> Rate:</b> {{ this.hotel.rate }}</p><b> Allotment:</b> {{
-                            this.hotel.allotment }}
-
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </template>
 
@@ -451,7 +392,7 @@ export default {
                     user: "",
                 }],
             },
-
+            selected_hotel: [],
             edit_mode: false,
             max_id: 0,
             max_room_id: 0,
@@ -515,18 +456,23 @@ export default {
 
     watch: {
         'hotel.allotment'(newValue) {
-            //to + - rooms count
-            if (newValue > this.hotel.room.length) {
-                const numberOfRoomsToAdd = newValue - this.hotel.room.length;
-                for (let i = 0; i < numberOfRoomsToAdd; i++) {
-                    this.hotel.room.push({
-                        // initialize new room data
-                    });
+            try {
+                //to + - rooms count
+                if (newValue > this.hotel.room.length) {
+                    const numberOfRoomsToAdd = newValue - this.hotel.room.length;
+                    for (let i = 0; i < numberOfRoomsToAdd; i++) {
+                        this.hotel.room.push({
+                            // initialize new room data
+                        });
+                    }
+                } else if (newValue < this.hotel.room.length) {
+                    const numberOfRoomsToRemove = this.hotel.room.length - newValue;
+                    this.hotel.room.splice(newValue, numberOfRoomsToRemove);
                 }
-            } else if (newValue < this.hotel.room.length) {
-                const numberOfRoomsToRemove = this.hotel.room.length - newValue;
-                this.hotel.room.splice(newValue, numberOfRoomsToRemove);
+            } catch (error) {
+
             }
+
 
             // if (newValue > 0 && newValue > hotel.room.length) {
 
@@ -548,6 +494,17 @@ export default {
         },
         'hotel.country'() {
             this.getCities();
+        },
+        selected_hotel(newValue){//send selected values to hotel array
+            this.hotel.id = newValue.id
+            this.hotel.name = newValue.name
+            this.hotel.country = newValue.country
+            this.hotel.city = newValue.city
+            this.hotel.area = newValue.area
+            this.hotel.rate = newValue.rate
+            this.hotel.allotment = newValue.allotment
+            this.hotel.notes = newValue.notes
+            this.hotel.user = newValue.user
         }
     },
 
@@ -623,7 +580,7 @@ export default {
                                 }
                             });
                             await this.get_max_room_id();
-                            alert(this.max_room_id);
+
                             // save all room dates to db
                             element.range = element.range.split(","); // str to array
                             let min_date = element.range[0];
@@ -753,11 +710,13 @@ export default {
         },
 
         async get_hotel(id) {
+            
             return axios({
                 method: "get",
                 url: domain_url + "/backend/hotels/?id=" + id,
                 auth: { username: "admin", password: "123", },
-            }).then((response) => (this.hotel = response.data[0]));
+            }).then((response) => (this.selected_hotel = response.data[0]));
+
         },
 
         showContextMenu(event) {
@@ -820,24 +779,21 @@ export default {
             $('#addModal').modal('toggle');
         },
 
-        open_details_modal() {
-            $('#detailsModal').modal('toggle');
-            this.row_click(this.active_index);
-        },
-
         closeModal() {
             $('#addModal').modal('hide');
             this.clear_form();
         },
+
         close_details_Modal() {
             $('#detailsModal').modal('hide');
         },
 
         async row_click(index) {
             this.active_index = index; //to change row color
+
             await this.get_hotel(index);
             await this.get_rooms(index);
-
+            return true
             //this.hotel.range = this.hotel.range.split(",");// convert text to array
 
         },

@@ -2,9 +2,9 @@ body {
    background-color: darkgray;
 }
 
-#main_table {
+/* #main_table {
    height: 36vh !important;
-}
+} */
 
 
 /* .sticky_header{
@@ -251,9 +251,9 @@ div.vpd-day[disabled]>span {
 
 
 
-#content-wrapper {
+/* #content-wrapper {
    max-height: 100vh !important;
-}
+} */
 
 .tow_color {
    background: linear-gradient(-90deg, #1cc88a 50%, #e74a3b 50%);

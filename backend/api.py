@@ -358,8 +358,11 @@ class rooms(ModelViewSet, mixins.DestroyModelMixin):
     def get_queryset(self):
         queryset = Rooms.objects.all()
         id = self.request.query_params.get('id')
+        hotel_id = self.request.query_params.get('hotel_id')
         if id is not None:
             queryset = queryset.filter(id=id)
+        if hotel_id is not None:
+            queryset = queryset.filter(hotel=hotel_id)
         search = self.request.query_params.get('search')
         if search is not None:
             queryset = queryset.filter(Q(hotel__contains=search) | Q(room_id__contains=search) | Q(room_type__contains=search) | Q(
@@ -378,6 +381,7 @@ class hotels(ModelViewSet, mixins.DestroyModelMixin):
     def get_queryset(self):
         queryset = Hotels.objects.all()
         id = self.request.query_params.get('id')
+        
         if id is not None:
             queryset = queryset.filter(id=id)
         search = self.request.query_params.get('search')
