@@ -104,6 +104,10 @@
                                                         {{ $t("Print") }}
                                                     </a>
                                                 </div>
+                                                <a class="" @click="open_details_modal">
+                                                    <i class="fa fa-pen-to-square"></i>
+                                                    {{ $t("Edit") }}
+                                                </a>
                                             </div>
 
                                         </td>
@@ -114,6 +118,43 @@
                         <!-- to get id of selected record -->
                         <input hidden type="text" v-model="active_index" id="row_id" />
                     </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="col-xl-12 center">
+            <div class="card shadow mb-4">
+                <div id="rooms_table" class="card-body">
+                    <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">{{ $t("room_id") }}</th>
+                                        <th scope="col">{{ $t("room_categ") }}</th>
+                                        <th scope="col">{{ $t("room_type") }}</th>
+                                        <th scope="col">{{ $t("meals") }}</th>
+                                        <th scope="col">{{ $t("persons") }}</th>
+                                        <th scope="col">{{ $t("range") }}</th>
+                                        <th scope="col">{{ $t("notes") }}</th>
+                                        <th scope="col" class="no_print">{{ $t("Actions") }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="ro in this.hotel.room" :key="ro.room_id" role="button">
+                                        <th scope="row" id="id">{{ ro.id }}</th>
+                                        <td>{{ $t(ro.room_id) }}</td>
+                                        <td>{{ $t(ro.room_categ) }}</td>
+                                        <td>{{ $t(ro.room_type) }}</td>
+                                        <td>{{ $t(ro.meals) }}</td>
+                                        <td>{{ $t(ro.persons) }}</td>
+                                        <td>{{ $t(ro.range) }}</td>
+                                        <td>{{ $t(ro.notes) }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                 </div>
             </div>
         </div>
@@ -330,6 +371,28 @@
             </div>
         </div>
 
+        <!-- details modal -->
+        <div class="modal  fade" id="detailsModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+            aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modal_label">{{ hotel.name }}</h5>
+                        <button type="button" class="close on-hover" @click="this.close_details_Modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+
+                        <h1>Hotel: <input type="text" v-model="hotel.name"></h1>
+                        <p><b>Country:</b> {{ this.hotel.country }} <b> City:</b> {{ this.hotel.city }}</p>
+                        <p><b>Area:</b> {{ this.hotel.area }} <b> Rate:</b> {{ this.hotel.rate }}</p><b> Allotment:</b> {{
+                            this.hotel.allotment }}
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -365,6 +428,7 @@ export default {
             cities: [],
             hotels_rows: [],
             hotel: {
+                id: "",
                 name: "",
                 country: "",
                 city: "",
@@ -374,6 +438,7 @@ export default {
                 notes: "",
                 user: "",
                 room: [{
+                    id: "",
                     hotel: "",
                     room_id: "",
                     room_categ: "",
@@ -491,6 +556,13 @@ export default {
             // we using return first of the function for 'await' 
             return my_api.get('/backend/hotels/')
                 .then((response) => (this.hotels_rows = response.data))
+                .catch(err => { alert(err) });
+        },
+
+        get_rooms(hotel_id) {
+            // we using return first of the function for 'await' 
+            return my_api.get('/backend/rooms/?hotel_id=' + hotel_id)
+                .then((response) => (this.hotel.room = response.data))
                 .catch(err => { alert(err) });
         },
 
@@ -735,14 +807,6 @@ export default {
             }).then((response) => (this.max_room_id = response.data.data.id__max));
         },
 
-        get_hotel_type(value) {
-            return axios({
-                method: "get",
-                url: domain_url + "/backend/get_hotel_type/?hotel_id=" + value,
-                //auth: { username: "admin", password: "123", },
-            }).then((response) => (this.hotel.hotel_type = response.data[0]));
-        },
-
         open_add_modal() {
             this.edit_mode = false;
             //$('#modal_label').html('Add hotel');
@@ -756,16 +820,26 @@ export default {
             $('#addModal').modal('toggle');
         },
 
+        open_details_modal() {
+            $('#detailsModal').modal('toggle');
+            this.row_click(this.active_index);
+        },
+
         closeModal() {
             $('#addModal').modal('hide');
             this.clear_form();
+        },
+        close_details_Modal() {
+            $('#detailsModal').modal('hide');
         },
 
         async row_click(index) {
             this.active_index = index; //to change row color
             await this.get_hotel(index);
+            await this.get_rooms(index);
 
-            this.hotel.range = this.hotel.range.split(",");// convert text to array
+            //this.hotel.range = this.hotel.range.split(",");// convert text to array
+
         },
 
         clear_form() {
