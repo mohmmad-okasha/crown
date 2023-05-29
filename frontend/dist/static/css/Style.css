@@ -2,6 +2,10 @@ body {
    background-color: darkgray;
 }
 
+.sidebar {
+   background-color: var(--primary) !important;
+ }
+
 /* #main_table {
    height: 36vh !important;
 } */

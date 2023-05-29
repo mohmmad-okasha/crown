@@ -455,7 +455,7 @@ export default {
 
     data() {
         return {
-            print: true, //to print after save
+            print: false, //to print after save
             validate: false, //for check forms
             active_index: null,//current id
             edit_mode: false,//edit form open
@@ -798,6 +798,7 @@ export default {
                     }
                     // convert the dates array to string to save it in db
                     if (this.this_row.dates.length > 1) { this.this_row.dates = this.this_row.dates.toString(); }
+                    if (!this.this_row.kids_number) { this.this_row.kids_number=0; }
                     this.this_row.persons_names = this.this_row.persons_names.join(',');
                     this.this_row.kids_names = this.this_row.kids_names.join(',');
                     this.this_row.kids_ages = this.this_row.kids_ages.join(',');

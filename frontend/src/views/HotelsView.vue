@@ -775,6 +775,9 @@ export default {
 
         open_edit_modal() {
             this.edit_mode = true;
+            this.hotel.room.forEach(element => {
+               element.range=element.range.split(',');
+            });
             //$('#modal_label').html('Edit hotel');
             $('#addModal').modal('toggle');
         },
