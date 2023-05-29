@@ -39,9 +39,10 @@
                                 </div>
                                 <div class="col-auto">
                                     <select id="room_type" class="form-control" placeholder="Room Type" v-model="room_type">
-                                        <option selected value="Single"> {{ $t("Single") }}</option>
-                                        <option value="Double"> {{ $t("Double") }}</option>
-                                        <option value="Triple"> {{ $t("Triple") }}</option>
+                                        <option value="SGL"> SGL</option>
+                                        <option value="DBL"> DBL</option>
+                                        <option value="TRPL"> TRPL</option>
+                                        <option value="QAD"> QAD</option>
                                     </select>
                                 </div>
                             </div>

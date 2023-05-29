@@ -205,7 +205,7 @@
 
                                 <div class="form-group col-md">
                                     <label for="allotment"> {{ $t("allotment") }}</label>
-                                    <input type="number" min="0" class="form-control" v-model="hotel.allotment"
+                                    <input type="number" min="1" value="1" class="form-control" v-model="hotel.allotment"
                                         id="allotment">
                                 </div>
 
@@ -284,10 +284,10 @@
 
                                                     <div class="form-group col-md">
                                                         <label for="cutomer_notes"> {{ $t("Date Range") }}</label>
-                                                        
+
                                                         <date-picker v-model="hotel.room[i - 1].range" range clearable
-                                                             :auto-submit="true" color="#098290"
-                                                            input-format="DD/MM/YYYY" format="DD/MM/YYYY" locale="en" />
+                                                            :auto-submit="true" color="#098290" input-format="DD/MM/YYYY"
+                                                            format="DD/MM/YYYY" locale="en" />
 
                                                     </div>
 
@@ -381,6 +381,7 @@ export default {
                     meals: "",
                     persons: 0,
                     range: [],
+                    range_dates: [],
                     notes: "",
                     user: "",
                 }],
@@ -388,6 +389,7 @@ export default {
 
             edit_mode: false,
             max_id: 0,
+            max_room_id: 0,
             //////////////////////////
             isContextMenuActive: false,
             menuStyle: {
@@ -409,7 +411,7 @@ export default {
         }////
 
         await this.get_Hotels();
-
+        await this.get_max_room_id();
         //get all countrys names
         axios.get('https://restcountries.com/v3/all')
             .then(response => {
@@ -450,21 +452,34 @@ export default {
         'hotel.allotment'(newValue) {
             //to + - rooms count
             if (newValue > this.hotel.room.length) {
-                this.hotel.room.push({
-                    hotel: "",
-                    room_id: "",
-                    room_categ: "",
-                    room_type: "",
-                    meals: "",
-                    persons: 0,
-                    range: [],
-                    notes: "",
-                    user: ""
-                });
+                const numberOfRoomsToAdd = newValue - this.hotel.room.length;
+                for (let i = 0; i < numberOfRoomsToAdd; i++) {
+                    this.hotel.room.push({
+                        // initialize new room data
+                    });
+                }
+            } else if (newValue < this.hotel.room.length) {
+                const numberOfRoomsToRemove = this.hotel.room.length - newValue;
+                this.hotel.room.splice(newValue, numberOfRoomsToRemove);
             }
-            else if (newValue < this.hotel.room.length) {
-                this.hotel.room.pop();
-            }
+
+            // if (newValue > 0 && newValue > hotel.room.length) {
+
+            //    hotel.room.push({
+            //         hotel: "",
+            //         room_id: "",
+            //         room_categ: "",
+            //         room_type: "",
+            //         meals: "",
+            //         persons: 0,
+            //         range: [],
+            //         notes: "",
+            //         user: ""
+            //     });
+            // }
+            // else if (newValue > 0 && newValue < hotel.room.length) {
+            //     hotel.room.pop();
+            // }
         },
         'hotel.country'() {
             this.getCities();
@@ -507,7 +522,7 @@ export default {
                     // convert the range array to string to save it in db
                     //this.hotel.range = this.hotel.range.toString();
 
-                    //this.get_persons();
+                    this.get_persons();
                     // save hotel info
                     var response = await fetch(domain_url + "/backend/hotels/", {
                         method: "post",
@@ -522,20 +537,46 @@ export default {
                     } else {
                         // Request was successful
                         //save all rooms
-                         await this.get_max_id();
-                         this.hotel.room.forEach((element,index) => {
-                            element.hotel=this.max_id;
-                            element.user=this.hotel.user;
-                            element.room_id='room_'+index+1;
+                        await this.get_max_id();
+                        for (const [i, element] of this.hotel.room.entries()) {
+                            element.hotel = this.max_id;
+                            element.user = this.hotel.user;
+                            element.room_id = 'room_' + (parseInt(i) + 1);
                             element.range = element.range.toString();
-                             fetch(domain_url + "/backend/rooms/", {
-                                 method: "post",
-                                 body: JSON.stringify(element),
-                                 headers: {
-                                     'Content-Type': 'application/json;charset=UTF-8'
-                                 }
-                             });
-                         });
+                            await fetch(domain_url + "/backend/rooms/", {
+                                method: "post",
+                                body: JSON.stringify(element),
+                                headers: {
+                                    'Content-Type': 'application/json;charset=UTF-8'
+                                }
+                            });
+                            await this.get_max_room_id();
+                            alert(this.max_room_id);
+                            // save all room dates to db
+                            element.range = element.range.split(","); // str to array
+                            let min_date = element.range[0];
+                            let max_date = element.range[1];
+                            const minDateParts = min_date.split('/');
+                            const maxDateParts = max_date.split('/');
+                            const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                            const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+
+                            const currentDate = new Date(startDate);
+                            element.range_dates = [];
+                            while (currentDate <= endDate) {
+                                element.range_dates.push(currentDate.toLocaleDateString("en-GB"));
+                                currentDate.setDate(currentDate.getDate() + 1);
+                            }
+                            element.range_dates.forEach((element_range) => {
+                                fetch(domain_url + "/backend/room_dates/", {
+                                    method: "post",
+                                    body: JSON.stringify({ 'room_id': this.max_room_id, 'date': element_range }),
+                                    headers: {
+                                        'Content-Type': 'application/json;charset=UTF-8'
+                                    }
+                                });
+                            });
+                        };
 
                         swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
                         this.get_Hotels();
@@ -549,22 +590,24 @@ export default {
         },
 
         get_persons() {
-            for (i in this.hotel.room) {
-                switch (i.room_type) {
+            this.hotel.room.forEach((element) => {
+                switch (element.room_type) {
                     case 'SGL':
-                        i.persons = 1;
+                        element.persons = 1;
                         break;
                     case 'DBL':
-                        i.persons = 2;
+                        element.persons = 2;
                         break;
                     case 'TRPL':
-                        i.persons = 3;
+                        element.persons = 3;
                         break;
                     case 'QAD':
-                        i.persons = 4;
+                        element.persons = 4;
                         break;
                 }
-            }
+            });
+
+
         },
 
         async update_hotel(id) {
@@ -684,6 +727,14 @@ export default {
             }).then((response) => (this.max_id = response.data.data.id__max));
         },
 
+        get_max_room_id() {
+            return axios({
+                method: "get",
+                url: domain_url + "/backend/get_max_id/?table_name=Rooms",
+                //auth: { username: "admin", password: "123", },
+            }).then((response) => (this.max_room_id = response.data.data.id__max));
+        },
+
         get_hotel_type(value) {
             return axios({
                 method: "get",
@@ -691,8 +742,6 @@ export default {
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.hotel.hotel_type = response.data[0]));
         },
-
-
 
         open_add_modal() {
             this.edit_mode = false;
@@ -725,7 +774,7 @@ export default {
             this.hotel.city = '';
             this.hotel.area = '';
             this.hotel.rate = '';
-            this.hotel.allotment = '';
+            this.hotel.allotment = 0;
             this.hotel.notes = '';
             this.validate = false;
         },

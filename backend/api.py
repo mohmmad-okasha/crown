@@ -198,20 +198,23 @@ def get_booked_rooms(request):
 @api_view(['GET'])
 def get_open_rooms(request):
     hotel = str(request.query_params['hotel'])
+    hotel_id= Hotels.objects.filter(name=hotel).first().id
+
     room_type = str(request.query_params['room_type'])
 
     if(hotel and room_type):
-        rooms = Rooms.objects.filter(hotel=hotel).filter(room_type=room_type).all()
+        rooms = Rooms.objects.filter(hotel=hotel_id).filter(room_type=room_type).all()
     elif(hotel):
-        rooms = Rooms.objects.filter(hotel=hotel).all()
+        rooms = Rooms.objects.filter(hotel=hotel_id).all()
     else:
         rooms = Rooms.objects.all()
     
     response_data = []
 
     for room in rooms:
+        hotel_name=Hotels.objects.filter(id=room.hotel_id).first().name
         room_data = {
-            'name': room.room_id +' - '+ room.hotel,
+            'name': room.room_id +' - '+ hotel_name,
             'dates': list(room.room_dates_set.values_list('date', flat=True))
         }
         response_data.append(room_data)
