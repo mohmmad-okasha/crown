@@ -216,12 +216,36 @@
                                 </div>
                             </div>
 
-                            <div v-show="this.hotel.allotment > 0" class="card form-group">
+                            <div v-if="this.hotel.allotment > 0" class="card form-group">
                                 <div class="card-header">
                                     {{ $t("Rooms") }}
                                 </div>
                                 <div class="card-body">
+                                    <div v-for="i in parseInt(hotel.allotment)" :key="i">
 
+                                        <div class="row">
+
+                                            <div class="form-group">
+                                                <label for="room_type">{{ $t("Room Type") }}</label>
+                                                <select :id="'room_type_' + [i - 1]" v-model="hotel.room[i - 1].room_type"
+                                                    type="text" class="form-control"
+                                                    :class="{ 'is-invalid': !hotel.room[i - 1].room_type && validate, 'is-valid': hotel.room[i - 1].room_type && validate }">
+                                                    <option :value="$t('Single')">{{ $t("Single") }} </option>
+                                                    <option :value="$t('Double')">{{ $t("Double") }} </option>
+                                                    <option :value="$t('Triple')">{{ $t("Triple") }} </option>
+                                                    <option :value="$t('Quad')">{{ $t("Quad") }} </option>
+                                                    <option :value="$t('Five')">{{ $t("Five") }} </option>
+                                                </select>
+                                                <div v-if="!hotel.room[i - 1].room_type && validate"
+                                                    class="invalid-feedback hidden">
+                                                    {{ $t("Please Select the room type") }}
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <hr>
+                                    </div>
                                 </div>
                             </div>
 
@@ -293,7 +317,19 @@ export default {
                 allotment: 0,
                 notes: "",
                 user: "",
+                room: [{
+                    hotel: "",
+                    room_id: "",
+                    room_categ: "",
+                    room_type: "",
+                    meals: "",
+                    persons: 0,
+                    range: [],
+                    notes: "",
+                    user: "",
+                }],
             },
+
             edit_mode: false,
             max_id: 0,
             //////////////////////////
@@ -355,6 +391,25 @@ export default {
     },
 
     watch: {
+        'hotel.allotment'(newValue) {
+            //to + - rooms count
+            if (newValue > this.hotel.room.length) {
+                this.hotel.room.push({
+                    hotel: "",
+                    room_id: "",
+                    room_categ: "",
+                    room_type: "",
+                    meals: "",
+                    persons: 0,
+                    range: [],
+                    notes: "",
+                    user: ""
+                });
+            }
+            else if (newValue < this.hotel.room.length) {
+                this.hotel.room.pop();
+            }
+        },
         'hotel.country'() {
             this.getCities();
         }
