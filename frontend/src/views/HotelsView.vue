@@ -217,38 +217,94 @@
                             </div>
 
                             <div v-if="this.hotel.allotment > 0" class="card form-group">
-                                <div class="card-header">
+                                <h4 class="card-header">
                                     {{ $t("Rooms") }}
-                                </div>
+                                </h4>
+
                                 <div class="card-body">
                                     <div v-for="i in parseInt(hotel.allotment)" :key="i">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                {{ $t("Room") + ' ' + i }}
+                                            </div>
+                                            <div class="card-body">
 
-                                        <div class="row">
+                                                <input hidden type="text" v-model="hotel.room[i - 1].hotel">
+                                                <input hidden type="text" v-model="hotel.room[i - 1].room_id">
+                                                <input hidden type="text" v-model="hotel.room[i - 1].user">
+                                                <div class="row">
 
-                                            <div class="form-group">
-                                                <label for="room_type">{{ $t("Room Type") }}</label>
-                                                <select :id="'room_type_' + [i - 1]" v-model="hotel.room[i - 1].room_type"
-                                                    type="text" class="form-control"
-                                                    :class="{ 'is-invalid': !hotel.room[i - 1].room_type && validate, 'is-valid': hotel.room[i - 1].room_type && validate }">
-                                                    <option :value="$t('Single')">{{ $t("Single") }} </option>
-                                                    <option :value="$t('Double')">{{ $t("Double") }} </option>
-                                                    <option :value="$t('Triple')">{{ $t("Triple") }} </option>
-                                                    <option :value="$t('Quad')">{{ $t("Quad") }} </option>
-                                                    <option :value="$t('Five')">{{ $t("Five") }} </option>
-                                                </select>
-                                                <div v-if="!hotel.room[i - 1].room_type && validate"
-                                                    class="invalid-feedback hidden">
-                                                    {{ $t("Please Select the room type") }}
+                                                    <div class="form-group col-md">
+                                                        <label for="room_type">{{ $t("Room Type") }}</label>
+                                                        <select v-model="hotel.room[i - 1].room_type" type="text"
+                                                            class="form-control"
+                                                            :class="{ 'is-invalid': !hotel.room[i - 1].room_type && validate, 'is-valid': hotel.room[i - 1].room_type && validate }">
+                                                            <option :value="$t('SGL')">{{ $t("SGL") }} </option>
+                                                            <option :value="$t('DBL')">{{ $t("DBL") }} </option>
+                                                            <option :value="$t('TRPL')">{{ $t("TRPL") }} </option>
+                                                            <option :value="$t('QAD')">{{ $t("QAD") }} </option>
+                                                        </select>
+                                                        <div v-if="!hotel.room[i - 1].room_type && validate"
+                                                            class="invalid-feedback hidden">
+                                                            {{ $t("Please Select the room type") }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-md">
+                                                        <label for="room_categ">{{ $t("Room Category") }}</label>
+                                                        <input v-model="hotel.room[i - 1].room_categ" type="text"
+                                                            class="form-control"
+                                                            :class="{ 'is-invalid': !hotel.room[i - 1].room_categ && validate, 'is-valid': hotel.room[i - 1].room_categ && validate }">
+                                                        <div v-if="!hotel.room[i - 1].room_categ && validate"
+                                                            class="invalid-feedback hidden">
+                                                            {{ $t("Please Input Room Category") }}
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group col-md">
+                                                        <label for="meals">{{ $t("Meals") }}</label>
+                                                        <select v-model="hotel.room[i - 1].meals" type="text"
+                                                            class="form-control"
+                                                            :class="{ 'is-invalid': !hotel.room[i - 1].meals && validate, 'is-valid': hotel.room[i - 1].meals && validate }">
+                                                            <option :value="$t('B.B')">{{ $t("B.B") }} </option>
+                                                            <option :value="$t('H.B')">{{ $t("H.B") }} </option>
+                                                            <option :value="$t('F.B')">{{ $t("F.B") }} </option>
+                                                            <option :value="$t('ALL')">{{ $t("ALL") }} </option>
+                                                            <option :value="$t('ULALL')">{{ $t("ULALL") }} </option>
+                                                        </select>
+                                                        <div v-if="!hotel.room[i - 1].meals && validate"
+                                                            class="invalid-feedback hidden">
+                                                            {{ $t("Please Select Meals") }}
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+
+                                                <div class="row">
+
+                                                    <div class="form-group col-md">
+                                                        <label for="cutomer_notes"> {{ $t("Date Range") }}</label>
+                                                        
+                                                        <date-picker v-model="hotel.room[i - 1].range" range clearable
+                                                             :auto-submit="true" color="#098290"
+                                                            input-format="DD/MM/YYYY" format="DD/MM/YYYY" locale="en" />
+
+                                                    </div>
+
+                                                    <div class="form-group col-md">
+                                                        <label for="cutomer_notes"> {{ $t("Notes") }}</label>
+                                                        <textarea class="form-control" v-model="hotel.room[i - 1].notes"
+                                                            id="cutomer_notes" rows="1"></textarea>
+                                                    </div>
+
                                                 </div>
                                             </div>
-
                                         </div>
-
-                                        <hr>
+                                        <br>
                                     </div>
                                 </div>
-                            </div>
 
+                            </div>
                         </form>
 
                     </div>
@@ -465,17 +521,21 @@ export default {
                         swal(errorMessage, { icon: 'error' });
                     } else {
                         // Request was successful
-                        //save range dates to table
-                        // await this.get_max_id();
-                        // this.range_dates.forEach((element) => {
-                        //     fetch(domain_url + "/backend/hotel_dates/", {
-                        //         method: "post",
-                        //         body: JSON.stringify({ 'hotel_id': this.max_id, 'date': element }),
-                        //         headers: {
-                        //             'Content-Type': 'application/json;charset=UTF-8'
-                        //         }
-                        //     });
-                        // });
+                        //save all rooms
+                         await this.get_max_id();
+                         this.hotel.room.forEach((element,index) => {
+                            element.hotel=this.max_id;
+                            element.user=this.hotel.user;
+                            element.room_id='room_'+index+1;
+                            element.range = element.range.toString();
+                             fetch(domain_url + "/backend/rooms/", {
+                                 method: "post",
+                                 body: JSON.stringify(element),
+                                 headers: {
+                                     'Content-Type': 'application/json;charset=UTF-8'
+                                 }
+                             });
+                         });
 
                         swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
                         this.get_Hotels();
@@ -488,6 +548,24 @@ export default {
             } catch (error) { console.error(); }
         },
 
+        get_persons() {
+            for (i in this.hotel.room) {
+                switch (i.room_type) {
+                    case 'SGL':
+                        i.persons = 1;
+                        break;
+                    case 'DBL':
+                        i.persons = 2;
+                        break;
+                    case 'TRPL':
+                        i.persons = 3;
+                        break;
+                    case 'QAD':
+                        i.persons = 4;
+                        break;
+                }
+            }
+        },
 
         async update_hotel(id) {
             try {
@@ -614,26 +692,7 @@ export default {
             }).then((response) => (this.hotel.hotel_type = response.data[0]));
         },
 
-        get_persons() {
 
-            switch (this.hotel.hotel_type) {
-                case 'Single':
-                    this.hotel.persons = 1;
-                    break;
-                case 'Double':
-                    this.hotel.persons = 2;
-                    break;
-                case 'Triple':
-                    this.hotel.persons = 3;
-                    break;
-                case 'Quad':
-                    this.hotel.persons = 4;
-                    break;
-                case 'Five':
-                    this.hotel.persons = 5;
-                    break;
-            }
-        },
 
         open_add_modal() {
             this.edit_mode = false;

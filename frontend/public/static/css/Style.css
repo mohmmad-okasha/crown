@@ -52,7 +52,7 @@ body {
 .vpd-dir-ltr .vpd-actions,
 .vpd-dir-ltr .vpd-addon-list-content,
 .vpd-dir-ltr .vpd-content {
-   margin-left: 13%;
+   margin-left: -5%;
 }
 
 /* mobile screen */
@@ -61,7 +61,7 @@ body {
    .vpd-dir-ltr .vpd-actions,
    .vpd-dir-ltr .vpd-addon-list-content,
    .vpd-dir-ltr .vpd-content {
-      margin-left: 0%;
+      margin-left: -30%;
    }
 }
 

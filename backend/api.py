@@ -87,8 +87,9 @@ def get_max_id(request):
 @api_view(['GET'])
 def get_rooms(request):
     hotel = request.query_params['hotel']
+    hotel_id= Hotels.objects.filter(name=hotel).first().id
     persons = request.query_params['persons']
-    rooms = Rooms.objects.filter(hotel=hotel).filter(persons=persons).values('room_id')
+    rooms = Rooms.objects.filter(hotel=hotel_id).filter(persons=persons).values('room_id')
     unique_rooms = set(room['room_id'] for room in rooms)
     return Response(list(unique_rooms))
 
@@ -98,7 +99,7 @@ def get_rooms(request):
 
 @api_view(['GET'])
 def get_hotels(request):
-    hotels = set(Rooms.objects.values_list('hotel', flat=True))
+    hotels = set(Hotels.objects.values_list('name', flat=True))
     return Response(list(hotels))
 
 #####################################################################################
@@ -109,8 +110,9 @@ def get_hotels(request):
 def get_room_info(request):
     room_id = request.query_params['room_id']
     hotel = request.query_params['hotel']
+    hotel_id= Hotels.objects.filter(name=hotel).first().id
 
-    room_info = Rooms.objects.filter(room_id=room_id, hotel=hotel).first()
+    room_info = Rooms.objects.filter(room_id=room_id, hotel=hotel_id).first()
     #room_dates = Rooms.objects.values_list('range',flat=True).filter(room_id=room_id, hotel=hotel)
 
     return Response({"id": room_info.id,"type": room_info.room_type,"range": room_info.range,"notes": room_info.notes})
