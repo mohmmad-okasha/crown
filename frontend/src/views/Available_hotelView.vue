@@ -99,7 +99,7 @@ export default {
             test: [],
             date_range: [],
             all_range_dates: [],
-            hotel: 'Hotel 1',
+            hotel: '',
             room_type: '',
             hotels: [],
             open_dates: [],//all dates for all room
@@ -179,21 +179,19 @@ export default {
             if (this.date_range) {
                 let month = this.date_range.split('/')[0];
                 let year = this.date_range.split('/')[1];
-                month = parseInt(month, 10).toString();//to remove 0 from month start with 0 like 05 , 09 
+                //month = parseInt(month, 10).toString();//to remove 0 from month start with 0 like 05 , 09 
 
                 // Filter out-of-range dates we loop in all dates 
                 this.open_dates.forEach(item => {
                     item.dates = item.dates.filter(date => {
                         const parts = date.split('/');
-                        const cDate = new Date(parts[2], parts[1] , parts[0]);
-                        return cDate.getFullYear() == year && cDate.getMonth() == month;
+                        return parts[2] == year && parts[1] == month;
                     });
                 });
                 this.close_dates.forEach(item => {
                     item.dates = item.dates.filter(date => {
                         const parts2 = date.split('/');
-                        const cDate2 = new Date(parts2[2], parts2[1] , parts2[0]);
-                        return cDate2.getFullYear() == year && cDate2.getMonth() == month;
+                        return parts2[2] == year && parts2[1] == month;
                     });
                 });
             }
@@ -267,11 +265,10 @@ export default {
             await this.get_open_rooms();
             await this.get_close_rooms();
             for (let roomBooked of this.close_dates) {// to remove booked dates from open dates
-                let roomBookedId = roomBooked.room_id;
-                let roomBookedHotel = roomBooked.hotel;
+                let roomBookedname = roomBooked.name;
                 let roomBookedDates = roomBooked.dates;
                 for (let room of this.open_dates) {
-                    if (room.room_id === roomBookedId && room.hotel === roomBookedHotel) {
+                    if (room.name === roomBookedname ) {
                         room.dates = room.dates.filter(date => !roomBookedDates.includes(date));
                     }
                 }

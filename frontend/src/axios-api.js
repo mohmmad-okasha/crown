@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const domain_url = 'http://13.50.110.227:8000';
 //13.50.110.227
+//127.0.0.1
 const my_api = axios.create({
     baseURL: domain_url,
     timeout: 1000

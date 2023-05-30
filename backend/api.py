@@ -198,7 +198,8 @@ def get_booked_rooms(request):
 @api_view(['GET'])
 def get_open_rooms(request):
     hotel = str(request.query_params['hotel'])
-    hotel_id= Hotels.objects.filter(name=hotel).first().id
+    if (hotel):
+        hotel_id= Hotels.objects.filter(name=hotel).first().id
 
     room_type = str(request.query_params['room_type'])
 
