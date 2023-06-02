@@ -228,13 +228,23 @@ export default {
                     item.dates.forEach(function(d, idx, array){// loop on all dates for all rooms
                         var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
                         var button = document.createElement("button");
-                        if (idx === array.length - 1){ 
-                            button.className = "btn btn-danger tow_color";
-                        }else{
                         button.className = "btn btn-danger";
-                        }
                         div.appendChild(button);
+                    });
+                } catch (error) {
+                }
+            });
 
+            //out_date two colors
+            this.close_dates.forEach(o => {
+                try {
+                    o.out_dates=o.out_dates.split(','); // str to array of dates
+                    o.out_dates.forEach(function(d){ // loop on all out_dates 
+                        var div = document.getElementById(o.name + '_' + (d.slice(0, 2)));// select target div by date day
+                        div.innerHTML = ''; // remove any btn in this out_date day
+                        var button = document.createElement("button");
+                        button.className = "btn btn-danger tow_color";
+                        div.appendChild(button);
                     });
                 } catch (error) {
                 }

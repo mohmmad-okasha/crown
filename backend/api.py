@@ -236,13 +236,14 @@ def get_close_rooms(request):
     elif(hotel):
         rooms = Bookings.objects.filter(hotel=hotel).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates from backend_bookings where status='Booked' group by room")
     else:
-        rooms = Bookings.objects.raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates from backend_bookings where status='Booked' group by room")
+        rooms = Bookings.objects.raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
     response_data = []
 
     for room in rooms:
         room_data = {
             'name': room.room,
-            'dates': room.all_dates
+            'dates': room.all_dates,
+            'out_dates': room.out_dates
         }
         response_data.append(room_data)
 

@@ -12,6 +12,7 @@ class Bookings(models.Model):
     kids_ages = models.CharField(max_length=200,blank=True)
     hotel = models.CharField(max_length=50)
     dates = models.CharField(max_length=100)
+    out_date = models.CharField(max_length=100)
     room_id = models.CharField(max_length=50)
     room_type = models.CharField(max_length=50)
     status = models.CharField(max_length=50)

@@ -479,6 +479,7 @@ export default {
                 room_id: "",
                 room_type: "",
                 dates: "",
+                out_date: "",
                 all_dates: "",
                 guests: "",
                 status: "",
@@ -525,8 +526,9 @@ export default {
             const dateValues = newValue.split(",");
             this.min_date = dateValues[0];
             this.max_date = dateValues[1];
+            this.this_row.out_date= this.this_row.dates[1];
             this.get_booked_dates()
-        },
+        }
     },
 
     ////////////////////
@@ -797,7 +799,7 @@ export default {
                         this.PrintDiv('booking_data');
                     }
                     // convert the dates array to string to save it in db
-                    if (this.this_row.dates.length > 1) { this.this_row.dates = this.this_row.dates.toString(); }
+                    if (this.this_row.dates.length > 1) {this.this_row.out_date=this.this_row.dates[1]; this.this_row.dates = this.this_row.dates.toString(); }
                     if (!this.this_row.kids_number) { this.this_row.kids_number=0; }
                     this.this_row.persons_names = this.this_row.persons_names.join(',');
                     this.this_row.kids_names = this.this_row.kids_names.join(',');
@@ -808,7 +810,7 @@ export default {
                         body: JSON.stringify(this.this_row),
                     });
 
-                    swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
+                    swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 1500, });
 
                     this.get_booking_rows();
                     this.get_max_id();
