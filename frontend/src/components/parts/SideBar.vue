@@ -48,7 +48,7 @@
         <div id="booking_menu" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
             <router-link tag="a" class="collapse-item" to="/available_hotel"> {{ $t("Available Hotel") }} </router-link>
-            <router-link tag="a" class="collapse-item" to="/rooms"> {{ $t("Rooms") }} </router-link>
+            <router-link tag="a" class="collapse-item" to="/hotels"> {{ $t("Hotels") }} </router-link>
             <router-link tag="a" class="collapse-item" to="/bookings"> {{ $t("Bookings") }} </router-link>
 
           </div>

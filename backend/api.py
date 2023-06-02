@@ -88,8 +88,7 @@ def get_max_id(request):
 def get_rooms(request):
     hotel = request.query_params['hotel']
     hotel_id= Hotels.objects.filter(name=hotel).first().id
-    persons = request.query_params['persons']
-    rooms = Rooms.objects.filter(hotel=hotel_id).filter(persons=persons).values('room_id')
+    rooms = Rooms.objects.filter(hotel=hotel_id).values('room_id')
     unique_rooms = set(room['room_id'] for room in rooms)
     return Response(list(unique_rooms))
 

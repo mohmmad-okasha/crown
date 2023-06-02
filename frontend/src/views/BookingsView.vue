@@ -140,12 +140,55 @@
 
                         <form>
                             <div class="form-group">
-                                <label for="book_date">{{ $t("Booking Date") }}</label>
-                                <input id="book_date" v-model="this_row.book_date" type="datetime-local"
-                                    :class="{ 'is-invalid': !this.this_row.book_date && this.validate, 'is-valid': this.this_row.book_date && this.validate }"
-                                    class="form-control">
-                                <div v-if="!this.this_row.book_date && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select The Date") }}
+                                    <label for="book_date">{{ $t("Booking Date") }}</label>
+                                    <input id="book_date" v-model="this_row.book_date" type="datetime-local"
+                                        :class="{ 'is-invalid': !this.this_row.book_date && this.validate, 'is-valid': this.this_row.book_date && this.validate }"
+                                        class="form-control">
+                                    <div v-if="!this.this_row.book_date && this.validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select The Date") }}
+                                    </div>
+                                </div>
+
+                            <div class="row g-3 form-group">
+
+
+                                <div class="col">
+                                    <label for="hotel">{{ $t("Hotel") }}</label>
+                                    <v-select id="hotel" v-model="this_row.hotel" :options="hotels"
+                                        :class="{ 'is-invalid': !this_row.hotel && validate, 'is-valid': this_row.hotel && validate }" />
+
+                                    <div v-if="!this_row.hotel && validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select hotel") }}
+                                    </div>
+                                </div>
+
+
+                                <div class="col">
+                                    <label for="room_id">{{ $t("Room ID") }}</label>
+                                    <select id="room_id" v-model="this_row.room_id" type="text" class="form-control"
+                                        :class="{ 'is-invalid': !this.this_row.room_id && this.validate, 'is-valid': this.this_row.room_id && this.validate }">
+                                        <option v-for="room in rooms" v-bind:value="room" :key="room">{{
+                                            room }}</option>
+                                    </select>
+                                    <div v-if="!this.this_row.room_id && this.validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select room_id") }}
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <label for="room_type">{{ $t("Room Type") }}</label>
+                                    <input readonly id="room_type" v-model="this_row.room_type" type="text"
+                                        class="form-control">
+                                </div>
+                            </div>
+
+
+                            <label v-show="this.this_row.room_id" for="dates">{{ $t("Select Date") }}</label>
+                            <div v-show="this.this_row.room_id" class="form-group card" id="dates" style="width: 100%;">
+                                <div class="card-body">
+                                    <date-picker v-model="this_row.dates" :min="min_date" :max="max_date"
+                                        :disable="disable_dates" range clearable locale="en" inline :auto-submit="true"
+                                        custom-input="none" color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY" />
                                 </div>
                             </div>
 
@@ -157,8 +200,8 @@
 
                                     <div class="row g-3 form-group">
                                         <div class="col">
-                                            <label for="guests"> {{ $t("Number of Persons") }}</label>
-                                            <input id="guests" v-model="this_row.persons_number" min="1" max="15"
+                                            <label for="Adults"> {{ $t("Adults") }}</label>
+                                            <input id="Adults" v-model="this_row.persons_number" min="1" max="15"
                                                 :class="{ 'is-invalid': !this.this_row.persons_number && this.validate, 'is-valid': this.this_row.persons_number && this.validate }"
                                                 type="number" class="form-control">
                                             <div v-if="!this.this_row.persons_number && this.validate"
@@ -167,8 +210,8 @@
                                             </div>
                                         </div>
                                         <div class="col">
-                                            <label for="guests"> {{ $t("Number of Kids") }}</label>
-                                            <input id="guests" v-model="this_row.kids_number" min="0" max="10"
+                                            <label for="Children"> {{ $t("Children") }}</label>
+                                            <input id="Children" v-model="this_row.kids_number" min="0" max="10"
                                                 :class="{ 'is-invalid': this.this_row.kids_number < 0 && this.validate, 'is-valid': this.this_row.kids_number && this.validate }"
                                                 type="number" class="form-control">
                                             <div v-if="this.this_row.kids_number < 0 && this.validate"
@@ -180,7 +223,7 @@
 
                                     <div v-if="this_row.persons_number > 0">
                                         <div v-for=" i in parseInt(this_row.persons_number)" :key="i" class="form-group">
-                                            <label>{{ $t("Full Name Of Person") + i }}</label>
+                                            <label>{{ $t("Adult Name ") + i  }}</label>
                                             <input v-model="this_row.persons_names[i - 1]" type="text" class="form-control"
                                                 :class="{ 'is-invalid': !this_row.persons_names[i - 1] && validate, 'is-valid': this_row.persons_names[i - 1] && validate }">
                                             <div v-if="!this_row.persons_names[i - 1] && validate"
@@ -194,23 +237,23 @@
                                         <div v-for=" i in parseInt(this_row.kids_number)" :key="i" class="form-group">
                                             <div class="row">
                                                 <div class="col">
-                                                    <label>{{ $t("Kids Name ") + i }}</label>
+                                                    <label>{{ $t("Children Name ") + i }}</label>
                                                     <input v-model="this_row.kids_names[i - 1]" type="text"
                                                         class="form-control"
                                                         :class="{ 'is-invalid': !this_row.kids_names[i - 1] && validate, 'is-valid': this_row.kids_names[i - 1] && validate }">
                                                     <div v-if="!this_row.kids_names[i - 1] && validate"
                                                         class="invalid-feedback hidden">
-                                                        {{ $t("Please Enter The Name of Kids") + i }}
+                                                        {{ $t("Please Enter Children Name") + i }}
                                                     </div>
                                                 </div>
                                                 <div class="col">
-                                                    <label>{{ $t("Kids Age ") + i }}</label>
+                                                    <label>{{ $t("Children Age ") + i }}</label>
                                                     <input v-model="this_row.kids_ages[i - 1]" type="text"
                                                         class="form-control"
                                                         :class="{ 'is-invalid': !this_row.kids_ages[i - 1] && validate, 'is-valid': this_row.kids_ages[i - 1] && validate }">
                                                     <div v-if="!this_row.kids_ages[i - 1] && validate"
                                                         class="invalid-feedback hidden">
-                                                        {{ $t("Please Enter The Name of Kids") + i }}
+                                                        {{ $t("Please Enter Children Age") + i }}
                                                     </div>
                                                 </div>
 
@@ -218,43 +261,6 @@
                                         </div>
                                     </div>
 
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="hotel">{{ $t("Hotel") }}</label>
-                                <v-select id="hotel" v-model="this_row.hotel" :options="hotels"
-                                    :class="{ 'is-invalid': !this_row.hotel && validate, 'is-valid': this_row.hotel && validate }" />
-
-                                <div v-if="!this_row.hotel && validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select hotel") }}
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="room_id">{{ $t("Room ID") }}</label>
-                                <select id="room_id" v-model="this_row.room_id" type="text" class="form-control"
-                                    :class="{ 'is-invalid': !this.this_row.room_id && this.validate, 'is-valid': this.this_row.room_id && this.validate }">
-                                    <option v-for="room in rooms" v-bind:value="room" :key="room">{{
-                                        room }}</option>
-                                </select>
-                                <div v-if="!this.this_row.room_id && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select room_id") }}
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="room_type">{{ $t("Room Type") }}</label>
-                                <input readonly id="room_type" v-model="this_row.room_type" type="text"
-                                    class="form-control">
-                            </div>
-
-                            <label v-show="this.this_row.room_id" for="dates">{{ $t("Select Date") }}</label>
-                            <div v-show="this.this_row.room_id" class="form-group card" id="dates" style="width: 100%;">
-                                <div class="card-body">
-                                    <date-picker v-model="this_row.dates" :min="min_date" :max="max_date"
-                                        :disable="disable_dates" range clearable locale="en" inline :auto-submit="true"
-                                        custom-input="none" color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY" />
                                 </div>
                             </div>
 
@@ -311,10 +317,8 @@
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
 
-
-
         <!-- Data Card -->
-        <div v-show="this.this_row.persons_names.length>0" class="col-xl-12 center">
+        <div v-show="this.this_row.persons_names.length > 0" class="col-xl-12 center">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
@@ -506,16 +510,16 @@ export default {
 
     ////////////////////
     watch: {
-        'this_row.hotel': function (newValue) {
+        'this_row.hotel': async function (newValue) {
             if (this.edit_mode || this.add_mode) {
-                this.get_rooms()
+                this.this_row.room_id='';
+                
+                await this.get_rooms();
+                this.this_row.room_id=this.rooms[0];
+
             }
         },
-        'this_row.persons_number': function (newValue) {
-            if (this.edit_mode || this.add_mode) {
-                this.get_rooms()
-            }
-        },
+
         'this_row.room_id': function (newValue) {
             if (this.edit_mode || this.add_mode) {
                 this.get_room_info(newValue);
@@ -526,7 +530,7 @@ export default {
             const dateValues = newValue.split(",");
             this.min_date = dateValues[0];
             this.max_date = dateValues[1];
-            this.this_row.out_date= this.this_row.dates[1];
+            this.this_row.out_date = this.this_row.dates[1];
             this.get_booked_dates()
         }
     },
@@ -676,7 +680,7 @@ export default {
             if (this.this_row.hotel)
                 return axios({
                     method: "get",
-                    url: domain_url + "/backend/get_rooms/", params: { hotel: this.this_row.hotel, persons: this.this_row.persons_number },
+                    url: domain_url + "/backend/get_rooms/", params: { hotel: this.this_row.hotel },
                     //auth: { username: "admin", password: "123", },
                 }).then((response) => (this.rooms = response.data));
         },
@@ -799,8 +803,8 @@ export default {
                         this.PrintDiv('booking_data');
                     }
                     // convert the dates array to string to save it in db
-                    if (this.this_row.dates.length > 1) {this.this_row.out_date=this.this_row.dates[1]; this.this_row.dates = this.this_row.dates.toString(); }
-                    if (!this.this_row.kids_number) { this.this_row.kids_number=0; }
+                    if (this.this_row.dates.length > 1) { this.this_row.out_date = this.this_row.dates[1]; this.this_row.dates = this.this_row.dates.toString(); }
+                    if (!this.this_row.kids_number) { this.this_row.kids_number = 0; }
                     this.this_row.persons_names = this.this_row.persons_names.join(',');
                     this.this_row.kids_names = this.this_row.kids_names.join(',');
                     this.this_row.kids_ages = this.this_row.kids_ages.join(',');
