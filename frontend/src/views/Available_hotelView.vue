@@ -144,12 +144,12 @@ export default {
         },
         hotel: async function (newValue) {
             await this.get_monitor();
-            await this.filter_dates();
+            //await this.filter_dates();
             this.create_closed();
         },
         room_type: async function (newValue) {
             await this.get_monitor();
-            await this.filter_dates();
+            //await this.filter_dates();
             this.create_closed();
         },
         close_dates: function (newValue) {//to get all dates in the booked ranges
@@ -225,7 +225,7 @@ export default {
             //loop on open rooms dates and create button on monitoring table
             this.close_dates.forEach(item => {
                 try {
-                    item.dates.forEach(function(d, idx, array){// loop on all dates for all rooms
+                    item.dates.forEach(function(d){// loop on all dates for all rooms
                         var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
                         var button = document.createElement("button");
                         button.className = "btn btn-danger";
