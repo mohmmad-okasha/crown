@@ -34,7 +34,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 # Login
 
-
 @api_view(['POST'])
 def login(request):
     username = request.data.get('username')
@@ -52,7 +51,6 @@ def login(request):
 
 # to upload files
 
-
 class FileUploadView(APIView):
     parser_classes = (MultiPartParser,)
 
@@ -67,8 +65,6 @@ class FileUploadView(APIView):
 
         default_storage.save(file_path, image_file)
         return Response({'success': True})
-
-
 
 #####################################################################################
 
@@ -133,16 +129,6 @@ def get_room_id(request):
 
 #####################################################################################
 
-# @api_view(['GET'])
-# def get_room_dates_old(request):
-#     room_id = str(request.query_params['room_id'])
-#     hotel = request.query_params['hotel']
-
-#     room_dates = Rooms.objects.values_list('dates',flat=True).filter(room_id=room_id).filter(hotel=hotel)
-#     return Response ({room_dates[0]})
-
-
-#####################################################################################
 @api_view(['GET'])
 def get_room_dates(request):
     room_id = str(request.query_params['room_id'])
@@ -167,7 +153,6 @@ def get_booked_dates(request):
     # booked_dates = Bookings.objects.raw("select id,dates from backend_Bookings where room_id='"+room_id+"' and hotel='"+hotel+"'")
     # dates_list = [booking.dates for booking in booked_dates]  # Convert RawQuerySet to list of dates
     # return Response({"booked_dates": dates_list})
-
 
 #####################################################################################
 @api_view(['GET'])
@@ -223,8 +208,6 @@ def get_open_rooms(request):
 
 ##################################################################################################################
 
-
-
 @api_view(['GET'])
 def get_close_rooms(request):
     hotel = str(request.query_params['hotel'])
@@ -248,22 +231,8 @@ def get_close_rooms(request):
 
     return JsonResponse(response_data, safe=False)
 
-##################################################################################################################
-
-# to check room if exist in hotel
-
-# @api_view(['GET'])
-# def check_room_exist(request):
-#     room_id = request.query_params['room_id']
-#     hotel = request.query_params['hotel']
-
-#     room_type = Rooms.objects.values_list('room_type',flat=True).filter(room_id=room_id).filter(hotel=hotel)
-#     return Response ({room_type})
-
-
 #####################################################################################
 # to remove files
-
 
 @api_view(['GET'])
 def remove_file(request):
@@ -277,7 +246,6 @@ def remove_file(request):
 
 #####################################################################################
 
-
 @api_view(['POST'])
 def new_account(request):
     parent = request.query_params['parent']
@@ -285,7 +253,6 @@ def new_account(request):
     return Response(parent+" "+name)
 
 #####################################################################################
-
 
 class bookings(ModelViewSet, mixins.DestroyModelMixin):
 
@@ -306,7 +273,6 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
         return self.update(request, *args, **kwargs)
 
 #####################################################################################
-
 
 class flights(ModelViewSet, mixins.DestroyModelMixin):
 
@@ -329,7 +295,6 @@ class flights(ModelViewSet, mixins.DestroyModelMixin):
         return self.update(request, *args, **kwargs)
 
 #####################################################################################
-
 
 class flight_dates(ModelViewSet, mixins.DestroyModelMixin):
 
@@ -374,6 +339,7 @@ class rooms(ModelViewSet, mixins.DestroyModelMixin):
         return self.update(request, *args, **kwargs)
 
 #####################################################################################
+
 class hotels(ModelViewSet, mixins.DestroyModelMixin):
 
     queryset = Hotels.objects.all()
@@ -416,7 +382,6 @@ class room_dates(ModelViewSet, mixins.DestroyModelMixin):
 
 #####################################################################################
 
-
 class accounts(ModelViewSet, mixins.DestroyModelMixin):
 
     queryset = Accounts.objects.all()
@@ -442,9 +407,7 @@ class accounts(ModelViewSet, mixins.DestroyModelMixin):
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
 
-
 #####################################################################################
-
 
 class dashboard_buttons(ModelViewSet, mixins.DestroyModelMixin):
 
@@ -463,7 +426,6 @@ class dashboard_buttons(ModelViewSet, mixins.DestroyModelMixin):
         return self.update(request, *args, **kwargs)
 
 #####################################################################################
-
 
 class settings(ModelViewSet):
 
