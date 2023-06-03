@@ -768,7 +768,7 @@ export default {
             }
             this.disable_dates = this.disable_dates.filter((el) => !this.this_row.all_dates.includes(el));
             //////////////////////////////////////////////
-
+            await this.get_rooms();
             $('#addModal').modal('toggle');
         },
 

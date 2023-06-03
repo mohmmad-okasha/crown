@@ -52,7 +52,7 @@
                     <div class="card-header cnter" style="display: none;" id="head_txt"></div>
                     <form class="site-form-table">
                         <div class="table-responsive">
-                            <table class="table table-hover">
+                            <table id="mytable" class="table table-hover">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -333,6 +333,7 @@
             </div>
         </div>
 
+        <button @click="exportToExcel">Export to Excel</button>
 
     </div>
 </template>
@@ -347,6 +348,7 @@ import NavBar from '../components/parts/NavBar.vue'
 
 import VuePersianDatetimePicker from 'vue-persian-datetime-picker';
 import swal from 'sweetalert';
+import XLSX from 'xlsx/dist/xlsx.full.min';
 
 export default {
     name: 'HotelsView',
@@ -437,7 +439,7 @@ export default {
                 console.log(error);
             });
 
-
+            
     },
 
     computed: {
@@ -495,7 +497,7 @@ export default {
         'hotel.country'() {
             this.getCities();
         },
-        selected_hotel(newValue){//send selected values to hotel array
+        selected_hotel(newValue) {//send selected values to hotel array
             this.hotel.id = newValue.id
             this.hotel.name = newValue.name
             this.hotel.country = newValue.country
@@ -509,6 +511,11 @@ export default {
     },
 
     methods: {
+        exportToExcel() {
+            const wb = XLSX.utils.table_to_book(document.querySelector('#mytable'));
+            XLSX.writeFile(wb, 'data.xlsx');
+        },
+
         get_Hotels() {
             // we using return first of the function for 'await' 
             return my_api.get('/backend/hotels/')
@@ -710,7 +717,7 @@ export default {
         },
 
         async get_hotel(id) {
-            
+
             return axios({
                 method: "get",
                 url: domain_url + "/backend/hotels/?id=" + id,
@@ -776,7 +783,7 @@ export default {
         open_edit_modal() {
             this.edit_mode = true;
             this.hotel.room.forEach(element => {
-               element.range=element.range.split(',');
+                element.range = element.range.split(',');
             });
             //$('#modal_label').html('Edit hotel');
             $('#addModal').modal('toggle');

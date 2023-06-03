@@ -5,8 +5,11 @@ import store from "./store";
 import axios from "axios";
 import swal from 'sweetalert';
 import VueI18n from 'vue-i18n'
+import XLSX from 'xlsx/dist/xlsx.full.min';
 
-axios.defaults.baseURL ='http://127.0.0.1:8000';
+
+var currentURL = window.location.protocol + "//" + window.location.hostname + ":8000" + window.location.pathname;
+axios.defaults.baseURL =currentURL;
 
 Vue.use(VueI18n)
 
@@ -105,5 +108,6 @@ new Vue({
   store,
   axios,
   swal,
+  XLSX,
   render: (h) => h(App),
 }).$mount("#app");
