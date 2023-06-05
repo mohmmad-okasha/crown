@@ -291,6 +291,19 @@ def new_account(request):
     return Response(parent+" "+name)
 
 #####################################################################################
+from django.contrib.auth.models import User
+
+class UserDataView(APIView):
+    
+    def get(self, request):
+        users = User.objects.all() 
+        
+        # Serialize the user data to a JSON response
+        user_data = [{'username': user.username, 'email': user.email,'first_name':user.first_name ,'last_name':user.last_name,'is_superuser':user.is_superuser,'last_login':user.last_login,'date_joined':user.date_joined} for user in users]
+        
+        return Response(user_data)
+
+#####################################################################################
 
 class bookings(ModelViewSet, mixins.DestroyModelMixin):
 

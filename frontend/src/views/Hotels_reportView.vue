@@ -268,7 +268,7 @@ export default {
             const blob = new Blob([wordContent], { type: 'application/msword' });
 
             // Save the Blob as a Word file
-            saveAs(blob, 'exported_data.doc');
+            saveAs(blob, this.hotel + ' on ' + this.range + '.doc');
         },
 
         getCities() {

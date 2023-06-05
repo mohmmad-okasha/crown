@@ -34,6 +34,8 @@ urlpatterns += [
     #Booking
     path("get_rooms/", api.get_rooms, name="get_rooms"),
 
+    path("users/", api.UserDataView.as_view(), name="UserDataView"),
+
     path("get_hotels/", api.get_hotels, name="get_hotels"),
 
     path("get_room_info/", api.get_room_info, name="get_room_info"),
