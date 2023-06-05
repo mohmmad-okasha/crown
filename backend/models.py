@@ -5,9 +5,9 @@ from django.db import models
 
 class Bookings(models.Model):
     book_date = models.DateTimeField(max_length=50)
-    persons_number = models.IntegerField(max_length=50)
+    persons_number = models.IntegerField()
     persons_names = models.CharField(max_length=200)
-    kids_number = models.IntegerField(max_length=50,default=0)
+    kids_number = models.IntegerField(default=0)
     kids_names = models.CharField(max_length=200,blank=True)
     kids_ages = models.CharField(max_length=200,blank=True)
     hotel = models.CharField(max_length=50)
@@ -34,7 +34,7 @@ class Hotels(models.Model):
     city = models.CharField(max_length=50)
     area = models.CharField(max_length=50,blank=True)
     rate = models.CharField(max_length=50)
-    allotment = models.IntegerField(max_length=50)
+    allotment = models.IntegerField()
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)
 
@@ -53,7 +53,7 @@ class Rooms(models.Model):
     room_categ = models.CharField(max_length=50,blank=True)#ROOM CATEGORY
     room_type = models.CharField(max_length=50)
     meals = models.CharField(max_length=50,blank=True)
-    persons = models.IntegerField(max_length=50)#persons number
+    persons = models.IntegerField()#persons number
     range = models.CharField(max_length=1000)
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)
@@ -81,7 +81,7 @@ class Flights(models.Model):
     to_airport = models.CharField(max_length=50)
     departure_date = models.DateTimeField(max_length=50)
     arrival_date=models.DateTimeField(max_length=50)
-    seats=models.IntegerField(max_length=100)
+    seats=models.IntegerField()
     status=models.CharField(max_length=100)
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)
@@ -95,7 +95,7 @@ class Flights(models.Model):
 #####################################################################################
 
 class Flight_dates(models.Model):
-    flight_id=models.IntegerField(max_length=100)
+    flight_id=models.IntegerField()
     departure_date = models.DateTimeField(max_length=50)
     arrival_date=models.DateTimeField(max_length=50)
 
@@ -135,6 +135,13 @@ class Dashboard_buttons(models.Model):
 
     class Meta:
         ordering= ['id'] #to Sort the values
+
+#####################################################################################
+from django.contrib.auth.models import User
+
+class Roles(models.Model):
+    user_name = models.ForeignKey(User, on_delete=models.CASCADE)
+    roles = models.CharField(max_length=1000)
 
 #####################################################################################
 

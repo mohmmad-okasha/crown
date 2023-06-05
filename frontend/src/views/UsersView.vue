@@ -62,13 +62,13 @@
                     <th scope="col">{{ $t("Email") }}</th>
                     <th scope="col">{{ $t("Admin") }}</th>
                     <th scope="col">{{ $t("Last Login") }}</th>
-                    <th scope="col">{{ $t("Date Joined") }}</th>
+                    <th scope="col">{{ $t("Created On") }}</th>
                     <th scope="col" class="no_print">{{ $t("Actions") }}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr @contextmenu="showContextMenu" v-for="r in this.users" :key="r.id"
-                    @click="row_click(r.id)" @click.right="row_click(r.id)" @dblclick="open_edit_modal" role="button"
+                  <tr @contextmenu="showContextMenu" v-for="r in this.users" :key="r.id" @click="row_click(r.id)"
+                    @click.right="row_click(r.id)" @dblclick="open_edit_modal" role="button"
                     :class="{ 'selected': r.id === active_index }">
                     <th scope="row" id="id">{{ r.id }}</th>
                     <td>{{ $t(r.first_name) }}</td>
@@ -76,8 +76,8 @@
                     <td>{{ $t(r.username) }}</td>
                     <td>{{ $t(r.email) }}</td>
                     <td>{{ $t(r.is_superuser) }}</td>
-                    <td>{{ $t(r.last_login) }}</td>
-                    <td>{{ $t(r.date_joined) }}</td>
+                    <td>{{ r.last_login.substring(0, 10) }}</td>
+                    <td>{{ r.date_joined.substring(0, 10) }}</td>
 
                     <td class="no_print">
 
@@ -342,7 +342,10 @@ export default {
   name: "users",
   data() {
     return {
+      active_index:'',
+      max_id:0,
       users: [],
+      
       user: {
         id: "",
         first_name: "",
@@ -352,6 +355,7 @@ export default {
         is_superuser: "",
         last_login: "",
         date_joined: "",
+        rols: [],
       },
       //////////////////////////
       isContextMenuActive: false,
@@ -381,82 +385,78 @@ export default {
     // },
 
     get_users() {
-
-      return my_api.get('backend/users/',{auth: { username: "admin", password: "123", }})
-                .then((response) => (this.users = response.data))
-                .catch(err => { alert(err) });
+      return my_api.get('backend/users/', { auth: { username: "admin", password: "123", } })
+        .then((response) => (this.users = response.data))
+        .catch(err => { alert(err) });
     },
 
     showContextMenu(event) {
-            event.preventDefault();
-            this.isContextMenuActive = true;
-            this.menuStyle.top = `${event.clientY}px`;
-            this.menuStyle.left = `${event.clientX}px`;
-            this.menuStyle.display = 'block';
-            // Add a click listener to the window object to hide the context menu
-            window.addEventListener('click', this.hideContextMenu);
-        },
+      event.preventDefault();
+      this.isContextMenuActive = true;
+      this.menuStyle.top = `${event.clientY}px`;
+      this.menuStyle.left = `${event.clientX}px`;
+      this.menuStyle.display = 'block';
+      // Add a click listener to the window object to hide the context menu
+      window.addEventListener('click', this.hideContextMenu);
+    },
 
-        hideContextMenu() {
-            this.isContextMenuActive = false;
-            this.menuStyle.display = 'none';
-            // Remove the click listener from the window object
-            window.removeEventListener('click', this.hideContextMenu);
-        },
+    hideContextMenu() {
+      this.isContextMenuActive = false;
+      this.menuStyle.display = 'none';
+      // Remove the click listener from the window object
+      window.removeEventListener('click', this.hideContextMenu);
+    },
 
-        open_add_modal() {
-            this.edit_mode = false;
-            //$('#modal_label').html('Add hotel');
-            this.clear_form();
-            $('#addModal').modal('toggle');
-        },
+    open_add_modal() {
+      this.edit_mode = false;
+      //$('#modal_label').html('Add user');
+      this.clear_form();
+      $('#addModal').modal('toggle');
+    },
 
-        open_edit_modal() {
-            this.edit_mode = true;
-            this.hotel.room.forEach(element => {
-                element.range = element.range.split(',');
-            });
-            //$('#modal_label').html('Edit hotel');
-            $('#addModal').modal('toggle');
-        },
-        closeModal() {
-            $('#addModal').modal('hide');
-            this.clear_form();
-        },
-        async row_click(index) {
-            this.active_index = index; //to change row color
+    open_edit_modal() {
+      this.edit_mode = true;
+      this.user.room.forEach(element => {
+        element.range = element.range.split(',');
+      });
+      $('#addModal').modal('toggle');
+    },
 
-            await this.get_hotel(index);
-            await this.get_rooms(index);
-            return true
-            //this.hotel.range = this.hotel.range.split(",");// convert text to array
+    closeModal() {
+      $('#addModal').modal('hide');
+      this.clear_form();
+    },
 
-        },
+    async row_click(index) {
+      this.active_index = index; //to change row color
+      await this.get_user(index);
+      return true
+    },
 
-        clear_form() {
-            this.hotel.name = '';
-            this.hotel.country = '';
-            this.hotel.city = '';
-            this.hotel.area = '';
-            this.hotel.rate = '';
-            this.hotel.allotment = 0;
-            this.hotel.notes = '';
-            this.validate = false;
-        },
+    clear_form() {
+      this.user.first_name = '';
+      this.user.last_name = '';
+      this.user.username = '';
+      this.user.email = '';
+      this.user.is_superuser = '';
+      this.user.last_login = '';
+      this.user.date_joined = '';
+      this.validate = false;
+    },
 
-        check_form() {
-            this.validate = true; //to change inputs color 'red/green'
+    check_form() {
+      this.validate = true; //to change inputs color 'red/green'
 
-            if (
-                this.hotel.name &&
-                this.hotel.country &&
-                this.hotel.rate
-            ) {
-                return true
-            } else {
-                return false
-            }
-        },
+      if (
+        this.user.username &&
+        this.user.email &&
+        this.user.is_superuser
+      ) {
+        return true
+      } else {
+        return false
+      }
+    },
   },
 };
 </script>

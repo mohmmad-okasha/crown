@@ -11,6 +11,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
+                                <div class="col-sm-2"></div>
                                 <div class="col-auto">
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Date Range") }}</label>
                                 </div>
@@ -29,7 +30,7 @@
                                 <div class="col-auto">
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Hotel") }}</label>
                                 </div>
-                                <div class="col-auto">
+                                <div class="col-2">
                                     <select class="form-control" placeholder="Hotel" v-model="hotel">
                                         <option v-for="h in this.hotels" :key="h" :value="h"> {{ h }}</option>
                                     </select>
@@ -64,6 +65,7 @@
                                         <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)" :title="r.name"
                                             type="button" class="btn btn-success"></button>
                                     </td>
+                                    <br><br>
                                 </tr>
                             </tbody>
                         </table>
@@ -193,6 +195,12 @@ export default {
                         const parts2 = date.split('/');
                         return parts2[2] == year && parts2[1] == month;
                     });
+                    item.out_dates=item.out_dates.split(',');
+                    item.out_dates = item.out_dates.filter(date => {
+                        const parts3 = date.split('/');
+                        return parts3[2] == year && parts3[1] == month;
+                    });
+                    item.out_dates=item.out_dates.toString();
                 });
             }
             // if (this.date_range.length > 0) {
@@ -294,7 +302,7 @@ export default {
         get_close_rooms() {
             return axios({
                 method: "get",
-                url: domain_url + "/backend/get_close_rooms/", params: { hotel: this.hotel, room_type: this.room_type },
+                url: domain_url + "/backend/get_close_rooms/", params: { hotel: this.hotel, room_type: this.room_type , month: this.date_range },
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.close_dates = response.data));
         },

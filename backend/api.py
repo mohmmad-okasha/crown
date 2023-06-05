@@ -250,6 +250,7 @@ def get_open_rooms(request):
 def get_close_rooms(request):
     hotel = str(request.query_params['hotel'])
     room_type = str(request.query_params['room_type'])
+    room_type = str(request.query_params['room_type'])
 
     if(hotel and room_type):
         rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
@@ -299,7 +300,7 @@ class UserDataView(APIView):
         users = User.objects.all() 
         
         # Serialize the user data to a JSON response
-        user_data = [{'username': user.username, 'email': user.email,'first_name':user.first_name ,'last_name':user.last_name,'is_superuser':user.is_superuser,'last_login':user.last_login,'date_joined':user.date_joined} for user in users]
+        user_data = [{'id':user.id,'username': user.username, 'email': user.email,'first_name':user.first_name ,'last_name':user.last_name,'is_superuser':user.is_superuser,'last_login':user.last_login,'date_joined':user.date_joined} for user in users]
         
         return Response(user_data)
 
