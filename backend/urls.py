@@ -50,5 +50,7 @@ urlpatterns += [
     
     path("get_booked_rooms/", api.get_booked_rooms, name="get_booked_rooms"),
 
+    path("booking_report/", api.booking_report, name="booking_report"),
+
 
 ]

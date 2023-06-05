@@ -76,6 +76,44 @@ def get_max_id(request):
     max_id = eval(table_name).objects.aggregate(Max('id'))
     return Response({'data': max_id})
 
+
+#####################################################################################
+from django.db.models import Subquery, OuterRef
+
+@api_view(['GET'])
+def booking_report(request):
+    hotel = str(request.query_params['hotel'])
+    hotel_id= Hotels.objects.filter(name=hotel).first().id
+
+    from_date = str(request.query_params['from_date'])
+    to_date = str(request.query_params['to_date'])
+
+    data = Bookings.objects.filter(hotel=hotel,dates__gte=from_date,dates__lte=to_date)
+    
+    #.raw("select backend_bookings.*,backend_rooms.meals from backend_rooms,backend_bookings where hotel_id='"+str(hotel_id)+"' and backend_bookings.room_id = backend_rooms.room_id")
+   
+    all_data = []
+    for d in data:
+        all_data.append({
+            'id': d.id,
+            'hotel': d.hotel,
+            'persons_names': d.persons_names,
+            'persons_number': d.persons_number,
+            'kids_names': d.kids_names,
+            'kids_number': d.kids_number,
+            'dates': d.dates,
+            'room_id': d.room_id,
+            'room_type': d.room_type,
+            'meals': Rooms.objects.filter(hotel_id=hotel_id,room_id=d.room_id).first().meals,
+            'room_categ': Rooms.objects.filter(hotel_id=hotel_id,room_id=d.room_id).first().room_categ,
+            'notes': d.notes,
+        })
+
+
+    serializer = serializers.bookings_serializer(all_data, many=True)
+
+    return Response(all_data)
+
 #####################################################################################
 
 # to get rooms by hotel
