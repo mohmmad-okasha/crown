@@ -4,7 +4,7 @@ body {
 
 .sidebar {
    background-color: var(--primary) !important;
- }
+}
 
 /* #main_table {
    height: 36vh !important;
@@ -56,8 +56,11 @@ body {
 .vpd-dir-ltr .vpd-actions,
 .vpd-dir-ltr .vpd-addon-list-content,
 .vpd-dir-ltr .vpd-content {
-   margin-left: -5%;
+   margin-left: 12%;
 }
+
+
+
 
 /* mobile screen */
 @media only screen and (max-device-width: 640px) {
@@ -65,8 +68,19 @@ body {
    .vpd-dir-ltr .vpd-actions,
    .vpd-dir-ltr .vpd-addon-list-content,
    .vpd-dir-ltr .vpd-content {
-      margin-left: -30%;
+      margin-left: -5%;
    }
+
+   .container,
+   .container-fluid,
+   .container-lg,
+   .container-md,
+   .container-sm,
+   .container-xl {
+      padding: 0 !important;
+   }
+
+
 }
 
 .vpd-header {
