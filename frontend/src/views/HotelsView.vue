@@ -333,7 +333,6 @@
             </div>
         </div>
 
-        <button @click="exportToExcel">Export to Excel</button>
 
     </div>
 </template>
@@ -511,11 +510,6 @@ export default {
     },
 
     methods: {
-        exportToExcel() {
-            const wb = XLSX.utils.table_to_book(document.querySelector('#mytable'));
-            XLSX.writeFile(wb, 'data.xlsx');
-        },
-
         get_Hotels() {
             // we using return first of the function for 'await' 
             return my_api.get('/backend/hotels/')

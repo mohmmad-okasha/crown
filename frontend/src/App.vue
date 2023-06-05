@@ -54,7 +54,7 @@
     </div>
 
     <div v-if="this.auth.logged_in">
-      
+
       <!-- Page Wrapper -->
       <div id="wrapper">
         <!-- Sidebar -->
@@ -207,7 +207,7 @@ export default {
         primary_color: '',
         back_color: '',
       },
-      user_name:'',
+      user_name: '',
       auth: {
         username: '',
         password: '',
@@ -221,7 +221,15 @@ export default {
     }
   },
   async mounted() {
-    this.user_name=localStorage.getItem('user_name')
+
+    //if mobile click sidebarToggleTop button
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      $(document).ready(function () {
+        $('#sidebarToggleTop').click();
+      });
+    }
+
+    this.user_name = localStorage.getItem('user_name')
 
     await this.get_settings();
     this.dark_mode();

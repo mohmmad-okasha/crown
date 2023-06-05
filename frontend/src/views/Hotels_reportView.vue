@@ -29,12 +29,13 @@
                 <!-- Card Body -->
                 <div class="card-body">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-3 m-1">
                             <label for="hotel">{{ $t("Hotel") }}</label>
                             <v-select id="hotel" v-model="hotel" :options="hotels" />
                         </div>
 
-                        <div class="col">
+                        <div class="col-sm-3 m-1">
                             <label for="range">{{ $t("Select Range") }}</label>
                             <input type="text" class="form-control date_input">
                             <date-picker v-model="range" range clearable locale="en" :auto-submit="true"
@@ -47,14 +48,14 @@
 
 
         <!-- Report Card -->
-        <div v-show="data.hotel_name" ref="exportContent" class="col-xl-12 center">
+        <div v-show="data.hotel_name" class="col-xl-12 center">
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">{{ $t("Report") }} </h6>
                 </div>
                 <!-- Card Body -->
-                <div class="card-body">
+                <div class="card-body" ref="exportContent">
                     <div class="row">
                         <div class="col">
                             <h1>{{ this.data.hotel_name }} Hotel </h1>
@@ -97,11 +98,12 @@
                         </div>
                     </div>
                 </div>
-                <div class="exclude-me">
-                    <button @click="exportToExcel">Export to Excel</button>
-                    <button @click="exportToWord">Export to Word</button>
-                </div>
 
+
+                <div class="card-footer text-muted" v-show="this.bookings.length">
+                    <button type="button" class="btn btn-primary m-1" @click="exportToWord"> <i class="fa-solid fa-file-word"></i></button>
+                    <button type="button" class="btn btn-primary m-1" @click="exportToExcel"> <i class="fa-solid fa-file-excel"></i></button>
+                </div>
 
             </div>
         </div>
@@ -260,28 +262,7 @@ export default {
         exportToWord() {
             // Generate the Word content (replace with your own logic)
             const divContent = this.$refs.exportContent.innerHTML;
-            const cssStyles = `
-                <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/4.6.0/css/bootstrap.min.css">
-                <style>
-                /* Additional custom styles */
-                .export-content {
-                    font-family: Arial, sans-serif;
-                    font-size: 14px;
-                    color: #333;
-                }
-                
-                .export-content h1 {
-                    font-size: 20px;
-                    color: #ff0000;
-                }
-                
-                .export-content p {
-                    font-size: 16px;
-                }
-                </style>
-            `;
-
-            const wordContent = `<html><head>${cssStyles}</head><body>${divContent}</body></html>`;
+            const wordContent = `<html><body>${divContent}</body></html>`;
 
             // Convert the content to a Blob
             const blob = new Blob([wordContent], { type: 'application/msword' });
