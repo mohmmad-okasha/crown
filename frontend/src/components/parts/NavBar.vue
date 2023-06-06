@@ -110,18 +110,18 @@
           </a>
           <!-- Dropdown - User Information -->
           <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-            <a class="dropdown-item on-hover-sm" href="#">
+            <!-- <a class="dropdown-item on-hover-sm" href="#">
               <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
               {{ $t("Profile") }}
-            </a>
+            </a> -->
             <a class="dropdown-item on-hover-sm" @click="this.open_settings_modal">
               <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
               {{ $t("Settings") }}
             </a>
-            <a class="dropdown-item on-hover-sm" href="#">
+            <!-- <a class="dropdown-item on-hover-sm" href="#">
               <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
               {{ $t("Activity Log") }}
-            </a>
+            </a> -->
 
             <div class="dropdown-divider"></div>
             <a class="dropdown-item on-hover-sm" href="#" data-toggle="modal" data-target="#logoutModal">

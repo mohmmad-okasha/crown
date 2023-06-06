@@ -314,9 +314,12 @@ class UserDataView(APIView):
         username = request.data.get('username')
         password = request.data.get('password')
         roles_list = request.data.get('roles_list')
+        first_name = request.data.get('first_name')
+        last_name = request.data.get('last_name')
+        email = request.data.get('email')
         
         # Create a new user instance
-        user = User(username=username,last_login=datetime.now())
+        user = User(username=username,last_login=datetime.now(),first_name=first_name,last_name=last_name,email=email)
         
         # Set the password for the user
         user.set_password(password)
@@ -344,7 +347,30 @@ class UserDataView(APIView):
         user.delete()
         
         return Response({'message': 'User deleted successfully'})
+    
+    def patch(self, request):
+        id = request.data.get('id')
+        new_data = request.data.get('new_data')
+        
+        # Retrieve the user object
+        user = get_object_or_404(User, id=id)
+        roles = get_object_or_404(Roles, user_name_id=id)
+        
+        # Update the user data
+        user.first_name = new_data.get('first_name', user.first_name)
+        user.last_name = new_data.get('last_name', user.last_name)
+        user.username = new_data.get('username', user.username)
+        user.email = new_data.get('email', user.email)
+        if(new_data.get('password', user.password)):
+            user.set_password(new_data.get('password', user.password))
+        
+        roles=new_data.get('roles', roles)
 
+        # Save the updated user instance
+        user.save()
+        roles.save()
+        
+        return Response({'message': 'User data updated successfully'})
     
 #####################################################################################
 

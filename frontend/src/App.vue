@@ -221,14 +221,6 @@ export default {
     }
   },
   async mounted() {
-
-    //if mobile click sidebarToggleTop button
-    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-      $(document).ready(function () {
-        $('#sidebarToggleTop').click();
-      });
-    }
-
     this.user_name = localStorage.getItem('user_name')
 
     await this.get_settings();
@@ -314,6 +306,14 @@ export default {
     },
   },
   beforeCreate() {
+    //if mobile click sidebarToggleTop button
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+      $(document).ready(function () {
+        $('#sidebarToggleTop').click();
+      });
+    }
+
+
     const token = localStorage.getItem('access_token')
     this.logged_in = token
     this.user_name = localStorage.getItem('user_name')

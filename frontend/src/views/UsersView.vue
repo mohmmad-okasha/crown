@@ -60,8 +60,6 @@
                     <th scope="col">{{ $t("Last Name") }}</th>
                     <th scope="col">{{ $t("User Name") }}</th>
                     <th scope="col">{{ $t("Email") }}</th>
-                    <th scope="col">{{ $t("Admin") }}</th>
-                    <th scope="col">{{ $t("Last Login") }}</th>
                     <th scope="col">{{ $t("Created On") }}</th>
                     <th scope="col" class="no_print">{{ $t("Actions") }}</th>
                   </tr>
@@ -74,8 +72,6 @@
                     <td>{{ $t(r.last_name) }}</td>
                     <td>{{ $t(r.username) }}</td>
                     <td>{{ $t(r.email) }}</td>
-                    <td>{{ $t(r.is_superuser) }}</td>
-                    <td>{{ r.last_login.substring(0, 10) }}</td>
                     <td>{{ r.date_joined.substring(0, 10) }}</td>
 
                     <td class="no_print">
@@ -192,7 +188,7 @@
                 <label for="password2"> {{ $t("Confirm Password") }}</label>
                 <input id="password2" v-model="user.password2"
                   :class="{ 'is-invalid': !(this.user.password == this.user.password2) && this.validate, 'is-valid': (this.user.password == this.user.password2) && this.validate }"
-                  type="password2" class="form-control">
+                  type="password" class="form-control">
 
                 <div v-if="!(this.user.password == this.user.password2) && this.validate" class="invalid-feedback hidden">
                   {{ $t("Password not match") }}
@@ -214,7 +210,7 @@
 
                       <select v-if="this.edit_mode" name="no_list" id="no_list" class="form-control input-medium" multiple
                         size="10">
-                        <option v-for="d in disabled_roles" :value="d">{{ d }}</option>
+                        <option v-for="d in disabled_roles" :key="d" :value="d">{{ d }}</option>
                       </select>
 
                       <button @click="add_role()" type="button" class="btn-sm btn btn-success btn-circle mt-3"
@@ -226,11 +222,11 @@
                       <label for="ok_list">{{ $t('Enabled') }}</label>
                       <select v-if="!this.edit_mode" name="ok_list" id="ok_list" class="form-control input-medium"
                         multiple size="10">
-                        <option v-for="a in this.all_roles" :value="a">{{ a }}</option>
+                        <option v-for="a in this.all_roles" :key="a" :value="a">{{ a }}</option>
                       </select>
                       <select v-if="this.edit_mode" name="ok_list" id="ok_list" class="form-control input-medium" multiple
                         size="10">
-                        <option v-for="e in enabled_roles" :value="e">{{ e }}</option>
+                        <option v-for="e in enabled_roles" :key="e" :value="e">{{ e }}</option>
                       </select>
                       <button @click="remove_role()" type="button" class="btn-sm btn btn-danger btn-circle mt-3"
                         :title="$t('Disable')"><i class="fas fa-angle-left"></i></button>
@@ -281,6 +277,7 @@ export default {
   data() {
     return {
       validate: false,
+      edit_mode: false,
       active_index: '',
       max_id: 0,
       users: [],
@@ -294,8 +291,6 @@ export default {
         password: "",
         password2: "",
         email: "",
-        is_superuser: "",
-        last_login: "",
         date_joined: "",
         roles: [],
         roles_list: [],
@@ -362,31 +357,82 @@ export default {
         }
       } catch (error) { console.error(); }
     },
-    async delete_user(id) {
-            try {
-                await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, })
-                    .then(async (willDelete) => {
-                        if (willDelete) {
-                            var response = await fetch(domain_url + '/backend/users/?id=' + id , {
-                                method: "delete",
-                                headers: { "Content-Type": "application/json", },
-                            });
-                            if (!response.ok) {
-                                // handle the error
-                                var errorMessage = "Error: " + response.status + " " + response.statusText;
-                                swal(errorMessage, { icon: 'error' });
-                            } else {
-                                // Request was successful
-                                swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 1500, });
-                                this.clear_form();
-                                await this.get_users();
-                                this.closeModal();
-                            }
 
-                        }
-                    });
-            } catch (error) { console.error(); }
-        },
+    async delete_user(id) {
+      try {
+        await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, })
+          .then(async (willDelete) => {
+            if (willDelete) {
+              var response = await fetch(domain_url + '/backend/users/?id=' + id, {
+                method: "delete",
+                headers: { "Content-Type": "application/json", },
+              });
+              if (!response.ok) {
+                // handle the error
+                var errorMessage = "Error: " + response.status + " " + response.statusText;
+                swal(errorMessage, { icon: 'error' });
+              } else {
+                // Request was successful
+                swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 1500, });
+                this.clear_form();
+                await this.get_users();
+                this.closeModal();
+              }
+
+            }
+          });
+      } catch (error) { console.error(); }
+    },
+
+    update_user(id) {
+      try {
+        if (this.check_form()) {
+          axios
+            .patch(`/backend/users/`, { id: id, new_data: this.user })
+            .then(response => {
+              swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
+              this.get_users();
+              this.closeModal();
+              this.edit_mode = false;
+            })
+            .catch(error => {
+              var errorMessage = "Error: " + error;
+              swal(errorMessage, { icon: 'error' });
+            });
+        }
+      } catch (error) {
+        console.error();
+      }
+    },
+
+    async update_user1(id) {
+      try {
+        if (this.check_form()) {
+          var response = await fetch(domain_url + "/backend/users/", { id: id, new_data: this.user }, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", },
+            body: JSON.stringify(this.user),
+          });
+
+          if (!response.ok) {
+            // handle the error
+            var errorMessage = "Error: " + response.status + " " + response.statusText;
+            swal(errorMessage, { icon: 'error' });
+          } else {
+            // Request was successful
+
+
+            swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
+            this.get_users();
+            this.closeModal();
+            this.edit_mode = false;
+          }
+        }
+      } catch (error) {
+        console.error();
+      }
+
+    },
 
     // Roles
     remove_role() {
@@ -476,8 +522,8 @@ export default {
       this.user.last_name = '';
       this.user.username = '';
       this.user.email = '';
-      this.user.is_superuser = '';
-      this.user.last_login = '';
+      this.user.password = '';
+      this.user.password2 = '';
       this.user.date_joined = '';
       this.validate = false;
     },
@@ -507,7 +553,6 @@ export default {
         this.user.username &&
         this.user.email &&
         this.user.password === this.user.password2
-        //this.user.is_superuser
       ) {
         return true
       } else {
