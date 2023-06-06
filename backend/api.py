@@ -299,7 +299,7 @@ from django.shortcuts import get_object_or_404
 class UserDataView(APIView):
     
     def get(self, request):
-        users = User.objects.all()
+        users = User.objects.all().exclude(username = 'admin')
         id = self.request.query_params.get('id')
         if id is not None:
             users = users.filter(id=id)
