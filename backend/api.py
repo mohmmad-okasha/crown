@@ -293,16 +293,81 @@ def new_account(request):
 
 #####################################################################################
 from django.contrib.auth.models import User
+from datetime import datetime
+from django.shortcuts import get_object_or_404
 
 class UserDataView(APIView):
     
     def get(self, request):
-        users = User.objects.all() 
+        users = User.objects.all()
+        id = self.request.query_params.get('id')
+        if id is not None:
+            users = users.filter(id=id)
         
         # Serialize the user data to a JSON response
         user_data = [{'id':user.id,'username': user.username, 'email': user.email,'first_name':user.first_name ,'last_name':user.last_name,'is_superuser':user.is_superuser,'last_login':user.last_login,'date_joined':user.date_joined} for user in users]
         
         return Response(user_data)
+    
+    def post(self, request):
+        # Get the username and password from the request data
+        username = request.data.get('username')
+        password = request.data.get('password')
+        roles_list = request.data.get('roles_list')
+        
+        # Create a new user instance
+        user = User(username=username,last_login=datetime.now())
+        
+        # Set the password for the user
+        user.set_password(password)
+        
+        # Save the user instance
+        user.save()
+
+        last_id = User.objects.last().id         
+
+        role = Roles(user_name_id=last_id)
+        for column_name in roles_list:
+            setattr(role, column_name, 1)
+
+        role.save()
+        
+        return Response({'message': 'User created successfully'})
+    
+    def delete(self, request):
+        id = request.query_params.get('id')
+        
+        # Retrieve the user object
+        user = get_object_or_404(User, id=id)
+        
+        # Delete the user
+        user.delete()
+        
+        return Response({'message': 'User deleted successfully'})
+
+    
+#####################################################################################
+
+@api_view(['GET'])
+def get_roles(request):
+    user_id = str(request.query_params['user_id'])
+
+    roles = Roles.objects.filter(user_name_id=user_id)
+    roles = serializers.roles_serializer(roles, many=True)
+
+    return Response(roles.data[0])
+
+    
+#####################################################################################
+
+@api_view(['GET'])
+def get_all_roles(request):
+
+    roles = Roles.objects.first()
+    roles = serializers.roles_serializer(roles, many=False)
+
+    return Response(roles.data)
+
 
 #####################################################################################
 

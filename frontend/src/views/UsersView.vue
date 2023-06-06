@@ -68,8 +68,7 @@
                 </thead>
                 <tbody>
                   <tr @contextmenu="showContextMenu" v-for="r in this.users" :key="r.id" @click="row_click(r.id)"
-                    @click.right="row_click(r.id)" @dblclick="open_edit_modal" role="button"
-                    :class="{ 'selected': r.id === active_index }">
+                    @click.right="row_click(r.id)" role="button" :class="{ 'selected': r.id === active_index }">
                     <th scope="row" id="id">{{ r.id }}</th>
                     <td>{{ $t(r.first_name) }}</td>
                     <td>{{ $t(r.last_name) }}</td>
@@ -122,213 +121,152 @@
     <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
 
     <!-- modal -->
-    <!-- <div class="modal  fade" id="addModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
-          aria-labelledby="staticBackdropLabel" aria-hidden="true">
-          <div class="modal-dialog modal-xl">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h5 v-if="!this.edit_mode" class="modal-title" id="modal_label">{{ $t("Add user") }}</h5>
-                      <h5 v-if="this.edit_mode" class="modal-title" id="modal_label">{{ $t("Edit user") }}</h5>
-                      <button type="button" class="close on-hover" @click="this.closeModal" aria-label="Close">
-                          <span aria-hidden="true">&times;</span>
-                      </button>
-                  </div>
-                  <div class="modal-body">
-
-                      <form>
-
-                          <div class="row">
-
-                              <div class="form-group col-md">
-                                  <label for="name"> {{ $t("name") }}</label>
-                                  <input id="name" v-model="user.name"
-                                      :class="{ 'is-invalid': !this.user.name && this.validate, 'is-valid': this.user.name && this.validate }"
-                                      type="text" class="form-control">
-                                  <div v-if="!this.user.name && this.validate" class="invalid-feedback hidden">
-                                      {{ $t("Please Enter The name") }}
-                                  </div>
-                              </div>
-
-                              <div class="form-group col-md">
-                                  <label for="country"> {{ $t("country") }}</label>
-                                  <select id="country" v-model="user.country"
-                                      :class="{ 'is-invalid': !this.user.country && this.validate, 'is-valid': this.user.country && this.validate }"
-                                      type="text" class="form-control">
-                                      <option v-for="country in countries" :value="country.name.common"
-                                          :key="country.name.common">
-                                          {{ country.name.common }}
-                                      </option>
-                                  </select>
-                                  <div v-if="!this.user.country && this.validate" class="invalid-feedback hidden">
-                                      {{ $t("Please Enter The country") }}
-                                  </div>
-                              </div>
-
-                              <div class="form-group col-md">
-                                  <label for="city"> {{ $t("city") }}</label>
-                                  <input id="city" v-model="user.city"
-                                      :class="{ 'is-invalid': !this.user.city && this.validate, 'is-valid': this.user.city && this.validate }"
-                                      type="text" class="form-control">
-
-                                  <div v-if="!this.user.city && this.validate" class="invalid-feedback hidden">
-                                      {{ $t("Please Enter The city") }}
-                                  </div>
-                              </div>
-
-
-                              <div class="form-group col-md">
-                                  <label for="area"> {{ $t("area") }}</label>
-                                  <input id="area" v-model="user.area"
-                                      :class="{ 'is-invalid': !this.user.area && this.validate, 'is-valid': this.user.name && this.validate }"
-                                      type="text" class="form-control">
-                                  <div v-if="!this.user.area && this.validate" class="invalid-feedback hidden">
-                                      {{ $t("Please Enter The area") }}
-                                  </div>
-                              </div>
-                          </div>
-
-                          <div class="row">
-                              <div class="form-group col-md">
-                                  <label for="rate">{{ $t("rate") }}</label>
-                                  <select id="rate" v-model="user.rate" type="text" class="form-control"
-                                      :class="{ 'is-invalid': !this.user.rate && this.validate, 'is-valid': this.user.rate && this.validate }">
-                                      <option :value="$t('5 Star')">{{ $t("5 Star") }} </option>
-                                      <option :value="$t('4 Star')">{{ $t("4 Star") }} </option>
-                                      <option :value="$t('3 Star')">{{ $t("3 Star") }} </option>
-                                      <option :value="$t('2 Star')">{{ $t("2 Star") }} </option>
-                                      <option :value="$t('1 Star')">{{ $t("1 Star") }} </option>
-                                  </select>
-                                  <div v-if="!this.user.rate && this.validate" class="invalid-feedback hidden">
-                                      {{ $t("Please Select the rate") }}
-                                  </div>
-                              </div>
-
-                              <div class="form-group col-md">
-                                  <label for="allotment"> {{ $t("allotment") }}</label>
-                                  <input type="number" min="1" value="1" class="form-control" v-model="user.allotment"
-                                      id="allotment">
-                              </div>
-
-                              <div class="form-group col-md-6">
-                                  <label for="user_notes"> {{ $t("Notes") }}</label>
-                                  <textarea class="form-control" v-model="user.notes" id="user_notes"
-                                      rows="1"></textarea>
-                              </div>
-                          </div>
-
-                          <div v-if="this.user.allotment > 0" class="card form-group">
-                              <h4 class="card-header">
-                                  {{ $t("Rooms") }}
-                              </h4>
-
-                              <div class="card-body">
-                                  <div v-for="i in parseInt(user.allotment)" :key="i">
-                                      <div class="card">
-                                          <div class="card-header">
-                                              {{ $t("Room") + ' ' + i }}
-                                          </div>
-                                          <div class="card-body">
-
-                                              <input hidden type="text" v-model="user.room[i - 1].user">
-                                              <input hidden type="text" v-model="user.room[i - 1].room_id">
-                                              <input hidden type="text" v-model="user.room[i - 1].user">
-                                              <div class="row">
-
-                                                  <div class="form-group col-md">
-                                                      <label for="room_type">{{ $t("Room Type") }}</label>
-                                                      <select v-model="user.room[i - 1].room_type" type="text"
-                                                          class="form-control"
-                                                          :class="{ 'is-invalid': !user.room[i - 1].room_type && validate, 'is-valid': user.room[i - 1].room_type && validate }">
-                                                          <option :value="$t('SGL')">{{ $t("SGL") }} </option>
-                                                          <option :value="$t('DBL')">{{ $t("DBL") }} </option>
-                                                          <option :value="$t('TRPL')">{{ $t("TRPL") }} </option>
-                                                          <option :value="$t('QAD')">{{ $t("QAD") }} </option>
-                                                      </select>
-                                                      <div v-if="!user.room[i - 1].room_type && validate"
-                                                          class="invalid-feedback hidden">
-                                                          {{ $t("Please Select the room type") }}
-                                                      </div>
-                                                  </div>
-
-                                                  <div class="form-group col-md">
-                                                      <label for="room_categ">{{ $t("Room Category") }}</label>
-                                                      <input v-model="user.room[i - 1].room_categ" type="text"
-                                                          class="form-control"
-                                                          :class="{ 'is-invalid': !user.room[i - 1].room_categ && validate, 'is-valid': user.room[i - 1].room_categ && validate }">
-                                                      <div v-if="!user.room[i - 1].room_categ && validate"
-                                                          class="invalid-feedback hidden">
-                                                          {{ $t("Please Input Room Category") }}
-                                                      </div>
-                                                  </div>
-
-                                                  <div class="form-group col-md">
-                                                      <label for="meals">{{ $t("Meals") }}</label>
-                                                      <select v-model="user.room[i - 1].meals" type="text"
-                                                          class="form-control"
-                                                          :class="{ 'is-invalid': !user.room[i - 1].meals && validate, 'is-valid': user.room[i - 1].meals && validate }">
-                                                          <option :value="$t('B.B')">{{ $t("B.B") }} </option>
-                                                          <option :value="$t('H.B')">{{ $t("H.B") }} </option>
-                                                          <option :value="$t('F.B')">{{ $t("F.B") }} </option>
-                                                          <option :value="$t('ALL')">{{ $t("ALL") }} </option>
-                                                          <option :value="$t('ULALL')">{{ $t("ULALL") }} </option>
-                                                      </select>
-                                                      <div v-if="!user.room[i - 1].meals && validate"
-                                                          class="invalid-feedback hidden">
-                                                          {{ $t("Please Select Meals") }}
-                                                      </div>
-                                                  </div>
-
-                                              </div>
-
-                                              <div class="row">
-
-                                                  <div class="form-group col-md">
-                                                      <label for="cutomer_notes"> {{ $t("Date Range") }}</label>
-
-                                                      <date-picker v-model="user.room[i - 1].range" range clearable
-                                                          :auto-submit="true" color="#098290" input-format="DD/MM/YYYY"
-                                                          format="DD/MM/YYYY" locale="en" />
-
-                                                  </div>
-
-                                                  <div class="form-group col-md">
-                                                      <label for="cutomer_notes"> {{ $t("Notes") }}</label>
-                                                      <textarea class="form-control" v-model="user.room[i - 1].notes"
-                                                          id="cutomer_notes" rows="1"></textarea>
-                                                  </div>
-
-                                              </div>
-                                          </div>
-                                      </div>
-                                      <br>
-                                  </div>
-                              </div>
-
-                          </div>
-                      </form>
-
-                  </div>
-                  <div class="modal-footer">
-
-                      <button type="button" id="closeModal" title="close" class="btn btn-secondary on-hover-sm"
-                          @click="this.closeModal">
-                          <i class="fa fa-xmark"></i>
-                      </button>
-
-                      <button v-if="!edit_mode" type="button" title="save" @click="save_user()"
-                          class="btn btn-primary on-hover-sm">
-                          <i class="fa fa-floppy-disk"></i></button>
-
-                      <button v-if="edit_mode" type="button" title="delete" @click="delete_user(active_index)"
-                          class="btn btn-danger on-hover-sm"> <i class="fa fa-trash"></i> </button>
-
-                      <button v-if="edit_mode" type="button" title="save" @click="update_user(active_index)"
-                          class="btn btn-primary on-hover-sm"> <i class="fa fa-floppy-disk"></i> </button>
-
-                  </div>
-              </div>
+    <div class="modal  fade" id="addModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+      aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 v-if="!this.edit_mode" class="modal-title" id="modal_label">{{ $t("Add User") }}</h5>
+            <h5 v-if="this.edit_mode" class="modal-title" id="modal_label">{{ $t("Edit User") }}</h5>
+            <button type="button" class="close on-hover" @click="this.closeModal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
           </div>
-      </div> -->
+          <div class="modal-body">
+
+            <form>
+
+              <div class="form-group col-md">
+                <label for="first_name"> {{ $t("First Name") }}</label>
+                <input id="first_name" v-model="user.first_name"
+                  :class="{ 'is-invalid': !this.user.first_name && this.validate, 'is-valid': this.user.first_name && this.validate }"
+                  type="text" class="form-control">
+                <div v-if="!this.user.first_name && this.validate" class="invalid-feedback hidden">
+                  {{ $t("Please Enter The first_name") }}
+                </div>
+              </div>
+
+              <div class="form-group col-md">
+                <label for="last_name"> {{ $t("Last Name") }}</label>
+                <input id="last_name" v-model="user.last_name"
+                  :class="{ 'is-invalid': !this.user.last_name && this.validate, 'is-valid': this.user.last_name && this.validate }"
+                  type="text" class="form-control">
+                <div v-if="!this.user.last_name && this.validate" class="invalid-feedback hidden">
+                  {{ $t("Please Enter The last_name") }}
+                </div>
+              </div>
+
+              <div class="form-group col-md">
+                <label for="username"> {{ $t("User Name") }}</label>
+                <input id="username" v-model="user.username"
+                  :class="{ 'is-invalid': !this.user.username && this.validate, 'is-valid': this.user.username && this.validate }"
+                  type="text" class="form-control">
+                <div v-if="!this.user.username && this.validate" class="invalid-feedback hidden">
+                  {{ $t("Please Enter The username") }}
+                </div>
+              </div>
+
+              <div class="form-group col-md">
+                <label for="email"> {{ $t("Email") }}</label>
+                <input id="city" v-model="user.email"
+                  :class="{ 'is-invalid': !this.user.email && this.validate, 'is-valid': this.user.email && this.validate }"
+                  type="text" class="form-control">
+
+                <div v-if="!this.user.email && this.validate" class="invalid-feedback hidden">
+                  {{ $t("Please Enter The Email") }}
+                </div>
+              </div>
+
+              <div class="form-group col-md">
+                <label for="password"> {{ $t("Password") }}</label>
+                <input id="password" v-model="user.password"
+                  :class="{ 'is-invalid': !(this.user.password == this.user.password2) && this.validate, 'is-valid': (this.user.password == this.user.password2) && this.validate }"
+                  type="password" class="form-control">
+
+                <div v-if="!(this.user.password == this.user.password2) && this.validate" class="invalid-feedback hidden">
+                  {{ $t("Password not match") }}
+                </div>
+              </div>
+
+              <div class="form-group col-md">
+                <label for="password2"> {{ $t("Confirm Password") }}</label>
+                <input id="password2" v-model="user.password2"
+                  :class="{ 'is-invalid': !(this.user.password == this.user.password2) && this.validate, 'is-valid': (this.user.password == this.user.password2) && this.validate }"
+                  type="password2" class="form-control">
+
+                <div v-if="!(this.user.password == this.user.password2) && this.validate" class="invalid-feedback hidden">
+                  {{ $t("Password not match") }}
+                </div>
+              </div>
+
+              <!-- Roles -->
+              <div class="card m-1">
+                <div class="card-header">
+                  {{ $t('Roles') }}
+                </div>
+                <div class="card-body ">
+                  <div class="form-row center">
+                    <div class="form-group col-md-6">
+                      <label for="no_list">{{ $t('Disabled') }}</label>
+                      <select v-if="!this.edit_mode" name="no_list" id="no_list" class="form-control input-medium"
+                        multiple size="10">
+                      </select>
+
+                      <select v-if="this.edit_mode" name="no_list" id="no_list" class="form-control input-medium" multiple
+                        size="10">
+                        <option v-for="d in disabled_roles" :value="d">{{ d }}</option>
+                      </select>
+
+                      <button @click="add_role()" type="button" class="btn-sm btn btn-success btn-circle mt-3"
+                        :title="$t('Enable')"><i class="fas fa-angle-right"></i></button>
+                      <button @click="add_all_role()" type="button" class="btn-sm btn btn-success btn-circle mt-3"
+                        :title="$t('Enable All')"><i class="fas fa-angle-double-right"></i></button>
+                    </div>
+                    <div class="form-group col-md-6">
+                      <label for="ok_list">{{ $t('Enabled') }}</label>
+                      <select v-if="!this.edit_mode" name="ok_list" id="ok_list" class="form-control input-medium"
+                        multiple size="10">
+                        <option v-for="a in this.all_roles" :value="a">{{ a }}</option>
+                      </select>
+                      <select v-if="this.edit_mode" name="ok_list" id="ok_list" class="form-control input-medium" multiple
+                        size="10">
+                        <option v-for="e in enabled_roles" :value="e">{{ e }}</option>
+                      </select>
+                      <button @click="remove_role()" type="button" class="btn-sm btn btn-danger btn-circle mt-3"
+                        :title="$t('Disable')"><i class="fas fa-angle-left"></i></button>
+                      <button @click="remove_all_role()" type="button" class="btn-sm btn btn-danger btn-circle mt-3"
+                        :title="$t('Disable All')"><i class="fas fa-angle-double-left"></i></button>
+                    </div>
+
+
+
+                  </div>
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+          <div class="modal-footer">
+
+            <button type="button" id="closeModal" title="close" class="btn btn-secondary on-hover-sm"
+              @click="this.closeModal">
+              <i class="fa fa-xmark"></i>
+            </button>
+
+            <button v-if="!edit_mode" type="button" title="save" @click="save_user()" class="btn btn-primary on-hover-sm">
+              <i class="fa fa-floppy-disk"></i></button>
+
+            <button v-if="edit_mode" type="button" title="delete" @click="delete_user(active_index)"
+              class="btn btn-danger on-hover-sm"> <i class="fa fa-trash"></i> </button>
+
+            <button v-if="edit_mode" type="button" title="save" @click="update_user(active_index)"
+              class="btn btn-primary on-hover-sm"> <i class="fa fa-floppy-disk"></i> </button>
+
+          </div>
+        </div>
+      </div>
+    </div>
 
   </div>
 </template>
@@ -342,20 +280,25 @@ export default {
   name: "users",
   data() {
     return {
-      active_index:'',
-      max_id:0,
+      validate: false,
+      active_index: '',
+      max_id: 0,
       users: [],
-      
+      all_roles: [],
+
       user: {
         id: "",
         first_name: "",
         last_name: "",
         username: "",
+        password: "",
+        password2: "",
         email: "",
         is_superuser: "",
         last_login: "",
         date_joined: "",
-        rols: [],
+        roles: [],
+        roles_list: [],
       },
       //////////////////////////
       isContextMenuActive: false,
@@ -366,27 +309,124 @@ export default {
       }
     };
   },
+  watch: {
+
+  },
+  computed: {
+    enabled_roles() {
+      return Object.keys(this.user.roles).filter(key => this.user.roles[key] === 1);
+    },
+    disabled_roles() {
+      return Object.keys(this.user.roles).filter(key => this.user.roles[key] === 0);
+    }
+
+  },
   async mounted() {
-    this.get_users();
+    await this.get_users();
+    await this.get_all_roles();
   },
   methods: {
-    // async save_user() {
-    //   var response = await fetch(
-    //     "http://127.0.0.1:8000/users/api/users_router/",
-    //     {
-    //       method: "post",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //       body: JSON.stringify(this.test),
-    //     }
-    //   );
-    //   this.users.push(await response.json());
-    // },
 
-    get_users() {
+    async save_user() {
+      try {
+        if (this.check_form()) {
+          this.saving = true;
+
+          // save roles to array
+          this.user.roles_list = [];
+          var list_box = document.getElementById("ok_list");
+          for (var i = 0; i < list_box.length; i++) {
+            this.user.roles_list.push(list_box.options[i].value);
+          }
+
+          var response = await fetch(domain_url + "/backend/users/", {
+            method: "post",
+            headers: { "Content-Type": "application/json", },
+            body: JSON.stringify(this.user),
+          });
+
+          if (!response.ok) {
+            // handle the error
+            var errorMessage = "Error: " + response.status + " " + response.statusText;
+            swal(errorMessage, { icon: 'error' });
+          } else {
+            // Request was successful
+
+            swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
+            this.get_users();
+            this.closeModal();
+          }
+
+          this.saving = false;
+
+        }
+      } catch (error) { console.error(); }
+    },
+    async delete_user(id) {
+            try {
+                await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, })
+                    .then(async (willDelete) => {
+                        if (willDelete) {
+                            var response = await fetch(domain_url + '/backend/users/?id=' + id , {
+                                method: "delete",
+                                headers: { "Content-Type": "application/json", },
+                            });
+                            if (!response.ok) {
+                                // handle the error
+                                var errorMessage = "Error: " + response.status + " " + response.statusText;
+                                swal(errorMessage, { icon: 'error' });
+                            } else {
+                                // Request was successful
+                                swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 1500, });
+                                this.clear_form();
+                                await this.get_users();
+                                this.closeModal();
+                            }
+
+                        }
+                    });
+            } catch (error) { console.error(); }
+        },
+
+    // Roles
+    remove_role() {
+      $('#ok_list option:selected').each(function () {
+        $('#no_list').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
+        $(this).remove();
+      });
+    },
+    add_role() {
+      $('#no_list option:selected').each(function () {
+        $('#ok_list').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
+        $(this).remove();
+      });
+    },
+    remove_all_role() {
+      $('#ok_list option').each(function () {
+        $('#no_list').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
+        $(this).remove();
+      });
+    },
+    add_all_role() {
+      $('#no_list option').each(function () {
+        $('#ok_list').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
+        $(this).remove();
+      });
+    },
+
+    async get_users() {
       return my_api.get('backend/users/', { auth: { username: "admin", password: "123", } })
         .then((response) => (this.users = response.data))
+        .catch(err => { alert(err) });
+    },
+    async get_roles() {
+      return my_api.get('backend/get_roles/?user_id=' + this.user.id, { auth: { username: "admin", password: "123", } })
+        .then((response) => (this.user.roles = response.data))
+        .catch(err => { alert(err) });
+    },
+    async get_all_roles() {
+      return my_api.get('backend/get_all_roles/', { auth: { username: "admin", password: "123", } })
+        .then((response) => (this.all_roles = Object.keys(response.data)))
         .catch(err => { alert(err) });
     },
 
@@ -414,11 +454,9 @@ export default {
       $('#addModal').modal('toggle');
     },
 
-    open_edit_modal() {
+    async open_edit_modal() {
+
       this.edit_mode = true;
-      this.user.room.forEach(element => {
-        element.range = element.range.split(',');
-      });
       $('#addModal').modal('toggle');
     },
 
@@ -444,13 +482,32 @@ export default {
       this.validate = false;
     },
 
+    async get_user(id) {
+
+      return axios({
+        method: "get",
+        url: domain_url + "/backend/users/?id=" + id,
+        auth: { username: "admin", password: "123", },
+      }).then((response) => (this.user = response.data[0]));
+
+    },
+
+    async row_click(index) {
+      this.active_index = index; //to change row color
+      await this.get_user(index);
+      await this.get_roles();
+      return true
+
+    },
+
     check_form() {
       this.validate = true; //to change inputs color 'red/green'
 
       if (
         this.user.username &&
         this.user.email &&
-        this.user.is_superuser
+        this.user.password === this.user.password2
+        //this.user.is_superuser
       ) {
         return true
       } else {

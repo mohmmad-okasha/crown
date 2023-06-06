@@ -36,6 +36,9 @@ urlpatterns += [
 
     path("users/", api.UserDataView.as_view(), name="UserDataView"),
 
+    path("get_roles/", api.get_roles, name="get_roles"),
+    path("get_all_roles/", api.get_all_roles, name="get_all_roles"),
+
     path("get_hotels/", api.get_hotels, name="get_hotels"),
 
     path("get_room_info/", api.get_room_info, name="get_room_info"),

@@ -141,7 +141,11 @@ from django.contrib.auth.models import User
 
 class Roles(models.Model):
     user_name = models.ForeignKey(User, on_delete=models.CASCADE)
-    roles = models.CharField(max_length=1000)
+    users = models.IntegerField(default=0)
+    bookings = models.IntegerField(default=0)
+    hotels = models.IntegerField(default=0)
+    available_hotels = models.IntegerField(default=0)
+    hotels_report = models.IntegerField(default=0)
 
 #####################################################################################
 

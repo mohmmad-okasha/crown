@@ -62,3 +62,11 @@ class dashboard_buttons_serializer(serializers.ModelSerializer):
         fields = '__all__'
 
 #####################################################################################
+
+class roles_serializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Roles
+        exclude = ('id', 'user_name')  # Specify the fields to exclude
+
+
+#####################################################################################
