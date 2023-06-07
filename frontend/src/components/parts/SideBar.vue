@@ -31,10 +31,10 @@
         </a>
         <div id="booking_menu" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <router-link v-if="user_roles['hotels']" tag="a" class="collapse-item" to="/hotels"> {{ $t("Hotels") }} </router-link>
-            <router-link v-if="user_roles['bookings']" tag="a" class="collapse-item" to="/bookings"> {{ $t("Bookings") }} </router-link>
-            <router-link v-if="user_roles['available_hotel']" tag="a" class="collapse-item" to="/available_hotel"> {{ $t("Available Hotels") }} </router-link>
-            <router-link v-if="user_roles['hotels_report']" tag="a" class="collapse-item" to="/hotels_report"> {{ $t("Hotels Report") }} </router-link>
+            <router-link v-if="this.user_roles['hotels']" tag="a" class="collapse-item" to="/hotels"> {{ $t("Hotels") }} </router-link>
+            <router-link v-if="this.user_roles['bookings']" tag="a" class="collapse-item" to="/bookings"> {{ $t("Bookings") }} </router-link>
+            <router-link v-if="this.user_roles['available_hotel']" tag="a" class="collapse-item" to="/available_hotel"> {{ $t("Available Hotels") }} </router-link>
+            <router-link v-if="this.user_roles['hotels_report']" tag="a" class="collapse-item" to="/hotels_report"> {{ $t("Hotels Report") }} </router-link>
           </div>
         </div>
       </li>
