@@ -388,6 +388,31 @@ class UserDataView(APIView):
     
 #####################################################################################
 
+class roles(ModelViewSet, mixins.DestroyModelMixin):
+
+    queryset = Roles.objects.all()
+    serializer_class = serializers.roles_serializer
+
+    def get_queryset(self):
+        queryset = Roles.objects.all()
+        id = self.request.query_params.get('id')
+        user_name_id = self.request.query_params.get('user_name_id')
+        if id is not None:
+            queryset = queryset.filter(id=id)
+        if user_name_id is not None:
+            queryset = queryset.filter(user_name_id=user_name_id)
+
+        return queryset
+    
+
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+#####################################################################################
+
+
+
 @api_view(['GET'])
 def get_roles(request):
     user_id = str(request.query_params['user_id'])
@@ -463,29 +488,6 @@ class rooms(ModelViewSet, mixins.DestroyModelMixin):
             queryset = queryset.filter(Q(hotel__contains=search) | Q(room_id__contains=search) | Q(room_type__contains=search) | Q(
                 dates__contains=search) )
         return queryset
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-#####################################################################################
-
-class roles(ModelViewSet, mixins.DestroyModelMixin):
-
-    queryset = Roles.objects.all()
-    serializer_class = serializers.roles_serializer
-
-    def get_queryset(self):
-        queryset = Roles.objects.all()
-        id = self.request.query_params.get('id')
-        user_name_id = self.request.query_params.get('user_name_id')
-        if id is not None:
-            queryset = queryset.filter(id=id)
-        if user_name_id is not None:
-            queryset = queryset.filter(user_name_id=user_name_id)
-
-        return queryset
-    
-
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
