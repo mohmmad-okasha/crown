@@ -98,6 +98,7 @@ export default {
     ////////////////////
     data() {
         return {
+            user_roles: "",
             test: [],
             date_range: [],
             all_range_dates: [],
@@ -109,6 +110,12 @@ export default {
         }
     },
     async mounted() {
+        await new Promise(resolve => setTimeout(resolve, 500)); // wait
+        await this.get_roles();
+        if (this.user_roles[this.$route.path.substring(1)] == 0) {
+            this.$router.back()
+        }
+
         await this.get_hotels();
         await this.get_monitor();
         await this.create_closed();
@@ -176,6 +183,9 @@ export default {
     ////////////////////
 
     methods: {
+        get_roles() {
+            this.user_roles = this.$parent.user_roles;
+        },
 
         filter_dates() {// remove any date out of selected range
             if (this.date_range) {

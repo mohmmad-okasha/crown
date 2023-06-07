@@ -39,6 +39,7 @@ urlpatterns += [
 
     path("get_roles/", api.get_roles, name="get_roles"),
     path("get_role_id/", api.get_role_id, name="get_role_id"),
+    path("get_user_name_id/", api.get_user_name_id, name="get_user_name_id"),
 
     path("get_all_roles/", api.get_all_roles, name="get_all_roles"),
 

@@ -1,7 +1,8 @@
 <template>
     <div class="row" id="page-top">
-        <div v-for="button in buttons" :key="button.id" v-show="button.show" class="col-xl-3 col-md-6 mb-4 on-hover-sm" role="button">
-            <div  :class="button.color" class="card shadow h-100 py-2">
+        <div v-for="button in buttons" :key="button.id" v-show="button.show && user_roles[button.url]" class="col-xl-3 col-md-6 mb-4 on-hover-sm"
+            role="button">
+            <div :class="button.color" class="card shadow h-100 py-2">
                 <router-link tag="div" class="card-body" :to="'/' + button.url">
 
                     <div class="row no-gutters align-items-center">
@@ -42,6 +43,8 @@ export default {
     data() {
         return {
             buttons: [],
+            user_roles: ''
+
         }
     },
     computed: {
@@ -60,6 +63,8 @@ export default {
     },
     async mounted() {
         await this.get_dashboard_buttons();
+        await new Promise(resolve => setTimeout(resolve, 500)); // wait
+        this.get_roles();
     },
 
     methods: {
@@ -68,6 +73,9 @@ export default {
                 .then((response) => (this.buttons = response.data))
                 .catch(err => { alert(err) });
         },
+        get_roles() {
+            this.user_roles = this.$parent.user_roles;
+        }
 
     },
 }

@@ -143,6 +143,7 @@ export default {
     data() {
         return {
             validate: false,
+            user_roles: "",
             hotel: "",
             range: "",
             hotels: [],
@@ -170,6 +171,12 @@ export default {
     },
 
     async mounted() {
+        await new Promise(resolve => setTimeout(resolve, 500)); // wait
+        await this.get_roles();
+        if (this.user_roles[this.$route.path.substring(1)] == 0) {
+            this.$router.back()
+        }
+
         // get user name to save in any record
         this.data.user = localStorage.getItem('user_name')
 
@@ -180,6 +187,9 @@ export default {
         }////
 
         await this.get_hotels();
+
+
+        
         //await this.get_report();
 
         //get all countrys names
@@ -234,6 +244,10 @@ export default {
     },
 
     methods: {
+        get_roles() {
+            this.user_roles = this.$parent.user_roles;
+        },
+
         get_hotels() {
             return my_api.get('/backend/get_hotels/')
                 .then((response) => (this.hotels = response.data))

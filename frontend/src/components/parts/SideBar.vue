@@ -137,11 +137,22 @@ export default {
   name: "SideBar",
   data() {
     return {
-      user_name: ''
+      user_name: '',
+      user_roles: ''
     }
   },
-  mounted() {
-    this.user_name = localStorage.getItem('user_name')
+  async mounted() {
+    this.user_name = localStorage.getItem('user_name');
+
+    await new Promise(resolve => setTimeout(resolve, 1000)); // 3 sec
+    this.get_roles();
+
+  },
+
+  methods: {
+    get_roles() {
+      this.user_roles = this.$parent.user_roles;
+    }
   }
 };
 </script>

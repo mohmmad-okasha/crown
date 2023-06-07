@@ -201,8 +201,8 @@
                 <div class="card-body ">
                   <div class="form-group row center">
                     <div v-for="(value, role) in user.roles" :key="role">
-                      <label  class="col-auto" v-if="role != 'id' && role != 'user_name'">
-                        <input  type="checkbox" :value="value" :checked="checkboxValues[role]"
+                      <label class="col-auto" v-if="role != 'id' && role != 'user_name'">
+                        <input type="checkbox" :value="value" :checked="checkboxValues[role]"
                           @change="updateUserRole(role, $event.target.checked)">
                         {{ role }}
                       </label>
@@ -292,7 +292,7 @@ export default {
       max_user_id: 0,
       role_id: 0,
       users: [],
-
+      user_roles: '',
 
       user: {
         id: "",
@@ -347,11 +347,25 @@ export default {
   },
 
   async mounted() {
-
-    await this.get_users();
     await this.get_all_roles();
+
+    await new Promise(resolve => setTimeout(resolve, 500)); // wait
+    await this.get_roles_before();
+    if (this.user_roles[this.$route.path.substring(1)] == 0) {
+      this.$router.back()
+    } else {
+      await this.get_users();
+    }
+
+  },
+  async beforeCreate() {
+
   },
   methods: {
+    get_roles_before() {
+      this.user_roles = this.$parent.user_roles;
+    },
+
     get_max_user_id() {
       return axios({
         method: "get",
@@ -376,7 +390,7 @@ export default {
             method: "post",
             headers: { "Content-Type": "application/json", },
             body: JSON.stringify(this.user),
-          }); 
+          });
 
           await this.get_max_user_id();
 
@@ -489,14 +503,16 @@ export default {
 
 
     async get_users() {
-      return my_api.get('backend/users/', { auth: { username: "admin", password: "123", } })
-        .then((response) => (this.users = response.data))
-        .catch(err => { alert(err) });
+      if (this.user_roles[this.$route.path.substring(1)] == 1) {//check roles
+        return my_api.get('backend/users/', { auth: { username: "admin", password: "123", } })
+          .then((response) => (this.users = response.data))
+          .catch(err => { alert(err) });
+      }
     },
     async get_roles() {
       return my_api.get('backend/get_roles/?user_id=' + this.user.id, { auth: { username: "admin", password: "123", } })
         .then((response) => (this.user.roles = response.data))
-        .catch(err => { alert(err) });
+        .catch(err => { });
     },
     async get_role_id() {
       return my_api.get('backend/get_role_id/?user_name_id=' + this.user.id, { auth: { username: "admin", password: "123", } })

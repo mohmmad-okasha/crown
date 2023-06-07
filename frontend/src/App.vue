@@ -193,6 +193,7 @@ import { my_api, domain_url } from "./axios-api";
 import SideBar from "@/components/parts/SideBar.vue";
 import NavBar from "@/components/parts/NavBar.vue";
 export default {
+
   name: "HomeView",
   components: {
     SideBar,
@@ -208,6 +209,7 @@ export default {
         back_color: '',
       },
       user_name: '',
+      user_name_id:'',
       auth: {
         username: '',
         password: '',
@@ -217,7 +219,7 @@ export default {
       primary_color: '',
       primary_text: '',
       back_color: '',
-
+      user_roles:[]
     }
   },
   async mounted() {
@@ -226,6 +228,8 @@ export default {
     await this.get_settings();
     this.dark_mode();
     this.set_lang();
+    await this.get_user_name_id();
+    this.get_roles();
   },
   methods: {
     async loginUser() {
@@ -242,6 +246,7 @@ export default {
         // redirect to dashboard or homepage after successful login
         this.error = false;
         this.$router.push('dashboard')
+        
       } catch (error) {
         this.error = true;
         console.log(error);
@@ -256,6 +261,18 @@ export default {
       localStorage.setItem('access_token', '');
       localStorage.setItem('user_name', '');
       this.auth.logged_in = '';
+    },
+    get_user_name_id() {
+      return axios({
+        method: "get",
+        url: domain_url + "/backend/get_user_name_id/?username="+this.user_name,
+        //auth: { username: "admin", password: "123", },
+      }).then((response) => (this.user_name_id = response.data.data));
+    },
+    async get_roles() {
+      return my_api.get('backend/get_roles/?user_id=' + this.user_name_id, { auth: { username: "admin", password: "123", } })
+        .then((response) => (this.user_roles = response.data))
+        .catch(err => {  });
     },
     dark_mode() {
       if (this.settings.dark_mode) {

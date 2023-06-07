@@ -392,6 +392,7 @@ export default {
                     user: "",
                 }],
             },
+            user_roles: '',
             selected_hotel: [],
             edit_mode: false,
             max_id: 0,
@@ -418,6 +419,15 @@ export default {
 
         await this.get_Hotels();
         await this.get_max_room_id();
+
+
+        await new Promise(resolve => setTimeout(resolve, 500)); // wait
+        await this.get_roles();
+        if (this.user_roles[this.$route.path.substring(1)] == 0) {
+            this.$router.back()
+        }
+
+
         //get all countrys names
         axios.get('https://restcountries.com/v3/all')
             .then(response => {
@@ -437,7 +447,7 @@ export default {
                 console.log(error);
             });
 
-            
+
     },
 
     computed: {
@@ -509,6 +519,10 @@ export default {
     },
 
     methods: {
+        get_roles() {
+            this.user_roles = this.$parent.user_roles;
+        },
+
         get_Hotels() {
             // we using return first of the function for 'await' 
             return my_api.get('/backend/hotels/')

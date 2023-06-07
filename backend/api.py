@@ -76,6 +76,16 @@ def get_max_id(request):
     max_id = eval(table_name).objects.aggregate(Max('id'))
     return Response({'data': max_id})
 
+#####################################################################################
+
+
+@api_view(['GET'])
+def get_user_name_id(request):
+    username = request.query_params['username']
+    user_name_id= User.objects.filter(username=username).first().id
+
+    return Response({'data': user_name_id})
+
 
 #####################################################################################
 from django.db.models import Subquery, OuterRef
