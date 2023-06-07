@@ -111,8 +111,6 @@
       </div>
     </div>
 
-
-
     <!-- to get search value from navbar -->
     <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
 
@@ -201,16 +199,26 @@
                   {{ $t('Roles') }}
                 </div>
                 <div class="card-body ">
-                  <div class="form-row center">
+                  <div class="form-group row center">
+                    <div v-for="(value, role) in user.roles" :key="role">
+                      <label  class="col-auto" v-if="role != 'id' && role != 'user_name'">
+                        <input  type="checkbox" :value="value" :checked="checkboxValues[role]"
+                          @change="updateUserRole(role, $event.target.checked)">
+                        {{ role }}
+                      </label>
+                    </div>
+                  </div>
+                  <!-- <div class="form-row center">
                     <div class="form-group col-md-6">
                       <label for="no_list">{{ $t('Disabled') }}</label>
                       <select v-if="!this.edit_mode" name="no_list" id="no_list" class="form-control input-medium"
                         multiple size="10">
+                        <option v-for="d in disabled_roles" @dblclick="add_role(b)" :key="d" :value="d">{{ d }}</option>
                       </select>
 
                       <select v-if="this.edit_mode" name="no_list" id="no_list" class="form-control input-medium" multiple
                         size="10">
-                        <option v-for="d in disabled_roles" :key="d" :value="d">{{ d }}</option>
+                        <option v-for="d in disabled_roles" @dblclick="add_role(b)" :key="d" :value="d">{{ d }}</option>
                       </select>
 
                       <button @click="add_role()" type="button" class="btn-sm btn btn-success btn-circle mt-3"
@@ -226,7 +234,7 @@
                       </select>
                       <select v-if="this.edit_mode" name="ok_list" id="ok_list" class="form-control input-medium" multiple
                         size="10">
-                        <option v-for="e in enabled_roles" :key="e" :value="e">{{ e }}</option>
+                        <option v-for="e in enabled_roles" @dblclick="remove_role(e)" :key="e" :value="e">{{ e }}</option>
                       </select>
                       <button @click="remove_role()" type="button" class="btn-sm btn btn-danger btn-circle mt-3"
                         :title="$t('Disable')"><i class="fas fa-angle-left"></i></button>
@@ -236,7 +244,7 @@
 
 
 
-                  </div>
+                  </div> -->
                 </div>
               </div>
 
@@ -276,12 +284,15 @@ export default {
   name: "users",
   data() {
     return {
+      checkboxValues: {},
+      all_roles: [],
       validate: false,
       edit_mode: false,
       active_index: '',
-      max_id: 0,
+      max_user_id: 0,
+      role_id: 0,
       users: [],
-      all_roles: [],
+
 
       user: {
         id: "",
@@ -308,19 +319,46 @@ export default {
 
   },
   computed: {
-    enabled_roles() {
-      return Object.keys(this.user.roles).filter(key => this.user.roles[key] === 1);
+    // Computed property to determine whether each checkbox should be checked or not
+    checkedRoles() {
+      const checkedRoles = {};
+      for (const role in this.user.roles) {
+        checkedRoles[role] = this.user.roles[role] === 1;
+      }
+      return checkedRoles;
     },
-    disabled_roles() {
-      return Object.keys(this.user.roles).filter(key => this.user.roles[key] === 0);
-    }
+
+    search() {
+      let data = this.$parent.$refs.NavBar.search
+      if (data && data.trim()) { // data.trim() to check data not spaces only
+        return axios({
+          method: "get",
+          url: domain_url + "/backend/hotels/?search=" + data,
+        }).then((response) => (this.Hotels = response.data));
+      } else {
+        this.get_users();
+      }
+    },
+
 
   },
+  created() {
+
+  },
+
   async mounted() {
+
     await this.get_users();
     await this.get_all_roles();
   },
   methods: {
+    get_max_user_id() {
+      return axios({
+        method: "get",
+        url: domain_url + "/backend/get_max_id/?table_name=User",
+        //auth: { username: "admin", password: "123", },
+      }).then((response) => (this.max_user_id = response.data.data.id__max));
+    },
 
     async save_user() {
       try {
@@ -328,11 +366,11 @@ export default {
           this.saving = true;
 
           // save roles to array
-          this.user.roles_list = [];
-          var list_box = document.getElementById("ok_list");
-          for (var i = 0; i < list_box.length; i++) {
-            this.user.roles_list.push(list_box.options[i].value);
-          }
+          // this.user.roles_list = [];
+          // var list_box = document.getElementById("ok_list");
+          // for (var i = 0; i < list_box.length; i++) {
+          //   this.user.roles_list.push(list_box.options[i].value);
+          // }
 
           var response = await fetch(domain_url + "/backend/users/", {
             method: "post",
@@ -340,7 +378,16 @@ export default {
             body: JSON.stringify(this.user),
           });
 
-          if (!response.ok) {
+          await this.get_max_user_id();
+
+          this.user.roles["user_name"] = this.max_user_id;
+          var response2 = await fetch(domain_url + "/backend/roles/", {
+            method: "post",
+            headers: { "Content-Type": "application/json", },
+            body: JSON.stringify(this.user.roles),
+          });
+
+          if (!response.ok || !response2.ok) {
             // handle the error
             var errorMessage = "Error: " + response.status + " " + response.statusText;
             swal(errorMessage, { icon: 'error' });
@@ -391,11 +438,17 @@ export default {
             .patch(`/backend/users/`, { id: id, new_data: this.user })
             .then(response => {
               swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
+              var response2 = fetch(domain_url + "/backend/roles/" + this.role_id + "/", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json", },
+                body: JSON.stringify(this.user.roles),
+              });
               this.get_users();
               this.closeModal();
               this.edit_mode = false;
             })
             .catch(error => {
+              console.error();
               var errorMessage = "Error: " + error;
               swal(errorMessage, { icon: 'error' });
             });
@@ -434,31 +487,6 @@ export default {
 
     },
 
-    // Roles
-    remove_role() {
-      $('#ok_list option:selected').each(function () {
-        $('#no_list').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
-        $(this).remove();
-      });
-    },
-    add_role() {
-      $('#no_list option:selected').each(function () {
-        $('#ok_list').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
-        $(this).remove();
-      });
-    },
-    remove_all_role() {
-      $('#ok_list option').each(function () {
-        $('#no_list').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
-        $(this).remove();
-      });
-    },
-    add_all_role() {
-      $('#no_list option').each(function () {
-        $('#ok_list').append('<option value="' + $(this).val() + '">' + $(this).text() + '</option>');
-        $(this).remove();
-      });
-    },
 
     async get_users() {
       return my_api.get('backend/users/', { auth: { username: "admin", password: "123", } })
@@ -470,11 +498,18 @@ export default {
         .then((response) => (this.user.roles = response.data))
         .catch(err => { alert(err) });
     },
-    async get_all_roles() {
-      return my_api.get('backend/get_all_roles/', { auth: { username: "admin", password: "123", } })
-        .then((response) => (this.all_roles = Object.keys(response.data)))
+    async get_role_id() {
+      return my_api.get('backend/get_role_id/?user_name_id=' + this.user.id, { auth: { username: "admin", password: "123", } })
+        .then((response) => (this.role_id = response.data.role_id))
         .catch(err => { alert(err) });
     },
+    async get_all_roles() {
+      return my_api.get('backend/get_all_roles/', { auth: { username: "admin", password: "123", } })
+        .then((response) => (this.all_roles = response.data))
+        .catch(err => { alert(err) });
+    },
+
+    // Object.keys(response.data)
 
     showContextMenu(event) {
       event.preventDefault();
@@ -493,28 +528,40 @@ export default {
       window.removeEventListener('click', this.hideContextMenu);
     },
 
-    open_add_modal() {
+    async open_add_modal() {
+      await this.get_max_user_id();
       this.edit_mode = false;
       //$('#modal_label').html('Add user');
       this.clear_form();
+
+      this.user.roles = this.all_roles; //create boxs
+      // Set the values for checkboxes based on user.roles
+      for (const role in this.user.roles) {
+        this.$set(this.checkboxValues, role, this.user.roles[role] === 1);
+      }
+
+
       $('#addModal').modal('toggle');
     },
 
-    async open_edit_modal() {
+    updateUserRole(role, checked) {
+      this.user.roles[role] = checked ? 1 : 0;
+    },
 
+    async open_edit_modal() {
       this.edit_mode = true;
+
+      // Set the values for checkboxes based on user.roles
+      for (const role in this.user.roles) {
+        this.$set(this.checkboxValues, role, this.user.roles[role] === 1);
+      }
+
       $('#addModal').modal('toggle');
     },
 
     closeModal() {
       $('#addModal').modal('hide');
       this.clear_form();
-    },
-
-    async row_click(index) {
-      this.active_index = index; //to change row color
-      await this.get_user(index);
-      return true
     },
 
     clear_form() {
@@ -524,7 +571,7 @@ export default {
       this.user.email = '';
       this.user.password = '';
       this.user.password2 = '';
-      this.user.date_joined = '';
+
       this.validate = false;
     },
 
@@ -542,8 +589,8 @@ export default {
       this.active_index = index; //to change row color
       await this.get_user(index);
       await this.get_roles();
+      await this.get_role_id();
       return true
-
     },
 
     check_form() {
@@ -559,6 +606,7 @@ export default {
         return false
       }
     },
+
   },
 };
 </script>

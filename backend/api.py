@@ -313,7 +313,7 @@ class UserDataView(APIView):
         # Get the username and password from the request data
         username = request.data.get('username')
         password = request.data.get('password')
-        roles_list = request.data.get('roles_list')
+        #roles_list = request.data.get('roles_list')
         first_name = request.data.get('first_name')
         last_name = request.data.get('last_name')
         email = request.data.get('email')
@@ -327,13 +327,13 @@ class UserDataView(APIView):
         # Save the user instance
         user.save()
 
-        last_id = User.objects.last().id         
+        # last_id = User.objects.last().id         
 
-        role = Roles(user_name_id=last_id)
-        for column_name in roles_list:
-            setattr(role, column_name, 1)
+        # role = Roles(user_name_id=last_id)
+        # for column_name in roles_list:
+        #     setattr(role, column_name, 1)
 
-        role.save()
+        # role.save()
         
         return Response({'message': 'User created successfully'})
     
@@ -351,10 +351,10 @@ class UserDataView(APIView):
     def patch(self, request):
         id = request.data.get('id')
         new_data = request.data.get('new_data')
-        
+
+
         # Retrieve the user object
         user = get_object_or_404(User, id=id)
-        roles = get_object_or_404(Roles, user_name_id=id)
         
         # Update the user data
         user.first_name = new_data.get('first_name', user.first_name)
@@ -364,11 +364,15 @@ class UserDataView(APIView):
         if(new_data.get('password', user.password)):
             user.set_password(new_data.get('password', user.password))
         
-        roles=new_data.get('roles', roles)
-
         # Save the updated user instance
         user.save()
-        roles.save()
+
+        #update roles
+        roles_list = new_data.get('roles')
+        role = get_object_or_404(Roles,user_name_id=id)
+        for column_name in roles_list:
+            setattr(role, column_name, 1)
+        role.save()
         
         return Response({'message': 'User data updated successfully'})
     
@@ -383,7 +387,22 @@ def get_roles(request):
 
     return Response(roles.data[0])
 
-    
+
+#####################################################################################
+# to get room id
+
+@api_view(['GET'])
+def get_role_id(request):
+    user_name_id = request.query_params['user_name_id']
+
+    role = Roles.objects.filter(user_name_id=user_name_id).first()
+    if role:
+        return JsonResponse({'role_id': role.id})
+    else:
+        return JsonResponse({'role_id': None})
+
+#####################################################################################
+
 #####################################################################################
 
 @api_view(['GET'])
@@ -393,7 +412,6 @@ def get_all_roles(request):
     roles = serializers.roles_serializer(roles, many=False)
 
     return Response(roles.data)
-
 
 #####################################################################################
 
@@ -410,48 +428,6 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
         search = self.request.query_params.get('search')
         if search is not None:
             queryset = queryset.filter(Q(id__contains=search) | Q(status__contains=search) | Q(room_id__contains=search) | Q(hotel__contains=search) | Q(room_type__contains=search) | Q(notes__contains=search)| Q(user__contains=search) )
-        return queryset
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-#####################################################################################
-
-class flights(ModelViewSet, mixins.DestroyModelMixin):
-
-    queryset = Flights.objects.all()
-    serializer_class = serializers.flights_serializer
-
-    def get_queryset(self):
-        # queryset = Flights.objects.all()
-        queryset = Flights.objects.raw("select * from backend_flights,backend_settings")
-        id = self.request.query_params.get('id')
-        if id is not None:
-            queryset = queryset.filter(id=id)
-        search = self.request.query_params.get('search')
-        if search is not None:
-            queryset = queryset.filter(Q(code__contains=search) | Q(airline__contains=search) | Q(from_airport__contains=search) | Q(
-                to_airport__contains=search) | Q(seats__contains=search) | Q(status__contains=search))
-        return queryset
-
-    def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
-
-#####################################################################################
-
-class flight_dates(ModelViewSet, mixins.DestroyModelMixin):
-
-    queryset = Flight_dates.objects.all()
-    serializer_class = serializers.flight_dates_serializer
-
-    def get_queryset(self):
-        queryset = Flight_dates.objects.all()
-        id = self.request.query_params.get('flight_id')
-        if id is not None:
-            queryset = queryset.filter(id=id)
-        search = self.request.query_params.get('search')
-        if search is not None:
-            queryset = queryset.filter(Q(flight_id__contains=search) | Q(departure_date__contains=search) | Q(arrival_date__contains=search))
         return queryset
 
     def put(self, request, *args, **kwargs):
@@ -477,6 +453,29 @@ class rooms(ModelViewSet, mixins.DestroyModelMixin):
             queryset = queryset.filter(Q(hotel__contains=search) | Q(room_id__contains=search) | Q(room_type__contains=search) | Q(
                 dates__contains=search) )
         return queryset
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+#####################################################################################
+
+class roles(ModelViewSet, mixins.DestroyModelMixin):
+
+    queryset = Roles.objects.all()
+    serializer_class = serializers.roles_serializer
+
+    def get_queryset(self):
+        queryset = Roles.objects.all()
+        id = self.request.query_params.get('id')
+        user_name_id = self.request.query_params.get('user_name_id')
+        if id is not None:
+            queryset = queryset.filter(id=id)
+        if user_name_id is not None:
+            queryset = queryset.filter(user_name_id=user_name_id)
+
+        return queryset
+    
+
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
@@ -577,6 +576,48 @@ class settings(ModelViewSet):
 
     def get_queryset(self):
         queryset = Settings.objects.all()
+        return queryset
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+#####################################################################################
+
+class flights(ModelViewSet, mixins.DestroyModelMixin):
+
+    queryset = Flights.objects.all()
+    serializer_class = serializers.flights_serializer
+
+    def get_queryset(self):
+        # queryset = Flights.objects.all()
+        queryset = Flights.objects.raw("select * from backend_flights,backend_settings")
+        id = self.request.query_params.get('id')
+        if id is not None:
+            queryset = queryset.filter(id=id)
+        search = self.request.query_params.get('search')
+        if search is not None:
+            queryset = queryset.filter(Q(code__contains=search) | Q(airline__contains=search) | Q(from_airport__contains=search) | Q(
+                to_airport__contains=search) | Q(seats__contains=search) | Q(status__contains=search))
+        return queryset
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+#####################################################################################
+
+class flight_dates(ModelViewSet, mixins.DestroyModelMixin):
+
+    queryset = Flight_dates.objects.all()
+    serializer_class = serializers.flight_dates_serializer
+
+    def get_queryset(self):
+        queryset = Flight_dates.objects.all()
+        id = self.request.query_params.get('flight_id')
+        if id is not None:
+            queryset = queryset.filter(id=id)
+        search = self.request.query_params.get('search')
+        if search is not None:
+            queryset = queryset.filter(Q(flight_id__contains=search) | Q(departure_date__contains=search) | Q(arrival_date__contains=search))
         return queryset
 
     def put(self, request, *args, **kwargs):

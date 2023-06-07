@@ -9,6 +9,7 @@ router.register('flights', api.flights)
 router.register('bookings', api.bookings)
 router.register('hotels', api.hotels)
 router.register('rooms', api.rooms)
+router.register('roles', api.roles)
 router.register('room_dates', api.room_dates)
 router.register('accounts', api.accounts)
 router.register('dashboard_buttons', api.dashboard_buttons)
@@ -37,6 +38,8 @@ urlpatterns += [
     path("users/", api.UserDataView.as_view(), name="UserDataView"),
 
     path("get_roles/", api.get_roles, name="get_roles"),
+    path("get_role_id/", api.get_role_id, name="get_role_id"),
+
     path("get_all_roles/", api.get_all_roles, name="get_all_roles"),
 
     path("get_hotels/", api.get_hotels, name="get_hotels"),
