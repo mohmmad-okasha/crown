@@ -459,6 +459,7 @@ export default {
 
     data() {
         return {
+            user_roles: "",
             print: false, //to print after save
             validate: false, //for check forms
             active_index: null,//current id
@@ -538,6 +539,13 @@ export default {
     ////////////////////
 
     async mounted() {
+        //get roles
+        await new Promise(resolve => setTimeout(resolve, 500)); // wait
+        await this.get_roles();
+        if (this.user_roles[this.$route.path.substring(1)] == 0) {
+            this.$router.back()
+        }
+
         this.this_row.user = localStorage.getItem('user_name'); //to get logged in user name
         await this.get_booking_rows();
         await this.get_hotels();
@@ -588,7 +596,10 @@ export default {
     ////////////////////
 
     methods: {
-
+        get_roles() {
+            this.user_roles = this.$parent.user_roles;
+        },
+        
         // page load **********************************
 
         get_booking_rows() {
