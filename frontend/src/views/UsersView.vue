@@ -376,7 +376,7 @@ export default {
             method: "post",
             headers: { "Content-Type": "application/json", },
             body: JSON.stringify(this.user),
-          });
+          }); 
 
           await this.get_max_user_id();
 
