@@ -6,7 +6,7 @@ const domain_url = currentURL;
 //127.0.0.1
 const my_api = axios.create({
     baseURL: domain_url,
-    timeout: 1000
+    timeout: 2500
 });
 
 
