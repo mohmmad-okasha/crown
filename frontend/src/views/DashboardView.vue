@@ -1,7 +1,7 @@
 <template>
     <div class="row" id="page-top">
-        <div v-for="button in buttons" :key="button.id" v-show="button.show && user_roles[button.url]" class="col-xl-3 col-md-6 mb-4 on-hover-sm"
-            role="button">
+        <div v-for="button in buttons" :key="button.id" v-show="button.show && user_roles[button.url]"
+            class="col-xl-3 col-md-6 mb-4 on-hover-sm" role="button">
             <div :class="button.color" class="card shadow h-100 py-2">
                 <router-link tag="div" class="card-body" :to="'/' + button.url">
 
@@ -63,7 +63,7 @@ export default {
     },
     async mounted() {
         await this.get_dashboard_buttons();
-        await new Promise(resolve => setTimeout(resolve, 500)); // wait
+        await this.get_user_name_id();
         this.get_roles();
     },
 
@@ -73,9 +73,19 @@ export default {
                 .then((response) => (this.buttons = response.data))
                 .catch(err => { alert(err) });
         },
-        get_roles() {
-            this.user_roles = this.$parent.user_roles;
-        }
+        get_user_name_id() {
+            return axios({
+                method: "get",
+                url: domain_url + "/backend/get_user_name_id/?username=" + this.$parent.user_name,
+                //auth: { username: "admin", password: "123", },
+            }).then((response) => (this.user_name_id = response.data.data));
+        },
+        async get_roles() {
+            return my_api.get('backend/get_roles/?user_id=' + this.user_name_id, { auth: { username: "admin", password: "123", } })
+                .then((response) => (this.user_roles = response.data))
+                .catch(err => { alert(err) });
+        },
+
 
     },
 }
