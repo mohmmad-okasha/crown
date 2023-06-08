@@ -224,12 +224,13 @@ export default {
   },
   async mounted() {
     this.user_name = localStorage.getItem('user_name')
-
+    this.get_user_name_id();
     await this.get_settings();
     this.dark_mode();
     this.set_lang();
-    await this.get_user_name_id();
+     
     this.get_roles();
+    
   },
   methods: {
     async loginUser() {
