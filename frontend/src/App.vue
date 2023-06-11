@@ -244,6 +244,9 @@ export default {
         localStorage.setItem('token_time', new Date())
         localStorage.setItem('user_name', this.username)
 
+        window.location.reload();
+
+        
         // redirect to dashboard or homepage after successful login
         this.error = false;
         this.$router.push('dashboard')
