@@ -11,34 +11,31 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
+                                <!-- <div class="col-sm-2"></div> -->
                                 <div class="col-sm-2"></div>
-                                <div class="col-auto">
-                                    <label for="inputPassword6" class="col-form-label">{{ $t("Date Range") }}</label>
-                                </div>
-                                <div class="col-3">
+                                <div class="col-sm-3 m-1">
                                     <!-- <input type="text" class="custom-input form-control" placeholder="Range"
                                         aria-label="Range">
                                     <date-picker v-model="date_range" range clearable locale="en" :auto-submit="true"
                                         color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY"
                                         display-format="jYYYY-jMM-jDD" custom-input=".custom-input" /> -->
+                                    <label for="inputPassword6" class="col-form-label">{{ $t("Date Range") }}</label>
                                     <input type="text" class="custom-input form-control" placeholder="Range"
                                         aria-label="Range">
                                     <date-picker v-model="date_range" type="year-month" clearable locale="en"
                                         :auto-submit="true" color="#098290" input-format="MM/YYYY" format="MM/YYYY"
                                         display-format="jYYYY-jMM" custom-input=".custom-input" />
                                 </div>
-                                <div class="col-auto">
+
+                                <div class="col-sm-2 m-1">
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Hotel") }}</label>
-                                </div>
-                                <div class="col-2">
                                     <select class="form-control" placeholder="Hotel" v-model="hotel">
                                         <option v-for="h in this.hotels" :key="h" :value="h"> {{ h }}</option>
                                     </select>
                                 </div>
-                                <div class="col-auto">
+                                <div class="col-sm-2 m-1">
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Room Type") }}</label>
-                                </div>
-                                <div class="col-auto">
+
                                     <select id="room_type" class="form-control" placeholder="Room Type" v-model="room_type">
                                         <option value="SGL"> SGL</option>
                                         <option value="DBL"> DBL</option>
@@ -205,12 +202,12 @@ export default {
                         const parts2 = date.split('/');
                         return parts2[2] == year && parts2[1] == month;
                     });
-                    item.out_dates=item.out_dates.split(',');
+                    item.out_dates = item.out_dates.split(',');
                     item.out_dates = item.out_dates.filter(date => {
                         const parts3 = date.split('/');
                         return parts3[2] == year && parts3[1] == month;
                     });
-                    item.out_dates=item.out_dates.toString();
+                    item.out_dates = item.out_dates.toString();
                 });
             }
             // if (this.date_range.length > 0) {
@@ -243,7 +240,7 @@ export default {
             //loop on open rooms dates and create button on monitoring table
             this.close_dates.forEach(item => {
                 try {
-                    item.dates.forEach(function(d){// loop on all dates for all rooms
+                    item.dates.forEach(function (d) {// loop on all dates for all rooms
                         var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
                         var button = document.createElement("button");
                         button.className = "btn btn-danger";
@@ -256,8 +253,8 @@ export default {
             //out_date two colors
             this.close_dates.forEach(o => {
                 try {
-                    o.out_dates=o.out_dates.split(','); // str to array of dates
-                    o.out_dates.forEach(function(d){ // loop on all out_dates 
+                    o.out_dates = o.out_dates.split(','); // str to array of dates
+                    o.out_dates.forEach(function (d) { // loop on all out_dates 
                         var div = document.getElementById(o.name + '_' + (d.slice(0, 2)));// select target div by date day
                         div.innerHTML = ''; // remove any btn in this out_date day
                         var button = document.createElement("button");
@@ -267,7 +264,7 @@ export default {
                 } catch (error) {
                 }
             });
-            
+
             // this.close_dates.forEach(item => {
             //     try {
             //         item.dates.forEach(d => {// loop on all dates for all rooms
@@ -296,7 +293,7 @@ export default {
                 let roomBookedname = roomBooked.name;
                 let roomBookedDates = roomBooked.dates;
                 for (let room of this.open_dates) {
-                    if (room.name === roomBookedname ) {
+                    if (room.name === roomBookedname) {
                         room.dates = room.dates.filter(date => !roomBookedDates.includes(date));
                     }
                 }
@@ -312,7 +309,7 @@ export default {
         get_close_rooms() {
             return axios({
                 method: "get",
-                url: domain_url + "/backend/get_close_rooms/", params: { hotel: this.hotel, room_type: this.room_type , month: this.date_range },
+                url: domain_url + "/backend/get_close_rooms/", params: { hotel: this.hotel, room_type: this.room_type, month: this.date_range },
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.close_dates = response.data));
         },
