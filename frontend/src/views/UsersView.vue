@@ -277,6 +277,7 @@
 
 <script>
 /* eslint-disable */
+import Vue from 'vue';
 import { my_api, domain_url } from "../axios-api";
 import axios from "axios";
 /* eslint-disable */
@@ -446,13 +447,16 @@ export default {
     },
 
     update_user(id) {
+      
+
       try {
         if (this.check_form()) {
           axios
             .patch(`/backend/users/`, { id: id, new_data: this.user })
             .then(response => {
               swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
-              var response2 = fetch(domain_url + "/backend/roles/" + this.role_id + "/", {
+
+              var response2 = fetch(domain_url + "/backend/roles/" + this.user.roles.id + "/", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json", },
                 body: JSON.stringify(this.user.roles),

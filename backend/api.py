@@ -364,7 +364,7 @@ class UserDataView(APIView):
 
 
         # Retrieve the user object
-        user = get_object_or_404(User, id=id)
+        user = User.objects.filter(id=id).first()
         
         # Update the user data
         user.first_name = new_data.get('first_name', user.first_name)
@@ -379,6 +379,8 @@ class UserDataView(APIView):
 
         #update roles
         roles_list = new_data.get('roles')
+        del roles_list["user_name"]
+        del roles_list["id"]
         role = get_object_or_404(Roles,user_name_id=id)
         for column_name in roles_list:
             setattr(role, column_name, 1)
@@ -405,13 +407,23 @@ class roles(ModelViewSet, mixins.DestroyModelMixin):
         return queryset
     
 
-
     def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        user_name_id = request.data.get('user_name')
+        roles_instance = self.get_object()  # Get the Roles instance based on the provided ID
+
+        # Get the User instance based on user_name_id
+        user_instance = get_object_or_404(User, id=user_name_id)
+
+        # Update the user_name field with the User instance
+        roles_instance.user_name = user_instance
+
+        serializer = serializers.roles_serializer(roles_instance, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return Response(serializer.data)
 
 #####################################################################################
-
-
 
 @api_view(['GET'])
 def get_roles(request):
@@ -421,7 +433,6 @@ def get_roles(request):
     roles = serializers.roles_serializer(roles, many=True)
 
     return Response(roles.data[0])
-
 
 #####################################################################################
 # to get room id
