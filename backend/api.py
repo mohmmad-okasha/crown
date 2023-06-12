@@ -376,7 +376,7 @@ class UserDataView(APIView):
         
         # Save the updated user instance
         user.save()
-
+ 
         #update roles
         roles_list = new_data.get('roles')
         del roles_list["user_name"]
