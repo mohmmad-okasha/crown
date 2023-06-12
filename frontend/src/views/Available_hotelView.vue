@@ -11,14 +11,8 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <!-- <div class="col-sm-2"></div> -->
                                 <div class="col-sm-2"></div>
                                 <div class="col-sm-3 m-1">
-                                    <!-- <input type="text" class="custom-input form-control" placeholder="Range"
-                                        aria-label="Range">
-                                    <date-picker v-model="date_range" range clearable locale="en" :auto-submit="true"
-                                        color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY"
-                                        display-format="jYYYY-jMM-jDD" custom-input=".custom-input" /> -->
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Date Range") }}</label>
                                     <input type="text" class="custom-input form-control" placeholder="Range"
                                         aria-label="Range">
@@ -138,25 +132,31 @@ export default {
     },
     watch: {
         date_range: async function (newValue) {
-            await this.get_monitor();
-            // const currentDate = new Date(startDate);
-            // this.all_range_dates = [];
-            // while (currentDate <= endDate) {
-            //     this.all_range_dates.push(currentDate.toLocaleDateString("en-GB"));
-            //     currentDate.setDate(currentDate.getDate() + 1);
-            // }
-            await this.filter_dates();
-            this.create_closed();
+            
+                await this.get_monitor();
+                // const currentDate = new Date(startDate);
+                // this.all_range_dates = [];
+                // while (currentDate <= endDate) {
+                //     this.all_range_dates.push(currentDate.toLocaleDateString("en-GB"));
+                //     currentDate.setDate(currentDate.getDate() + 1);
+                // }
+                await this.filter_dates();
+                this.create_closed();
+            
         },
         hotel: async function (newValue) {
-            await this.get_monitor();
-            //await this.filter_dates();
-            this.create_closed();
+            if (this.date_range.length>0) {
+                await this.get_monitor();
+                await this.filter_dates();
+                this.create_closed();
+            }
         },
         room_type: async function (newValue) {
-            await this.get_monitor();
-            //await this.filter_dates();
-            this.create_closed();
+            if (this.date_range.length>0) {
+                await this.get_monitor();
+                await this.filter_dates();
+                this.create_closed();
+            }
         },
         close_dates: function (newValue) {//to get all dates in the booked ranges
             newValue.forEach(item => {
