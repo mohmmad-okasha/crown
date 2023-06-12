@@ -240,7 +240,8 @@ def get_open_rooms(request):
     elif(hotel):
         rooms = Rooms.objects.filter(hotel=hotel_id).all()
     else:
-        rooms = Rooms.objects.all()
+        #rooms = Rooms.objects.all()
+        rooms = []
     
     response_data = []
 
