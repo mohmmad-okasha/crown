@@ -1,5 +1,6 @@
 <template>
     <div class="BookingsView">
+        <loading :active.sync="isLoading" :can-cancel="true" :on-cancel="onCancel" :is-full-page="fullPage"></loading>
 
         <!-- context-menu -->
         <div id="context-menu" class="context-menu" :style="menuStyle">
@@ -140,14 +141,14 @@
 
                         <form>
                             <div class="form-group">
-                                    <label for="book_date">{{ $t("Booking Date") }}</label>
-                                    <input id="book_date" v-model="this_row.book_date" type="datetime-local"
-                                        :class="{ 'is-invalid': !this.this_row.book_date && this.validate, 'is-valid': this.this_row.book_date && this.validate }"
-                                        class="form-control">
-                                    <div v-if="!this.this_row.book_date && this.validate" class="invalid-feedback hidden">
-                                        {{ $t("Please Select The Date") }}
-                                    </div>
+                                <label for="book_date">{{ $t("Booking Date") }}</label>
+                                <input id="book_date" v-model="this_row.book_date" type="datetime-local"
+                                    :class="{ 'is-invalid': !this.this_row.book_date && this.validate, 'is-valid': this.this_row.book_date && this.validate }"
+                                    class="form-control">
+                                <div v-if="!this.this_row.book_date && this.validate" class="invalid-feedback hidden">
+                                    {{ $t("Please Select The Date") }}
                                 </div>
+                            </div>
 
                             <div class="row g-3 form-group">
 
@@ -223,7 +224,7 @@
 
                                     <div v-if="this_row.persons_number > 0">
                                         <div v-for=" i in parseInt(this_row.persons_number)" :key="i" class="form-group">
-                                            <label>{{ $t("Adult Name ") + i  }}</label>
+                                            <label>{{ $t("Adult Name ") + i }}</label>
                                             <input v-model="this_row.persons_names[i - 1]" type="text" class="form-control"
                                                 :class="{ 'is-invalid': !this_row.persons_names[i - 1] && validate, 'is-valid': this_row.persons_names[i - 1] && validate }">
                                             <div v-if="!this_row.persons_names[i - 1] && validate"
@@ -443,6 +444,10 @@ import NavBar from '../components/parts/NavBar.vue';
 import VuePersianDatetimePicker from 'vue-persian-datetime-picker';
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
+import Loading from 'vue-loading-overlay';
+
+import 'vue-loading-overlay/dist/vue-loading.css';
+
 // end of import block
 
 export default {
@@ -452,13 +457,17 @@ export default {
     components: {
         NavBar,
         datePicker: VuePersianDatetimePicker,
-        vSelect
+        vSelect,
+        Loading,
     },
 
     ////////////////////
 
     data() {
         return {
+            isLoading: false,
+            fullPage: true,
+
             user_roles: "",
             print: false, //to print after save
             validate: false, //for check forms
@@ -513,10 +522,10 @@ export default {
     watch: {
         'this_row.hotel': async function (newValue) {
             if (this.edit_mode || this.add_mode) {
-                this.this_row.room_id='';
-                
+                this.this_row.room_id = '';
+
                 await this.get_rooms();
-                this.this_row.room_id=this.rooms[0];
+                this.this_row.room_id = this.rooms[0];
 
             }
         },
@@ -539,6 +548,7 @@ export default {
     ////////////////////
 
     async mounted() {
+        this.isLoading = true;
         //get roles
         await new Promise(resolve => setTimeout(resolve, 500)); // wait
         await this.get_roles();
@@ -572,6 +582,7 @@ export default {
             // Create the button element
 
         });
+        this.isLoading = false;
     },
 
     ////////////////////
@@ -599,7 +610,7 @@ export default {
         get_roles() {
             this.user_roles = this.$parent.user_roles;
         },
-        
+
         // page load **********************************
 
         get_booking_rows() {
@@ -808,6 +819,7 @@ export default {
         // end for modals ***************************
 
         async save_booking() {
+            this.isLoading = true;
             try {
                 if (this.check_form()) {
                     if (this.print) {
@@ -832,9 +844,11 @@ export default {
                     this.closeModal();
                 }
             } catch (error) { console.error(); }
+            this.isLoading = false;
         },
 
         async delete_booking(id) {
+            this.isLoading = true;
             try {
                 const willDelete = await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, });
 
@@ -847,9 +861,11 @@ export default {
             } catch (error) {
                 console.error("Error deleting booking:", error);
             }
+            this.isLoading = false;
         },
 
         async update_booking(id) {
+            this.isLoading = true;
             try {
                 if (this.check_form()) {
                     if (this.print) {
@@ -875,7 +891,7 @@ export default {
             } catch (error) {
                 console.error();
             }
-
+            this.isLoading = false;
         },
 
         async row_click(index) {

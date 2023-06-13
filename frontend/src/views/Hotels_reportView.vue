@@ -1,5 +1,6 @@
 <template>
     <div class="Hotels_reportView">
+        <loading :active.sync="isLoading" :can-cancel="true" :on-cancel="onCancel" :is-full-page="fullPage"></loading>
 
         <!-- context-menu -->
         <div id="context-menu" class="context-menu" :style="menuStyle">
@@ -101,8 +102,10 @@
 
 
                 <div class="card-footer text-muted" v-show="this.bookings.length">
-                    <button type="button" class="btn btn-primary m-1" @click="exportToWord"> <i class="fa-solid fa-file-word"></i></button>
-                    <button type="button" class="btn btn-primary m-1" @click="exportToExcel"> <i class="fa-solid fa-file-excel"></i></button>
+                    <button type="button" class="btn btn-primary m-1" @click="exportToWord"> <i
+                            class="fa-solid fa-file-word"></i></button>
+                    <button type="button" class="btn btn-primary m-1" @click="exportToExcel"> <i
+                            class="fa-solid fa-file-excel"></i></button>
                 </div>
 
             </div>
@@ -122,13 +125,14 @@
 import axios from 'axios';
 import { my_api, domain_url } from "../axios-api";
 import { lang, change_lang } from '../main';
-
 import NavBar from '../components/parts/NavBar.vue'
-
 import VuePersianDatetimePicker from 'vue-persian-datetime-picker';
 import swal from 'sweetalert';
 import XLSX from 'xlsx/dist/xlsx.full.min';
 import { saveAs } from 'file-saver';
+
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
 
 import vSelect from 'vue-select';
 
@@ -137,11 +141,15 @@ export default {
     components: {
         NavBar,
         vSelect,
-        datePicker: VuePersianDatetimePicker
+        datePicker: VuePersianDatetimePicker,
+        Loading,
     },
 
     data() {
         return {
+            isLoading: false,
+            fullPage: true,
+
             validate: false,
             user_roles: "",
             hotel: "",
@@ -171,6 +179,7 @@ export default {
     },
 
     async mounted() {
+        this.isLoading = true;
         await new Promise(resolve => setTimeout(resolve, 500)); // wait
         await this.get_roles();
         if (this.user_roles[this.$route.path.substring(1)] == 0) {
@@ -189,7 +198,7 @@ export default {
         await this.get_hotels();
 
 
-        
+
         //await this.get_report();
 
         //get all countrys names
@@ -211,7 +220,7 @@ export default {
                 console.log(error);
             });
 
-
+            this.isLoading = false;
     },
 
     computed: {
@@ -262,18 +271,24 @@ export default {
         },
 
         get_report() {
+            this.isLoading = true;
             // we using return first of the function for 'await' 
             return my_api.get('/backend/booking_report/?hotel=' + this.hotel + '&from_date=' + this.range[0] + '&to_date=' + this.range[1])
-                .then((response) => (this.bookings = response.data))
+                .then((response) => (this.bookings = response.data,this.isLoading = false))
                 .catch(err => { alert(err) });
+
+            
         },
 
         exportToExcel() {
+            this.isLoading = true;
             const wb = XLSX.utils.table_to_book(document.querySelector('#books_table'));
             XLSX.writeFile(wb, this.hotel + ' on ' + this.range + '.xlsx');
+            this.isLoading = false;
         },
 
         exportToWord() {
+            this.isLoading = true;
             // Generate the Word content (replace with your own logic)
             const divContent = this.$refs.exportContent.innerHTML;
             const wordContent = `<html><body>${divContent}</body></html>`;
@@ -283,6 +298,7 @@ export default {
 
             // Save the Blob as a Word file
             saveAs(blob, this.hotel + ' on ' + this.range + '.doc');
+            this.isLoading = false;
         },
 
         getCities() {

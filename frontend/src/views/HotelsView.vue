@@ -1,5 +1,6 @@
 <template>
     <div class="HotelsView">
+        <loading :active.sync="isLoading" :can-cancel="true" :on-cancel="onCancel" :is-full-page="fullPage"></loading>
 
         <!-- context-menu -->
         <div id="context-menu" class="context-menu" :style="menuStyle">
@@ -344,6 +345,9 @@ import { lang, change_lang } from '../main';
 
 import NavBar from '../components/parts/NavBar.vue'
 
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+
 import VuePersianDatetimePicker from 'vue-persian-datetime-picker';
 import swal from 'sweetalert';
 import XLSX from 'xlsx/dist/xlsx.full.min';
@@ -352,11 +356,15 @@ export default {
     name: 'HotelsView',
     components: {
         NavBar,
-        datePicker: VuePersianDatetimePicker
+        datePicker: VuePersianDatetimePicker,
+        Loading,
     },
 
     data() {
         return {
+            isLoading: false,
+            fullPage: true,
+
             saving: false,
             validate: false, //for check forms
             base_url: window.location.origin + '/media/hotels/',//for images 
@@ -408,6 +416,8 @@ export default {
     },
 
     async mounted() {
+        this.isLoading = true;
+
         // get user name to save in any record
         this.hotel.user = localStorage.getItem('user_name')
 
@@ -446,6 +456,8 @@ export default {
             .catch(error => {
                 console.log(error);
             });
+
+        this.isLoading = false;
 
 
     },
@@ -558,6 +570,8 @@ export default {
         },
 
         async save_hotel() {
+            this.isLoading = true;
+
             try {
                 if (this.check_form()) {
                     this.saving = true;
@@ -630,6 +644,9 @@ export default {
 
                 }
             } catch (error) { console.error(); }
+
+            this.isLoading = false;
+
         },
 
         get_persons() {
@@ -654,6 +671,8 @@ export default {
         },
 
         async update_hotel(id) {
+            this.isLoading = true;
+
             try {
                 if (this.check_form()) {
                     // convert the dates array to string to save it in db
@@ -695,9 +714,12 @@ export default {
                 console.error();
             }
 
+            this.isLoading = false;
+
         },
 
         async delete_hotel(id) {
+            this.isLoading = true;
             try {
                 await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, })
                     .then(async (willDelete) => {
@@ -721,6 +743,7 @@ export default {
                         }
                     });
             } catch (error) { console.error(); }
+            this.isLoading = false;
         },
 
         async get_hotel(id) {

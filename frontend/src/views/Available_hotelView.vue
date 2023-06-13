@@ -1,5 +1,8 @@
 <template>
     <div class="Available_hotelView">
+
+        <loading :active.sync="isLoading" :can-cancel="true" :on-cancel="onCancel" :is-full-page="fullPage"></loading>
+
         <!-- Rooms Monitor -->
         <div class="col-xl-12 center">
             <div class="card shadow mb-4">
@@ -77,6 +80,10 @@ import NavBar from '../components/parts/NavBar.vue';
 import VuePersianDatetimePicker from 'vue-persian-datetime-picker';
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
+
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+
 // end of import block
 export default {
     name: 'Available_hotelView',
@@ -84,11 +91,15 @@ export default {
     components: {
         NavBar,
         datePicker: VuePersianDatetimePicker,
-        vSelect
+        vSelect,
+        Loading,
     },
     ////////////////////
     data() {
         return {
+            isLoading: false,
+            fullPage: true,
+
             user_roles: "",
             test: [],
             date_range: [],
@@ -101,6 +112,7 @@ export default {
         }
     },
     async mounted() {
+        this.isLoading = true;
         await new Promise(resolve => setTimeout(resolve, 500)); // wait
         await this.get_roles();
         if (this.user_roles[this.$route.path.substring(1)] == 0) {
@@ -115,6 +127,7 @@ export default {
         while (elements.length > 0) {
             elements[0].parentNode.removeChild(elements[0]);
         }////
+        this.isLoading = false;
     },
     ////////////////////
     computed: {
@@ -132,27 +145,27 @@ export default {
     },
     watch: {
         date_range: async function (newValue) {
-            
-                await this.get_monitor();
-                // const currentDate = new Date(startDate);
-                // this.all_range_dates = [];
-                // while (currentDate <= endDate) {
-                //     this.all_range_dates.push(currentDate.toLocaleDateString("en-GB"));
-                //     currentDate.setDate(currentDate.getDate() + 1);
-                // }
-                await this.filter_dates();
-                this.create_closed();
-            
+
+            await this.get_monitor();
+            // const currentDate = new Date(startDate);
+            // this.all_range_dates = [];
+            // while (currentDate <= endDate) {
+            //     this.all_range_dates.push(currentDate.toLocaleDateString("en-GB"));
+            //     currentDate.setDate(currentDate.getDate() + 1);
+            // }
+            await this.filter_dates();
+            this.create_closed();
+
         },
         hotel: async function (newValue) {
-            if (this.date_range.length>0) {
+            if (this.date_range.length > 0) {
                 await this.get_monitor();
                 await this.filter_dates();
                 this.create_closed();
             }
         },
         room_type: async function (newValue) {
-            if (this.date_range.length>0) {
+            if (this.date_range.length > 0) {
                 await this.get_monitor();
                 await this.filter_dates();
                 this.create_closed();
@@ -185,6 +198,7 @@ export default {
         },
 
         filter_dates() {// remove any date out of selected range
+            this.isLoading = true;
             if (this.date_range) {
                 let month = this.date_range.split('/')[0];
                 let year = this.date_range.split('/')[1];
@@ -234,9 +248,11 @@ export default {
             //         });
             //     });
             // }
+            this.isLoading = false;
         },
 
         create_closed() {
+            this.isLoading = true;
             //loop on open rooms dates and create button on monitoring table
             this.close_dates.forEach(item => {
                 try {
@@ -264,7 +280,7 @@ export default {
                 } catch (error) {
                 }
             });
-
+            this.isLoading = false;
             // this.close_dates.forEach(item => {
             //     try {
             //         item.dates.forEach(d => {// loop on all dates for all rooms
@@ -300,18 +316,22 @@ export default {
             };
         },
         get_open_rooms() {
+            this.isLoading = true;
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_open_rooms/", params: { hotel: this.hotel, room_type: this.room_type },
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.open_dates = response.data));
+            this.isLoading = false;
         },
         get_close_rooms() {
+            this.isLoading = true;
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_close_rooms/", params: { hotel: this.hotel, room_type: this.room_type, month: this.date_range },
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.close_dates = response.data));
+            this.isLoading = false;
         },
         // end page load *******************************
         // insert form *******************************

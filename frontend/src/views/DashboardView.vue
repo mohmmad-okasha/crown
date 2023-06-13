@@ -1,5 +1,12 @@
 <template>
     <div class="row" id="page-top">
+
+        <!-- loading  -->
+        <loading :active.sync="isLoading"
+                 :can-cancel="true"
+                 :on-cancel="onCancel"
+                 :is-full-page="fullPage"></loading>
+
         <div v-for="button in buttons" :key="button.id" v-show="button.show && user_roles[button.url]"
             class="col-xl-3 col-md-6 mb-4 on-hover-sm" role="button">
             <div :class="button.color" class="card shadow h-100 py-2">
@@ -32,16 +39,23 @@ import axios from 'axios';
 import { my_api, domain_url } from "../axios-api";
 import NavBar from '../components/parts/NavBar.vue'
 
+import Loading from 'vue-loading-overlay';
+import 'vue-loading-overlay/dist/vue-loading.css';
+
 export default {
 
     name: "dashboard",
 
     components: {
         NavBar,
+        Loading,
     },
 
     data() {
         return {
+            isLoading: false,
+            fullPage: true,
+
             buttons: [],
             user_roles: ''
 
@@ -62,9 +76,11 @@ export default {
         },
     },
     async mounted() {
+        this.isLoading = true;
         await this.get_dashboard_buttons();
         await this.get_user_name_id();
-        this.get_roles();
+        await this.get_roles();
+        this.isLoading = false;
     },
 
     methods: {
