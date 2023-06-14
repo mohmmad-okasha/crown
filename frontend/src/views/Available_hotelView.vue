@@ -253,7 +253,7 @@ export default {
 
         create_closed() {
             this.isLoading = true;
-            //loop on open rooms dates and create button on monitoring table
+            //loop on close rooms dates and create button on monitoring table
             this.close_dates.forEach(item => {
                 try {
                     item.dates.forEach(function (d) {// loop on all dates for all rooms

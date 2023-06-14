@@ -261,7 +261,6 @@ def get_open_rooms(request):
 def get_close_rooms(request):
     hotel = str(request.query_params['hotel'])
     room_type = str(request.query_params['room_type'])
-    room_type = str(request.query_params['room_type'])
 
     if(hotel and room_type):
         rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
@@ -270,6 +269,7 @@ def get_close_rooms(request):
     else:
         rooms = Bookings.objects.raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
     response_data = []
+
 
     for room in rooms:
         room_data = {

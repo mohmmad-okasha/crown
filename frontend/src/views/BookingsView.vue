@@ -771,27 +771,29 @@ export default {
         },
 
         async open_edit_modal() {
-            this.edit_mode = true;
-            this.add_mode = false;
+            if (this.user_roles.hotels) {
+                this.edit_mode = true;
+                this.add_mode = false;
 
-            await this.get_booked_dates(); // to disable other booked dates 
+                await this.get_booked_dates(); // to disable other booked dates 
 
-            // remove this booked dates from disable_dates to enable edit booked dates
-            this.this_row.all_dates = [];
-            const minDateParts = this.this_row.dates[0].split('/');
-            const maxDateParts = this.this_row.dates[1].split('/');
-            const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
-            const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+                // remove this booked dates from disable_dates to enable edit booked dates
+                this.this_row.all_dates = [];
+                const minDateParts = this.this_row.dates[0].split('/');
+                const maxDateParts = this.this_row.dates[1].split('/');
+                const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
 
-            const currentDate = new Date(startDate);
-            while (currentDate <= endDate) {
-                this.this_row.all_dates.push(currentDate.toLocaleDateString("en-GB"));
-                currentDate.setDate(currentDate.getDate() + 1);
+                const currentDate = new Date(startDate);
+                while (currentDate <= endDate) {
+                    this.this_row.all_dates.push(currentDate.toLocaleDateString("en-GB"));
+                    currentDate.setDate(currentDate.getDate() + 1);
+                }
+                this.disable_dates = this.disable_dates.filter((el) => !this.this_row.all_dates.includes(el));
+                //////////////////////////////////////////////
+                await this.get_rooms();
+                $('#addModal').modal('toggle');
             }
-            this.disable_dates = this.disable_dates.filter((el) => !this.this_row.all_dates.includes(el));
-            //////////////////////////////////////////////
-            await this.get_rooms();
-            $('#addModal').modal('toggle');
         },
 
         clear_form() {
@@ -848,20 +850,22 @@ export default {
         },
 
         async delete_booking(id) {
-            this.isLoading = true;
-            try {
-                const willDelete = await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, });
+            if (this.user_roles.hotels) {
+                this.isLoading = true;
+                try {
+                    const willDelete = await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, });
 
-                if (willDelete) {
-                    await my_api.delete(`/backend/bookings/${id}/`);
-                    swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
-                    this.get_booking_rows();
-                    this.closeModal();
+                    if (willDelete) {
+                        await my_api.delete(`/backend/bookings/${id}/`);
+                        swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+                        this.get_booking_rows();
+                        this.closeModal();
+                    }
+                } catch (error) {
+                    console.error("Error deleting booking:", error);
                 }
-            } catch (error) {
-                console.error("Error deleting booking:", error);
+                this.isLoading = false;
             }
-            this.isLoading = false;
         },
 
         async update_booking(id) {
