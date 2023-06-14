@@ -1,7 +1,7 @@
 <template>
     <div class="Available_hotelView">
 
-        <loading :active.sync="isLoading" :can-cancel="false"  :is-full-page="fullPage"></loading>
+        <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="fullPage"></loading>
 
         <!-- Rooms Monitor -->
         <div class="col-xl-12 center">
@@ -270,12 +270,24 @@ export default {
             this.close_dates.forEach(o => {
                 try {
                     o.out_dates = o.out_dates.split(','); // str to array of dates
+
                     o.out_dates.forEach(function (d) { // loop on all out_dates 
-                        var div = document.getElementById(o.name + '_' + (d.slice(0, 2)));// select target div by date day
-                        div.innerHTML = ''; // remove any btn in this out_date day
-                        var button = document.createElement("button");
-                        button.className = "btn btn-danger tow_color";
-                        div.appendChild(button);
+
+                        const [day, month, year] = d.split("/");
+                        const date = new Date(`${month}/${day}/${year}`);
+                        // Increment the date by one day
+                        date.setDate(date.getDate() + 1);
+                        // Format the incremented date to match the format in datesArray
+                        const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
+                        
+                        // check if the next date of out date is booked then the out day will be booked 
+                        if (!o.dates.includes(formattedDate)) {
+                            var div = document.getElementById(o.name + '_' + (d.slice(0, 2)));// select target div by date day
+                            div.innerHTML = ''; // remove any btn in this out_date day
+                            var button = document.createElement("button");
+                            button.className = "btn btn-danger tow_color";
+                            div.appendChild(button);
+                        }
                     });
                 } catch (error) {
                 }
