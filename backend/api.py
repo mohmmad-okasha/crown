@@ -281,7 +281,35 @@ def get_close_rooms(request):
 
     return JsonResponse(response_data, safe=False)
 
+#######################################################################################################################################################################################################
+
+@api_view(['GET'])
+def get_no_show_rooms(request):
+    hotel = str(request.query_params['hotel'])
+    room_type = str(request.query_params['room_type'])
+
+    if(hotel and room_type):
+        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='No Show' group by room")
+    elif(hotel):
+        rooms = Bookings.objects.filter(hotel=hotel).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='No Show' group by room")
+    else:
+        rooms = Bookings.objects.raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='No Show' group by room")
+    response_data = []
+
+
+    for room in rooms:
+        room_data = {
+            'name': room.room,
+            'dates': room.all_dates,
+            'out_dates': room.out_dates
+        }
+        response_data.append(room_data)
+
+    return JsonResponse(response_data, safe=False)
+
 #####################################################################################
+
+
 # to remove files
 
 @api_view(['GET'])

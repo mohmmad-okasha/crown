@@ -109,6 +109,7 @@ export default {
             hotels: [],
             open_dates: [],//all dates for all room
             close_dates: [],//all dates for all room
+            no_show_dates: [],
         }
     },
     async mounted() {
@@ -292,6 +293,22 @@ export default {
                 } catch (error) {
                 }
             });
+
+            //loop on no_show rooms dates and create button on monitoring table
+            this.no_show_dates.forEach(n => {
+                try {
+                    n.dates=n.dates.split(',') // test to array
+                    n.dates.forEach(function (d) {// loop on all dates for all rooms
+                        var div2 = document.getElementById(n.name + '_' + (d.slice(0, 2)));
+                        var button2 = document.createElement("button");
+                        div2.innerHTML = ''; 
+                        button2.className = "btn btn-warning";
+                        div2.appendChild(button2);
+                    });
+                } catch (error) {
+                }
+            });
+
             this.isLoading = false;
             // this.close_dates.forEach(item => {
             //     try {
@@ -317,6 +334,7 @@ export default {
             this.open_dates = [];
             await this.get_open_rooms();
             await this.get_close_rooms();
+            await this.get_no_show_rooms();
             for (let roomBooked of this.close_dates) {// to remove booked dates from open dates
                 let roomBookedname = roomBooked.name;
                 let roomBookedDates = roomBooked.dates;
@@ -328,22 +346,30 @@ export default {
             };
         },
         get_open_rooms() {
-            this.isLoading = true;
+            
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_open_rooms/", params: { hotel: this.hotel, room_type: this.room_type },
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.open_dates = response.data));
-            this.isLoading = false;
+            
         },
         get_close_rooms() {
-            this.isLoading = true;
+            
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_close_rooms/", params: { hotel: this.hotel, room_type: this.room_type, month: this.date_range },
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.close_dates = response.data));
-            this.isLoading = false;
+            
+        },
+        get_no_show_rooms() {
+            this.isLoading = true;
+            return axios({
+                method: "get",
+                url: domain_url + "/backend/get_no_show_rooms/", params: { hotel: this.hotel, room_type: this.room_type, month: this.date_range },
+            }).then((response) => (this.no_show_dates = response.data));
+            
         },
         // end page load *******************************
         // insert form *******************************

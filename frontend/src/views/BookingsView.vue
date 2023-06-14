@@ -188,8 +188,16 @@
                             <div v-show="this.this_row.room_id" class="form-group card" id="dates" style="width: 100%;">
                                 <div class="card-body">
                                     <date-picker v-model="this_row.dates" :min="min_date" :max="max_date"
-                                        :disable="disable_dates" range clearable locale="en" inline :auto-submit="true"
-                                        custom-input="none" color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY" />
+                                        :disable="disable_dates" :range="is_range" clearable locale="en" inline
+                                        :auto-submit="false" custom-input="none" color="#098290" input-format="DD/MM/YYYY"
+                                        format="DD/MM/YYYY" />
+                                </div>
+
+                                <input readonly id="dates" v-model="this_row.dates" type="text"
+                                    :class="{ 'is-invalid': !this.this_row.dates && this.validate, 'is-valid': this.this_row.dates && this.validate }"
+                                    class="form-control">
+                                <div v-if="!this.this_row.dates && this.validate" class="invalid-feedback hidden">
+                                    {{ $t("Please Select The Date") }}
                                 </div>
                             </div>
 
@@ -467,6 +475,7 @@ export default {
         return {
             isLoading: false,
             fullPage: true,
+            is_range: true,
 
             user_roles: "",
             print: false, //to print after save
@@ -828,7 +837,12 @@ export default {
                         this.PrintDiv('booking_data');
                     }
                     // convert the dates array to string to save it in db
-                    if (this.this_row.dates.length > 1) { this.this_row.out_date = this.this_row.dates[1]; this.this_row.dates = this.this_row.dates.toString(); }
+                    if (this.this_row.dates.length > 1) {
+                        this.this_row.out_date = this.this_row.dates[1];
+                    }else{
+                        this.this_row.dates.push(this.this_row.dates[0]);
+                    }
+                    this.this_row.dates = this.this_row.dates.toString();
                     if (!this.this_row.kids_number) { this.this_row.kids_number = 0; }
                     this.this_row.persons_names = this.this_row.persons_names.join(',');
                     this.this_row.kids_names = this.this_row.kids_names.join(',');

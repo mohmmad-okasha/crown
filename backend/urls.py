@@ -50,6 +50,8 @@ urlpatterns += [
     path("get_open_rooms/", api.get_open_rooms, name="get_open_rooms"),
 
     path("get_close_rooms/", api.get_close_rooms, name="get_close_rooms"),
+    
+    path("get_no_show_rooms/", api.get_no_show_rooms, name="get_no_show_rooms"),
 
     path("get_room_id/", api.get_room_id, name="get_room_type"),
 
