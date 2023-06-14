@@ -365,6 +365,7 @@ export default {
             isLoading: false,
             fullPage: true,
 
+            user: '',
             saving: false,
             validate: false, //for check forms
             base_url: window.location.origin + '/media/hotels/',//for images 
@@ -400,6 +401,7 @@ export default {
                     user: "",
                 }],
             },
+            old_rooms: [],
             user_roles: '',
             selected_hotel: [],
             edit_mode: false,
@@ -568,7 +570,6 @@ export default {
                     console.log(error);
                 });
         },
-        
 
         async save_hotel() {
             this.isLoading = true;
@@ -691,17 +692,70 @@ export default {
                         swal(errorMessage, { icon: 'error' });
                     } else {
                         // Request was successful
-                        this.hotel.range = this.hotel.range.toString();
-                        //delete old dates and save the new
-                        this.range_dates.forEach((element) => {
-                            fetch(domain_url + "/backend/hotel_dates/", {
+                        //this.hotel.range = this.hotel.range.toString();
+
+                        //delete old rooms and save the new
+                        
+                        if (this.old_rooms.length>0) {
+                            for (const old of this.old_rooms.entries()) {
+                                var response = await fetch(domain_url + '/backend/rooms/' + old.id + '/', {
+                                    method: "delete",
+                                    headers: { "Content-Type": "application/json", },
+                                });
+                            };
+                        }
+
+                        for (const [i, element] of this.hotel.room.entries()) {
+                            element.hotel = this.hotel.id;
+                            element.user = this.user;
+                            element.room_id = 'room_' + (parseInt(i) + 1);
+                            element.range = element.range.toString();
+                            await fetch(domain_url + "/backend/rooms/", {
                                 method: "post",
-                                body: JSON.stringify({ 'hotel_id': this.max_id, 'date': element }),
+                                body: JSON.stringify(element),
                                 headers: {
                                     'Content-Type': 'application/json;charset=UTF-8'
                                 }
                             });
-                        });
+
+                            await this.get_max_room_id();
+
+                            // save all room dates to db
+                            element.range = element.range.split(","); // str to array
+                            let min_date = element.range[0];
+                            let max_date = element.range[1];
+                            const minDateParts = min_date.split('/');
+                            const maxDateParts = max_date.split('/');
+                            const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                            const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
+
+                            const currentDate = new Date(startDate);
+                            element.range_dates = [];
+                            while (currentDate <= endDate) {
+                                element.range_dates.push(currentDate.toLocaleDateString("en-GB"));
+                                currentDate.setDate(currentDate.getDate() + 1);
+                            }
+                            element.range_dates.forEach((element_range) => {
+                                fetch(domain_url + "/backend/room_dates/", {
+                                    method: "post",
+                                    body: JSON.stringify({ 'room_id': this.max_room_id, 'date': element_range }),
+                                    headers: {
+                                        'Content-Type': 'application/json;charset=UTF-8'
+                                    }
+                                });
+                            });
+                        };
+
+
+                        // this.range_dates.forEach((element) => {
+                        //     fetch(domain_url + "/backend/hotel_dates/", {
+                        //         method: "post",
+                        //         body: JSON.stringify({ 'hotel_id': this.max_id, 'date': element }),
+                        //         headers: {
+                        //             'Content-Type': 'application/json;charset=UTF-8'
+                        //         }
+                        //     });
+                        // });
 
                         swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
                         this.max_id = this.hotel.id
@@ -812,6 +866,8 @@ export default {
 
         open_edit_modal() {
             this.edit_mode = true;
+            this.user = localStorage.getItem('user_name')
+            this.old_rooms = this.hotel.room;//save old rooms to delete on edit
             this.hotel.room.forEach(element => {
                 element.range = element.range.split(',');
             });
