@@ -697,18 +697,20 @@ export default {
                         //delete old rooms and save the new
                         
                         if (this.old_rooms.length>0) {
-                            for (const old of this.old_rooms.entries()) {
+                            for (const [i,old] of this.old_rooms.entries()) {
                                 var response = await fetch(domain_url + '/backend/rooms/' + old.id + '/', {
                                     method: "delete",
                                     headers: { "Content-Type": "application/json", },
                                 });
                             };
                         }
+                        alert("removed old");
 
-                        for (const [i, element] of this.hotel.room.entries()) {
+                        for (const [j, element] of this.hotel.room.entries()) {
+
                             element.hotel = this.hotel.id;
                             element.user = this.user;
-                            element.room_id = 'room_' + (parseInt(i) + 1);
+                            element.room_id = 'room_' + (parseInt(j) + 1);
                             element.range = element.range.toString();
                             await fetch(domain_url + "/backend/rooms/", {
                                 method: "post",
@@ -867,11 +869,12 @@ export default {
         open_edit_modal() {
             this.edit_mode = true;
             this.user = localStorage.getItem('user_name')
-            this.old_rooms = this.hotel.room;//save old rooms to delete on edit
+            this.old_rooms = this.hotel.room.slice();//save old rooms to delete on edit
             this.hotel.room.forEach(element => {
                 element.range = element.range.split(',');
             });
             //$('#modal_label').html('Edit hotel');
+            
             $('#addModal').modal('toggle');
         },
 
