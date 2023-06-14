@@ -334,7 +334,6 @@ export default {
       });
     }
 
-
     const token = localStorage.getItem('access_token')
     this.logged_in = token
     this.user_name = localStorage.getItem('user_name')
@@ -347,7 +346,7 @@ export default {
     const diffInMinutes = Math.floor((diffInMs / 1000) / 60);
 
     //auto logout
-    if (diffInMinutes > 600) {
+    if (diffInMinutes > 60) {
       localStorage.setItem('access_token', '');
       localStorage.setItem('token_time', 0)
       //this.auth.logged_in = '';

@@ -1,7 +1,7 @@
 <template>
     <div class="Available_hotelView">
 
-        <loading :active.sync="isLoading" :can-cancel="true" :on-cancel="onCancel" :is-full-page="fullPage"></loading>
+        <loading :active.sync="isLoading" :can-cancel="true"  :is-full-page="fullPage"></loading>
 
         <!-- Rooms Monitor -->
         <div class="col-xl-12 center">

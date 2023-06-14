@@ -568,6 +568,7 @@ export default {
                     console.log(error);
                 });
         },
+        
 
         async save_hotel() {
             this.isLoading = true;
@@ -676,7 +677,7 @@ export default {
             try {
                 if (this.check_form()) {
                     // convert the dates array to string to save it in db
-                    this.hotel.range = this.hotel.range.toString();
+                    //this.hotel.range = this.hotel.range.toString();
 
                     var response = await fetch(domain_url + "/backend/hotels/" + id + "/", {
                         method: "PUT",
@@ -690,7 +691,7 @@ export default {
                         swal(errorMessage, { icon: 'error' });
                     } else {
                         // Request was successful
-
+                        this.hotel.range = this.hotel.range.toString();
                         //delete old dates and save the new
                         this.range_dates.forEach((element) => {
                             fetch(domain_url + "/backend/hotel_dates/", {
@@ -701,7 +702,6 @@ export default {
                                 }
                             });
                         });
-
 
                         swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
                         this.max_id = this.hotel.id
