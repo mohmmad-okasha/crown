@@ -153,7 +153,7 @@
                             <div class="row g-3 form-group">
 
 
-                                <div class="col">
+                                <div class="col-sm-7">
                                     <label for="hotel">{{ $t("Hotel") }}</label>
                                     <v-select id="hotel" v-model="this_row.hotel" :options="hotels"
                                         :class="{ 'is-invalid': !this_row.hotel && validate, 'is-valid': this_row.hotel && validate }" />
@@ -164,7 +164,7 @@
                                 </div>
 
 
-                                <div class="col">
+                                <div class="col-sm-3">
                                     <label for="room_id">{{ $t("Room ID") }}</label>
                                     <select id="room_id" v-model="this_row.room_id" type="text" class="form-control"
                                         :class="{ 'is-invalid': !this.this_row.room_id && this.validate, 'is-valid': this.this_row.room_id && this.validate }">
@@ -176,8 +176,8 @@
                                     </div>
                                 </div>
 
-                                <div class="col">
-                                    <label for="room_type">{{ $t("Room Type") }}</label>
+                                <div class="col-sm-2">
+                                    <label for="room_type">{{ $t("Type") }}</label>
                                     <input readonly id="room_type" v-model="this_row.room_type" type="text"
                                         class="form-control">
                                 </div>
@@ -559,7 +559,7 @@ export default {
         this.this_row.user = localStorage.getItem('user_name'); //to get logged in user name
         await this.get_booking_rows();
         await this.get_hotels();
-        await this.get_monitor();
+        //await this.get_monitor();
 
         //to remove modal background on auto vue js reload
         const elements = document.getElementsByClassName("modal-backdrop fade show");
@@ -569,19 +569,19 @@ export default {
 
 
         //loop on open rooms dates and create button on monitoring table
-        this.all_rooms_dates.forEach(item => {
-            item.dates.forEach(d => {// loop on all dates for all rooms
-                var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
-                var button = document.createElement("button");
-                button.className = "btn btn-success"; // Set button text
-                div.appendChild(button);
-            });
+        // this.all_rooms_dates.forEach(item => {
+        //     item.dates.forEach(d => {// loop on all dates for all rooms
+        //         var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
+        //         var button = document.createElement("button");
+        //         button.className = "btn btn-success"; // Set button text
+        //         div.appendChild(button);
+        //     });
 
-            // Select the element by its ID
+        //     // Select the element by its ID
 
-            // Create the button element
+        //     // Create the button element
 
-        });
+        // });
         this.isLoading = false;
     },
 
