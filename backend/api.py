@@ -331,6 +331,7 @@ def new_account(request):
     return Response(parent+" "+name)
 
 #####################################################################################
+
 from django.contrib.auth.models import User
 from datetime import datetime
 from django.shortcuts import get_object_or_404
@@ -483,8 +484,6 @@ def get_role_id(request):
 
 #####################################################################################
 
-#####################################################################################
-
 @api_view(['GET'])
 def get_all_roles(request):
 
@@ -492,6 +491,24 @@ def get_all_roles(request):
     roles = serializers.roles_serializer(roles, many=False)
 
     return Response(roles.data)
+
+#####################################################################################
+
+# class save_all_rooms(APIView):
+#     def post(self, request, format=None):
+#         rooms = request.data
+#         room_ids = []
+#         for room in rooms:
+
+#             new_room = Rooms.objects.create(
+#                 hotel_id=room['hotel'],
+#                 user_id=room['user'],
+#                 room_id=room['room_id'],
+#                 range=room['range']
+#             )
+#             room_ids.append(new_room.id)
+
+#         return Response({"room_ids": room_ids}, status=201)
 
 #####################################################################################
 

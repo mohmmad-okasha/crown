@@ -578,7 +578,9 @@ export default {
                 if (this.check_form()) {
                     this.saving = true;
 
-    
+                    // convert the range array to string to save it in db
+                    //this.hotel.range = this.hotel.range.toString();
+
                     this.get_persons();
                     // save hotel info
                     var response = await fetch(domain_url + "/backend/hotels/", {

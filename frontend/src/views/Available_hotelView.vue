@@ -189,6 +189,31 @@ export default {
                 })
                 item.dates = [...new Set(datesArray)]//remove dublicated dates from array
             })
+        },
+        no_show_dates: function (newValue) {//to get all dates in the booked ranges
+            
+            newValue.forEach(item => {
+                const datesArray = [];
+                const ranges = item.dates.split(' / ');
+                ranges.forEach(r => {
+                    const minDateParts = r.split(',')[0].split('/');
+                    const maxDateParts='';
+                    try {
+                         maxDateParts = r.split(',')[1].split('/');
+                    } catch (error) {
+                         
+                    }
+                    const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+                    const endDate =startDate;
+                    if(maxDateParts){ endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);}
+                    const currentDate = new Date(startDate);
+                    while (currentDate <= endDate) {
+                        datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
+                        currentDate.setDate(currentDate.getDate() + 1);
+                    }
+                })
+                item.dates = [...new Set(datesArray)]//remove dublicated dates from array
+            })
         }
     },
     ////////////////////
@@ -212,6 +237,7 @@ export default {
                         return parts[2] == year && parts[1] == month;
                     });
                 });
+                
                 this.close_dates.forEach(item => {
                     item.dates = item.dates.filter(date => {
                         const parts2 = date.split('/');
@@ -224,6 +250,15 @@ export default {
                     });
                     item.out_dates = item.out_dates.toString();
                 });
+
+                this.no_show_dates.forEach(item => {
+                    item.dates = item.dates.filter(date => {
+                        const parts = date.split('/');
+                        return parts[2] == year && parts[1] == month;
+                    });
+                });
+
+
             }
             // if (this.date_range.length > 0) {
             //     let min_date = this.date_range[0];
@@ -252,8 +287,11 @@ export default {
             this.isLoading = false;
         },
 
-        create_closed() {
+        async create_closed() {
             this.isLoading = true;
+
+
+
             //loop on close rooms dates and create button on monitoring table
             this.close_dates.forEach(item => {
                 try {
@@ -280,7 +318,7 @@ export default {
                         date.setDate(date.getDate() + 1);
                         // Format the incremented date to match the format in datesArray
                         const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
-                        
+
                         // check if the next date of out date is booked then the out day will be booked 
                         if (!o.dates.includes(formattedDate)) {
                             var div = document.getElementById(o.name + '_' + (d.slice(0, 2)));// select target div by date day
@@ -297,11 +335,11 @@ export default {
             //loop on no_show rooms dates and create button on monitoring table
             this.no_show_dates.forEach(n => {
                 try {
-                    n.dates=n.dates.split(',') // test to array
+                    //n.dates = n.dates.split(',') // text to array
                     n.dates.forEach(function (d) {// loop on all dates for all rooms
                         var div2 = document.getElementById(n.name + '_' + (d.slice(0, 2)));
                         var button2 = document.createElement("button");
-                        div2.innerHTML = ''; 
+                        div2.innerHTML = '';
                         button2.className = "btn btn-warning";
                         div2.appendChild(button2);
                     });
@@ -346,30 +384,33 @@ export default {
             };
         },
         get_open_rooms() {
-            
+
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_open_rooms/", params: { hotel: this.hotel, room_type: this.room_type },
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.open_dates = response.data));
-            
+
         },
         get_close_rooms() {
-            
+
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_close_rooms/", params: { hotel: this.hotel, room_type: this.room_type, month: this.date_range },
                 //auth: { username: "admin", password: "123", },
             }).then((response) => (this.close_dates = response.data));
-            
+
         },
         get_no_show_rooms() {
             this.isLoading = true;
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_no_show_rooms/", params: { hotel: this.hotel, room_type: this.room_type, month: this.date_range },
-            }).then((response) => (this.no_show_dates = response.data));
-            
+            }).then((response) => {
+                this.no_show_dates = response.data;
+
+            });
+
         },
         // end page load *******************************
         // insert form *******************************
