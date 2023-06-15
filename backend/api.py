@@ -456,7 +456,12 @@ class roles(ModelViewSet, mixins.DestroyModelMixin):
 
 @api_view(['GET'])
 def get_roles(request):
-    user_id = str(request.query_params['user_id'])
+    
+    user_id = request.query_params.get('user_id', False)
+    user_name = request.query_params.get('user_name', False)
+
+    if (user_name):
+        user_id=User.objects.filter(username=user_name).first().id
 
     roles = Roles.objects.filter(user_name_id=user_id)
     roles = serializers.roles_serializer(roles, many=True)
@@ -496,7 +501,7 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
     serializer_class = serializers.bookings_serializer
 
     def get_queryset(self):
-        queryset = Bookings.objects.all()
+        queryset = Bookings.objects.order_by('-id').all()
         id = self.request.query_params.get('id')
         if id is not None:
             queryset = queryset.filter(id=id)

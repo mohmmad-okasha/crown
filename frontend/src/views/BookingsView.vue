@@ -1,6 +1,6 @@
 <template>
     <div class="BookingsView">
-        <loading :active.sync="isLoading" :can-cancel="false" :on-cancel="onCancel" :is-full-page="fullPage"></loading>
+        <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="fullPage"></loading>
 
         <!-- context-menu -->
         <div id="context-menu" class="context-menu" :style="menuStyle">
@@ -558,6 +558,8 @@ export default {
 
     async mounted() {
         this.isLoading = true;
+        this.this_row.user = localStorage.getItem('user_name'); //to get logged in user name
+
         //get roles
         await new Promise(resolve => setTimeout(resolve, 500)); // wait
         await this.get_roles();
@@ -565,7 +567,6 @@ export default {
             this.$router.back()
         }
 
-        this.this_row.user = localStorage.getItem('user_name'); //to get logged in user name
         await this.get_booking_rows();
         await this.get_hotels();
         //await this.get_monitor();
@@ -616,8 +617,10 @@ export default {
     ////////////////////
 
     methods: {
-        get_roles() {
-            this.user_roles = this.$parent.user_roles;
+        async get_roles() {
+            return my_api.get('backend/get_roles/?user_name=' + this.this_row.user, { auth: { username: "admin", password: "123", } })
+                .then((response) => (this.user_roles = response.data))
+                .catch(err => { });
         },
 
         // page load **********************************
@@ -781,13 +784,18 @@ export default {
 
         async open_edit_modal() {
             if (this.user_roles.hotels) {
+                
                 this.edit_mode = true;
                 this.add_mode = false;
 
-                await this.get_booked_dates(); // to disable other booked dates 
-
                 // remove this booked dates from disable_dates to enable edit booked dates
                 this.this_row.all_dates = [];
+                
+                if (this.this_row.dates.length<2){
+                    this.this_row.dates.push(this.this_row.dates[0]);
+                }else{
+                    await this.get_booked_dates(); // to disable other booked dates 
+                }
                 const minDateParts = this.this_row.dates[0].split('/');
                 const maxDateParts = this.this_row.dates[1].split('/');
                 const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
@@ -839,7 +847,7 @@ export default {
                     // convert the dates array to string to save it in db
                     if (this.this_row.dates.length > 1) {
                         this.this_row.out_date = this.this_row.dates[1];
-                    }else{
+                    } else {
                         this.this_row.dates.push(this.this_row.dates[0]);
                     }
                     this.this_row.dates = this.this_row.dates.toString();
@@ -854,6 +862,8 @@ export default {
                     });
 
                     swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 1500, });
+
+                    window.location.reload();
 
                     this.get_booking_rows();
                     this.get_max_id();
