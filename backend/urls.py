@@ -17,6 +17,8 @@ router.register('settings', api.settings)
 
 urlpatterns = router.urls
 urlpatterns += [
+
+
     # to login
     path("login/", api.login, name="login"),
     # to upload files

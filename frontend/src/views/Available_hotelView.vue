@@ -15,6 +15,14 @@
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-sm-2"></div>
+
+                                <div class="col-sm-2 m-1">
+                                    <label for="inputPassword6" class="col-form-label">{{ $t("Hotel") }}</label>
+                                    <select class="form-control" placeholder="Hotel" v-model="hotel">
+                                        <option v-for="h in this.hotels" :key="h" :value="h"> {{ h }}</option>
+                                    </select>
+                                </div>
+                                
                                 <div class="col-sm-3 m-1">
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Date Range") }}</label>
                                     <input type="text" class="custom-input form-control" placeholder="Range"
@@ -24,12 +32,7 @@
                                         display-format="jYYYY-jMM" custom-input=".custom-input" />
                                 </div>
 
-                                <div class="col-sm-2 m-1">
-                                    <label for="inputPassword6" class="col-form-label">{{ $t("Hotel") }}</label>
-                                    <select class="form-control" placeholder="Hotel" v-model="hotel">
-                                        <option v-for="h in this.hotels" :key="h" :value="h"> {{ h }}</option>
-                                    </select>
-                                </div>
+
                                 <div class="col-sm-2 m-1">
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Room Type") }}</label>
 
@@ -368,6 +371,7 @@ export default {
                 .catch(err => { alert(err) });
         },
         async get_monitor() {
+            this.isLoading = true;
             this.close_dates = [];
             this.open_dates = [];
             await this.get_open_rooms();
@@ -382,6 +386,7 @@ export default {
                     }
                 }
             };
+            this.isLoading = false;
         },
         get_open_rooms() {
 

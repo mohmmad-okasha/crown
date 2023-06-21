@@ -702,8 +702,7 @@ export default {
                                 });
                             };
                         }
-                        alert("removed old");
-
+l
                         for (const [j, element] of this.hotel.room.entries()) {
 
                             element.hotel = this.hotel.id;

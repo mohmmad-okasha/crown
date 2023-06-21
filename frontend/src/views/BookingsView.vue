@@ -758,7 +758,7 @@ export default {
             var divToPrint = document.getElementById(id);
             var popupWin = window.open('', '_blank', 'width=100000,height=10000');
             document.getElementById('head_txt').style.display = "block";
-            document.getElementById('head_txt').innerHTML = this.$t("Flights");
+            document.getElementById('head_txt').innerHTML = this.$t("Bookings");
             popupWin.document.write('<link href="static/css/sb-admin-2.min.css" rel="stylesheet">');
             popupWin.document.write('<link href="static/css/reports.css" rel="stylesheet">');
             popupWin.document.write('<style>body{background-color:white !important;}</style>');

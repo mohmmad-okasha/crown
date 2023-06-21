@@ -264,11 +264,11 @@ def get_close_rooms(request):
     room_type = str(request.query_params['room_type'])
 
     if(hotel and room_type):
-        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='Booked' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
     elif(hotel):
-        rooms = Bookings.objects.filter(hotel=hotel).raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='Booked' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.filter(hotel=hotel).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
     else:
-        rooms = Bookings.objects.filter().raw("SELECT MAX(id) as id, (room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates FROM backend_bookings WHERE status='Booked' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.raw("SELECT MAX(id) as id, (room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates FROM backend_bookings WHERE status='Booked' GROUP BY room_id, hotel")
 
     response_data = []
 
@@ -291,11 +291,11 @@ def get_no_show_rooms(request):
     room_type = str(request.query_params['room_type'])
 
     if(hotel and room_type):
-        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='No Show' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='No Show' group by room")
     elif(hotel):
-        rooms = Bookings.objects.filter(hotel=hotel).raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='No Show' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.filter(hotel=hotel).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='No Show' group by room")
     else:
-        rooms = Bookings.objects.raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='No Show' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='No Show' group by room")
     response_data = []
 
 
