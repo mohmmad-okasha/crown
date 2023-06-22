@@ -104,7 +104,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'booking',
-        'USER': 'root2',
+        'USER': 'root',
         'PASSWORD': 'admin-123',
         'HOST': 'localhost',
         'PORT': '3306',
