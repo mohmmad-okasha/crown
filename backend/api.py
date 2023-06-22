@@ -30,6 +30,26 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 
+import os
+import subprocess
+from django.http import JsonResponse
+
+
+def backup(request):
+    # Generate a backup file name, e.g., using a timestamp
+    backup_file = path.abspath('frontend/public/media/backups/')+'test.sql'
+
+        # Run the mysqldump command to create the backup file
+    subprocess.call([
+            'mysqldump',
+            '-u', 'root',
+            '-p', 'admin-123',
+            'booking',
+            '--result-file', backup_file,
+    ])
+
+        # Return the backup file name as the API response
+    return Response({'backup_file': backup_file})
 
 #####################################################################################
 
@@ -58,8 +78,7 @@ class FileUploadView(APIView):
     def post(self, request, format=None):
         file_name = self.request.query_params.get('file_name')
         image_file = request.FILES.get('image')
-        file_path = path.abspath(
-            'frontend/public/media/'+path.curdir)+file_name
+        file_path = path.abspath('frontend/public/media/'+path.curdir)+file_name
         # to remove last img for this customer
         if (os.path.exists(file_path)):
             os.remove(os.path.join(file_path))
@@ -79,14 +98,12 @@ def get_max_id(request):
 
 #####################################################################################
 
-
 @api_view(['GET'])
 def get_user_name_id(request):
     username = request.query_params['username']
     user_name_id= User.objects.filter(username=username).first().id
 
     return Response({'data': user_name_id})
-
 
 #####################################################################################
 from django.db.models import Subquery, OuterRef
@@ -526,7 +543,15 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
             queryset = queryset.filter(id=id)
         search = self.request.query_params.get('search')
         if search is not None:
-            queryset = queryset.filter(Q(id__contains=search) | Q(status__contains=search) | Q(room_id__contains=search) | Q(hotel__contains=search) | Q(room_type__contains=search) | Q(notes__contains=search)| Q(user__contains=search) )
+            queryset = queryset.filter(
+                Q(id__contains=search) 
+                | Q(status__contains=search) 
+                | Q(room_id__contains=search) 
+                | Q(hotel__contains=search) 
+                | Q(room_type__contains=search) 
+                | Q(notes__contains=search)
+                | Q(persons_names__contains=search)
+                | Q(user__contains=search) )
         return queryset
 
     def put(self, request, *args, **kwargs):

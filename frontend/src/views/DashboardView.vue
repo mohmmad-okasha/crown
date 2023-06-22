@@ -77,6 +77,7 @@ export default {
     },
     async mounted() {
         this.isLoading = true;
+        my_api.get('backend/create_backup/');
         await this.get_dashboard_buttons();
         await this.get_user_name_id();
         await this.get_roles();

@@ -578,7 +578,6 @@ export default {
                 if (this.check_form()) {
                     this.saving = true;
 
-    
                     this.get_persons();
                     // save hotel info
                     var response = await fetch(domain_url + "/backend/hotels/", {

@@ -44,6 +44,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'rest_framework_simplejwt',
+    'base_app',
+    'frontend',
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -102,7 +104,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'booking',
-        'USER': 'root',
+        'USER': 'root2',
         'PASSWORD': 'admin-123',
         'HOST': 'localhost',
         'PORT': '3306',
