@@ -33,7 +33,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import os
 import subprocess
 from django.http import JsonResponse
-
+from rest_framework.renderers import JSONRenderer
 
 def backup(request):
     # Generate a backup file name, e.g., using a timestamp
@@ -49,7 +49,8 @@ def backup(request):
     ])
 
         # Return the backup file name as the API response
-    return Response({'backup_file': backup_file})
+    return Response({'backup_file': backup_file}, renderer_classes=[JSONRenderer])
+
 
 #####################################################################################
 
