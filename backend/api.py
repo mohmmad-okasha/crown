@@ -30,27 +30,6 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 
-import os
-import subprocess
-from django.http import JsonResponse
-from rest_framework.renderers import JSONRenderer
-
-def backup(request):
-    # Generate a backup file name, e.g., using a timestamp
-    backup_file = path.abspath('frontend/public/media/backups/')+'test.sql'
-
-        # Run the mysqldump command to create the backup file
-    subprocess.call([
-            'mysqldump',
-            '-u', 'root',
-            '-p', 'admin-123',
-            'booking',
-            '--result-file', backup_file,
-    ])
-
-        # Return the backup file name as the API response
-    return Response({'backup_file': backup_file}, renderer_classes=[JSONRenderer])
-
 
 #####################################################################################
 
@@ -250,17 +229,18 @@ def get_booked_rooms(request):
 def get_open_rooms(request):
     hotel = str(request.query_params['hotel'])
     if (hotel):
-        hotel_id= Hotels.objects.filter(name=hotel).first().id
+        hotel_id= Hotels.objects.get(name=hotel).id
 
     room_type = str(request.query_params['room_type'])
 
-    if(hotel and room_type):
-        rooms = Rooms.objects.filter(hotel=hotel_id).filter(room_type=room_type).all()
-    elif(hotel):
-        rooms = Rooms.objects.filter(hotel=hotel_id).all()
+    if hotel:
+        if room_type:
+            rooms = Rooms.objects.filter(hotel=hotel_id).filter(room_type=room_type).all()
+        else:
+            rooms = Rooms.objects.filter(hotel=hotel_id).all()
     else:
-        #rooms = Rooms.objects.all()
         rooms = []
+
     
     response_data = []
 
@@ -282,11 +262,11 @@ def get_close_rooms(request):
     room_type = str(request.query_params['room_type'])
 
     if(hotel and room_type):
-        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='Booked' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
     elif(hotel):
-        rooms = Bookings.objects.filter(hotel=hotel).raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='Booked' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.filter(hotel=hotel).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
     else:
-        rooms = Bookings.objects.filter().raw("SELECT MAX(id) as id, (room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates FROM backend_bookings WHERE status='Booked' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.raw("SELECT MAX(id) as id, (room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates FROM backend_bookings WHERE status='Booked' GROUP BY room")
 
     response_data = []
 
@@ -303,17 +283,18 @@ def get_close_rooms(request):
 
 #######################################################################################################################################################################################################
 
+
 @api_view(['GET'])
 def get_no_show_rooms(request):
     hotel = str(request.query_params['hotel'])
     room_type = str(request.query_params['room_type'])
 
     if(hotel and room_type):
-        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='No Show' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='No Show' group by room")
     elif(hotel):
-        rooms = Bookings.objects.filter(hotel=hotel).raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='No Show' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.filter(hotel=hotel).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='No Show' group by room")
     else:
-        rooms = Bookings.objects.raw("SELECT MAX(id) as id, CONCAT(room_id, ' - ', hotel) as room, GROUP_CONCAT(dates SEPARATOR ' / ') AS all_dates, GROUP_CONCAT(out_date SEPARATOR ',') AS out_dates FROM backend_bookings WHERE status='No Show' GROUP BY room_id, hotel")
+        rooms = Bookings.objects.raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='No Show' group by room")
     response_data = []
 
 
@@ -446,7 +427,7 @@ class roles(ModelViewSet, mixins.DestroyModelMixin):
     serializer_class = serializers.roles_serializer
 
     def get_queryset(self):
-        queryset = Roles.objects.all()
+        queryset = self.queryset
         id = self.request.query_params.get('id')
         user_name_id = self.request.query_params.get('user_name_id')
         if id is not None:
@@ -511,6 +492,34 @@ def get_all_roles(request):
     roles = serializers.roles_serializer(roles, many=False)
 
     return Response(roles.data)
+
+#####################################################################################
+@api_view(['POST'])
+def send_message(request):
+    
+        sender = request.user
+        receiver_id = request.POST.get('receiver_id')
+        message = request.POST.get('message')
+
+        if receiver_id and message:
+            receiver = User.objects.get(id=receiver_id)
+            chat_message = ChatMessage.objects.create(sender=sender, receiver=receiver, message=message)
+            return JsonResponse({'status': 'success'})
+    
+        return JsonResponse({'status': 'error'})
+
+@api_view(['GET'])
+def get_messages(request):
+    if request.method == 'GET':
+        receiver_id = request.GET.get('receiver_id')
+        if receiver_id:
+            sender = request.user
+            receiver = User.objects.get(id=receiver_id)
+            messages = ChatMessage.objects.filter(sender=sender, receiver=receiver) | ChatMessage.objects.filter(sender=receiver, receiver=sender)
+            message_list = [{'sender': str(message.sender), 'message': message.message, 'timestamp': message.timestamp} for message in messages]
+            return JsonResponse({'messages': message_list})
+    
+    return JsonResponse({'status': 'error'})
 
 #####################################################################################
 
@@ -726,3 +735,4 @@ class flight_dates(ModelViewSet, mixins.DestroyModelMixin):
         return self.update(request, *args, **kwargs)
 
 #####################################################################################
+

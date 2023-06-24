@@ -2,10 +2,7 @@
     <div class="row" id="page-top">
 
         <!-- loading  -->
-        <loading :active.sync="isLoading"
-                 :can-cancel="true"
-                 :on-cancel="onCancel"
-                 :is-full-page="fullPage"></loading>
+        <loading :active.sync="isLoading" :can-cancel="true" :on-cancel="onCancel" :is-full-page="fullPage"></loading>
 
         <div v-for="button in buttons" :key="button.id" v-show="button.show && user_roles[button.url]"
             class="col-xl-3 col-md-6 mb-4 on-hover-sm" role="button">
@@ -28,6 +25,16 @@
         </div>
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
+        
+        
+        <!-- <div>
+            <div v-for="message in messages" :key="message.timestamp">
+                <strong>{{ message.sender }}</strong>: {{ message.message }}
+            </div>
+            <input v-model="newMessage" placeholder="Type your message">
+            <button @click="sendMessage">Send</button>
+        </div> -->
+
 
     </div>
 </template>
@@ -57,8 +64,10 @@ export default {
             fullPage: true,
 
             buttons: [],
-            user_roles: ''
+            user_roles: '',
 
+            messages: [],
+            newMessage: ''
         }
     },
     computed: {
@@ -77,7 +86,12 @@ export default {
     },
     async mounted() {
         this.isLoading = true;
-        my_api.get('backend/create_backup/');
+
+
+        this.fetchMessages();
+
+
+        //my_api.get('backend/create_backup/');
         await this.get_dashboard_buttons();
         await this.get_user_name_id();
         await this.get_roles();
@@ -103,6 +117,32 @@ export default {
                 .catch(err => { alert(err) });
         },
 
+        fetchMessages() {
+            const receiverId = 1; // Set the receiver ID dynamically
+            axios.get(`/backend/get-messages/?receiver_id=${receiverId}`)
+                .then(response => {
+                    this.messages = response.data.messages;
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        },
+        sendMessage() {
+            const receiverId = 1; // Set the receiver ID dynamically
+            axios.post('/backend/send-message/', {
+                receiver_id: receiverId,
+                message: this.newMessage
+            })
+                .then(response => {
+                    if (response.data.status === 'success') {
+                        this.newMessage = '';
+                        this.fetchMessages();
+                    }
+                })
+                .catch(error => {
+                    console.log(error);
+                });
+        }
 
     },
 }

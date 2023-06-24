@@ -1,6 +1,7 @@
 from django.db import models
 
 
+
 #####################################################################################
 
 class Bookings(models.Model):
@@ -154,5 +155,17 @@ class Settings(models.Model):
     lang = models.CharField(max_length=50)
     primary_color = models.CharField(max_length=50)
     back_color = models.CharField(max_length=50)
+
+#####################################################################################
+
+from django.db import models
+from django.contrib.auth.models import User
+
+class ChatMessage(models.Model):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    message = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
 
 #####################################################################################

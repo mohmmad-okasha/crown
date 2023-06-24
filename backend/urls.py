@@ -66,10 +66,9 @@ urlpatterns += [
     path("booking_report/", api.booking_report, name="booking_report"),
 
 
-    path("create_backup/", api.backup, name="create_backup"),
-
     #path('save_all_rooms/', api.save_all_rooms.as_view()),
 
-
+    path('send-message/', api.send_message, name='send_message'),
+    path('get-messages/', api.get_messages, name='get_messages'),
 
 ]

@@ -116,7 +116,7 @@ export default {
         }
     },
     async mounted() {
-        this.isLoading = true;
+        
         await new Promise(resolve => setTimeout(resolve, 500)); // wait
         await this.get_roles();
         if (this.user_roles[this.$route.path.substring(1)] == 0) {
@@ -131,7 +131,7 @@ export default {
         while (elements.length > 0) {
             elements[0].parentNode.removeChild(elements[0]);
         }////
-        this.isLoading = false;
+        
     },
     ////////////////////
     computed: {
@@ -185,7 +185,7 @@ export default {
                     const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
                     const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
                     const currentDate = new Date(startDate);
-                    while (currentDate <= endDate) {
+                    while (currentDate < endDate) {
                         datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
                         currentDate.setDate(currentDate.getDate() + 1);
                     }
@@ -227,7 +227,7 @@ export default {
         },
 
         filter_dates() {// remove any date out of selected range
-            this.isLoading = true;
+            
             if (this.date_range) {
                 let month = this.date_range.split('/')[0];
                 let year = this.date_range.split('/')[1];
@@ -287,14 +287,10 @@ export default {
             //         });
             //     });
             // }
-            this.isLoading = false;
+            
         },
 
         async create_closed() {
-            this.isLoading = true;
-
-
-
             //loop on close rooms dates and create button on monitoring table
             this.close_dates.forEach(item => {
                 try {
@@ -318,10 +314,11 @@ export default {
                         const [day, month, year] = d.split("/");
                         const date = new Date(`${month}/${day}/${year}`);
                         // Increment the date by one day
-                        date.setDate(date.getDate() + 1);
+                        date.setDate(date.getDate());
                         // Format the incremented date to match the format in datesArray
                         const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
 
+                        
                         // check if the next date of out date is booked then the out day will be booked 
                         if (!o.dates.includes(formattedDate)) {
                             var div = document.getElementById(o.name + '_' + (d.slice(0, 2)));// select target div by date day
@@ -350,7 +347,7 @@ export default {
                 }
             });
 
-            this.isLoading = false;
+            
             // this.close_dates.forEach(item => {
             //     try {
             //         item.dates.forEach(d => {// loop on all dates for all rooms
@@ -407,7 +404,7 @@ export default {
 
         },
         get_no_show_rooms() {
-            this.isLoading = true;
+            
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_no_show_rooms/", params: { hotel: this.hotel, room_type: this.room_type, month: this.date_range },
