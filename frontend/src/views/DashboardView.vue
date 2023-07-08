@@ -26,7 +26,6 @@
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
         
-        
         <!-- <div>
             <div v-for="message in messages" :key="message.timestamp">
                 <strong>{{ message.sender }}</strong>: {{ message.message }}
@@ -34,7 +33,6 @@
             <input v-model="newMessage" placeholder="Type your message">
             <button @click="sendMessage">Send</button>
         </div> -->
-
 
     </div>
 </template>
