@@ -57,9 +57,9 @@
                             </thead>
                             <tbody>
                                 <tr v-for="r in this.open_dates" :key="r.name">
-                                    <td>{{ r.name }}</td>
+                                    <td><p>{{ r.categ + '/' +r.name }}</p></td>
                                     <td v-for="ii in 31" :key="ii" :id="r.name + '_' + ii.toString().padStart(2, '0')">
-                                        <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)" :title="r.name"
+                                        <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)" :title="r.categ + '/' +r.name"
                                             type="button" class="btn btn-success"></button>
                                     </td>
                                     <br><br>
@@ -298,6 +298,7 @@ export default {
                         var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
                         var button = document.createElement("button");
                         button.className = "btn btn-danger";
+                        button.title=item.name
                         div.appendChild(button);
                     });
                 } catch (error) {

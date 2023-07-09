@@ -676,7 +676,7 @@ export default {
                 if (this.check_form()) {
                     // convert the dates array to string to save it in db
                     //this.hotel.range = this.hotel.range.toString();
-
+                    this.get_persons();
                     var response = await fetch(domain_url + "/backend/hotels/" + id + "/", {
                         method: "PUT",
                         headers: { "Content-Type": "application/json", },
@@ -689,24 +689,14 @@ export default {
                         swal(errorMessage, { icon: 'error' });
                     } else {
                         // Request was successful
-                        //this.hotel.range = this.hotel.range.toString();
 
-                        //delete old rooms and save the new
-                        
-                        if (this.old_rooms.length>0) {
-                            for (const [i,old] of this.old_rooms.entries()) {
-                                var response = await fetch(domain_url + '/backend/rooms/' + old.id + '/', {
-                                    method: "delete",
-                                    headers: { "Content-Type": "application/json", },
-                                });
-                            };
-                        }
-l
-                        for (const [j, element] of this.hotel.room.entries()) {
+                        //delete old data
+                        await this.delete_hotel_rooms(this.hotel.id);
 
+                        for (const [i, element] of this.hotel.room.entries()) {
                             element.hotel = this.hotel.id;
-                            element.user = this.user;
-                            element.room_id = 'room_' + (parseInt(j) + 1);
+                            element.user = this.hotel.user;
+                            element.room_id = 'room_' + (parseInt(i) + 1);
                             element.range = element.range.toString();
                             await fetch(domain_url + "/backend/rooms/", {
                                 method: "post",
@@ -715,7 +705,6 @@ l
                                     'Content-Type': 'application/json;charset=UTF-8'
                                 }
                             });
-
                             await this.get_max_room_id();
 
                             // save all room dates to db
@@ -744,17 +733,6 @@ l
                             });
                         };
 
-
-                        // this.range_dates.forEach((element) => {
-                        //     fetch(domain_url + "/backend/hotel_dates/", {
-                        //         method: "post",
-                        //         body: JSON.stringify({ 'hotel_id': this.max_id, 'date': element }),
-                        //         headers: {
-                        //             'Content-Type': 'application/json;charset=UTF-8'
-                        //         }
-                        //     });
-                        // });
-
                         swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
                         this.max_id = this.hotel.id
                         this.get_Hotels();
@@ -768,6 +746,13 @@ l
 
             this.isLoading = false;
 
+        },
+
+        delete_hotel_rooms(id) {
+            return axios({
+                method: "get",
+                url: domain_url + "/backend/delete_hotel_rooms/?hotel_id=" + id,
+            });
         },
 
         async delete_hotel(id) {
@@ -870,7 +855,7 @@ l
                 element.range = element.range.split(',');
             });
             //$('#modal_label').html('Edit hotel');
-            
+
             $('#addModal').modal('toggle');
         },
 

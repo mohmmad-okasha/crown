@@ -77,6 +77,16 @@ def get_max_id(request):
     return Response({'data': max_id})
 
 #####################################################################################
+# to delete rooms by hotel id
+
+@api_view(['GET'])
+def delete_hotel_rooms(request):
+    hotel_id = request.query_params['hotel_id']
+    Rooms.objects.filter(hotel_id=hotel_id).delete()
+
+    return Response({'data': 1})
+
+#####################################################################################
 
 @api_view(['GET'])
 def get_user_name_id(request):
@@ -247,6 +257,7 @@ def get_open_rooms(request):
     for room in rooms:
         hotel_name=Hotels.objects.filter(id=room.hotel_id).first().name
         room_data = {
+            'categ': room.room_categ,
             'name': room.room_id +' - '+ hotel_name,
             'dates': list(room.room_dates_set.values_list('date', flat=True))
         }
@@ -264,7 +275,7 @@ def get_close_rooms(request):
     if(hotel and room_type):
         rooms = Bookings.objects.filter(hotel=hotel).filter(room_type=room_type).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
     elif(hotel):
-        rooms = Bookings.objects.filter(hotel=hotel).raw("select id,(room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
+        rooms = Bookings.objects.filter(hotel=hotel).raw("select id,(room_id || ' - ' || hotel ) as room , GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates from backend_bookings where status='Booked' group by room")
     else:
         rooms = Bookings.objects.raw("SELECT MAX(id) as id, (room_id || ' - ' || hotel) as room, GROUP_CONCAT(dates, ' / ') AS all_dates, GROUP_CONCAT(out_date, ',') AS out_dates FROM backend_bookings WHERE status='Booked' GROUP BY room")
 
