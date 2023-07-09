@@ -2,7 +2,7 @@
     <div class="row" id="page-top">
 
         <!-- loading  -->
-        <loading :active.sync="isLoading" :can-cancel="true" :on-cancel="onCancel" :is-full-page="fullPage"></loading>
+        <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
 
         <div v-for="button in buttons" :key="button.id" v-show="button.show && user_roles[button.url]"
             class="col-xl-3 col-md-6 mb-4 on-hover-sm" role="button">

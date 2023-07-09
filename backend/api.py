@@ -85,6 +85,20 @@ from datetime import datetime, timedelta
 import glob
 
 @api_view(['GET'])
+def get_backup_files(backup_folder):
+    file_pattern = os.path.join('db_backup/*.sqlite3')
+    backup_files = glob.glob(file_pattern)
+    backup_file_info = []
+    
+    for file in backup_files:
+        file_name = os.path.basename(file)
+        creation_time = datetime.fromtimestamp(os.path.getmtime(file))
+        backup_file_info.append({"name":os.path.splitext(file_name)[0], "time":creation_time.strftime('%d/%m/%Y %H:%M')})
+    return Response({'data': backup_file_info})
+
+#####################################################################################
+
+@api_view(['GET'])
 def save_backup(request):
     # Path to the original database file
     original_db_path = 'db.sqlite3'
@@ -101,9 +115,7 @@ def save_backup(request):
     backup_file_full_path = os.path.join(backup_folder, backup_file_name)
     
     # Copy the database file to the backup folder
-    shutil.copy2(original_db_full_path, backup_file_full_path)
-    
-
+    shutil.copy2(original_db_full_path, backup_file_full_path) 
 
     # Remove old backup files older than one week
     one_week_ago = datetime.now() - timedelta(days=7)
@@ -121,6 +133,38 @@ def save_backup(request):
     return Response({'data': 'Successfully created a backup of the SQLite database'})
 
 #####################################################################################
+@api_view(['GET'])
+def restore_backup(request):
+    backup_name = request.query_params['backup_name']
+
+    # Path to the backup file
+    backup_file_path = 'db_backup/'+backup_name+'.sqlite3'
+    
+    # Path to the destination database file
+    destination_db_path = 'db.sqlite3'
+    
+    # Copy the backup file to the destination database location
+    shutil.copy2(backup_file_path, destination_db_path)
+
+    return Response({'data': f'Successfully restored the SQLite database from the backup file: {backup_file_path}'})
+#####################################################################################
+@api_view(['GET'])
+def remove_backup_file(request):
+    file_name = request.query_params['backup_name']
+
+    file_path = os.path.join('db_backup/'+ file_name+'.sqlite3')
+        
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        return Response({'data':f"Successfully removed backup file: {file_name}"})
+    else:
+        return Response({'data':f"Backup file not found: {file_name}"})
+    
+#####################################################################################
+
+
+
+
 # to delete rooms by hotel id
 
 @api_view(['GET'])

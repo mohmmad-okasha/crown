@@ -369,7 +369,6 @@ export default {
       const backup_diffInMs = Math.abs(last_backup_date - date1);
       const backup_diffInMinutes = Math.floor((backup_diffInMs / 1000) / 60);
       if (backup_diffInMinutes > 800) {
-        alert(backup_diffInMinutes)
         my_api.get('/backend/save_backup/')
           .then(localStorage.setItem('last_backup', new Date()))
           .catch(err => { alert(err) });

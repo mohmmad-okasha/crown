@@ -67,7 +67,13 @@ urlpatterns += [
 
     path("delete_hotel_rooms/", api.delete_hotel_rooms, name="delete_hotel_rooms"),
 
+    path("get_backup_files/", api.get_backup_files, name="get_backup_files"),
+    
     path("save_backup/", api.save_backup, name="save_backup"),
+
+    path("remove_backup_file/", api.remove_backup_file, name="remove_backup_file"),
+
+    path("restore_backup/", api.restore_backup, name="restore_backup"),
 
 
 

@@ -1,6 +1,6 @@
 <template>
     <div class="HotelsView">
-        <loading :active.sync="isLoading" :can-cancel="false" :on-cancel="onCancel" :is-full-page="fullPage"></loading>
+        <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="fullPage"></loading>
 
         <!-- context-menu -->
         <div id="context-menu" class="context-menu" :style="menuStyle">

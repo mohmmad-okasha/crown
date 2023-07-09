@@ -147,6 +147,7 @@ class Roles(models.Model):
     hotels = models.IntegerField(default=0)
     available_hotel = models.IntegerField(default=0)
     hotels_report = models.IntegerField(default=0)
+    backups = models.IntegerField(default=0)
 
 #####################################################################################
 
