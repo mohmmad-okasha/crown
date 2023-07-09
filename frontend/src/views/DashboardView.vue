@@ -86,7 +86,7 @@ export default {
         this.isLoading = true;
 
 
-        this.fetchMessages();
+        //this.fetchMessages();
 
 
         //my_api.get('backend/create_backup/');
@@ -97,6 +97,7 @@ export default {
     },
 
     methods: {
+
         get_dashboard_buttons() {
             return my_api.get('/backend/dashboard_buttons/')
                 .then((response) => (this.buttons = response.data))

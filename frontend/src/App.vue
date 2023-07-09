@@ -209,7 +209,7 @@ export default {
         back_color: '',
       },
       user_name: '',
-      user_name_id:'',
+      user_name_id: '',
       auth: {
         username: '',
         password: '',
@@ -219,7 +219,7 @@ export default {
       primary_color: '',
       primary_text: '',
       back_color: '',
-      user_roles:[]
+      user_roles: []
     }
   },
   async mounted() {
@@ -228,9 +228,9 @@ export default {
     await this.get_settings();
     this.dark_mode();
     this.set_lang();
-     
+
     this.get_roles();
-    
+
   },
   methods: {
     async loginUser() {
@@ -246,11 +246,11 @@ export default {
 
         window.location.reload();
 
-        
+
         // redirect to dashboard or homepage after successful login
         this.error = false;
         this.$router.push('dashboard')
-        
+
       } catch (error) {
         this.error = true;
         console.log(error);
@@ -266,17 +266,22 @@ export default {
       localStorage.setItem('user_name', '');
       this.auth.logged_in = '';
     },
+    save_backup() {
+      return my_api.get('/backend/save_backup/')
+        .then(localStorage.setItem('last_backup', new Date()))
+        .catch(err => { alert(err) });
+    },
     get_user_name_id() {
       return axios({
         method: "get",
-        url: domain_url + "/backend/get_user_name_id/?username="+this.user_name,
+        url: domain_url + "/backend/get_user_name_id/?username=" + this.user_name,
         //auth: { username: "admin", password: "123", },
       }).then((response) => (this.user_name_id = response.data.data));
     },
     async get_roles() {
       return my_api.get('backend/get_roles/?user_id=' + this.user_name_id, { auth: { username: "admin", password: "123", } })
         .then((response) => (this.user_roles = response.data))
-        .catch(err => {  });
+        .catch(err => { });
     },
     dark_mode() {
       if (this.settings.dark_mode) {
@@ -349,8 +354,32 @@ export default {
     if (diffInMinutes > 60) {
       localStorage.setItem('access_token', '');
       localStorage.setItem('token_time', 0)
-      //this.auth.logged_in = '';
     }
+
+
+    //auto backup
+    const last_backup = localStorage.getItem('last_backup')
+    if (!last_backup) {
+      my_api.get('/backend/save_backup/')
+        .then(localStorage.setItem('last_backup', new Date()))
+        .catch(err => { alert(err) });
+    } else {
+
+      const last_backup_date = new Date(last_backup);
+      const backup_diffInMs = Math.abs(last_backup_date - date1);
+      const backup_diffInMinutes = Math.floor((backup_diffInMs / 1000) / 60);
+      if (backup_diffInMinutes > 800) {
+        alert(backup_diffInMinutes)
+        my_api.get('/backend/save_backup/')
+          .then(localStorage.setItem('last_backup', new Date()))
+          .catch(err => { alert(err) });
+      }
+      
+    }
+
+
+
+
   },
 };
 </script>

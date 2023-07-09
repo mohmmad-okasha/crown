@@ -67,6 +67,9 @@ urlpatterns += [
 
     path("delete_hotel_rooms/", api.delete_hotel_rooms, name="delete_hotel_rooms"),
 
+    path("save_backup/", api.save_backup, name="save_backup"),
+
+
 
     #path('save_all_rooms/', api.save_all_rooms.as_view()),
 

@@ -77,6 +77,50 @@ def get_max_id(request):
     return Response({'data': max_id})
 
 #####################################################################################
+
+# to save db backup
+import shutil
+import os
+from datetime import datetime, timedelta
+import glob
+
+@api_view(['GET'])
+def save_backup(request):
+    # Path to the original database file
+    original_db_path = 'db.sqlite3'
+    
+    # Destination folder for the backup
+    backup_folder = 'db_backup'
+    
+    # Create the backup file name based on the current timestamp
+    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    backup_file_name = f'backup_{timestamp}.sqlite3'
+    
+    # Construct the full paths for the original database and the backup file
+    original_db_full_path = os.path.abspath(original_db_path)
+    backup_file_full_path = os.path.join(backup_folder, backup_file_name)
+    
+    # Copy the database file to the backup folder
+    shutil.copy2(original_db_full_path, backup_file_full_path)
+    
+
+
+    # Remove old backup files older than one week
+    one_week_ago = datetime.now() - timedelta(days=7)
+    file_pattern = os.path.join(backup_folder, 'backup_*.sqlite3')
+    
+    # Get a list of all backup files matching the pattern
+    backup_files = glob.glob(file_pattern)
+    
+    for file_path in backup_files:
+        file_modified_time = datetime.fromtimestamp(os.path.getmtime(file_path))
+        if file_modified_time < one_week_ago:
+            os.remove(file_path)
+            print(f'Removed old backup file: {file_path}')
+
+    return Response({'data': 'Successfully created a backup of the SQLite database'})
+
+#####################################################################################
 # to delete rooms by hotel id
 
 @api_view(['GET'])
