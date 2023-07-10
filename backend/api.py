@@ -125,7 +125,7 @@ def save_backup(request):
     backup_files = glob.glob(file_pattern)
     
     for file_path in backup_files:
-        file_modified_time = datetime.fromtimestamp(os.path.getmtime(file_path))
+        file_modified_time = datetime.fromtimestamp(os.path.getctime(file_path))
         if file_modified_time < one_week_ago:
             os.remove(file_path)
             print(f'Removed old backup file: {file_path}')
