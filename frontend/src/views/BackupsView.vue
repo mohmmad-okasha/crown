@@ -54,7 +54,6 @@
                             <table id="mytable" class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th scope="col">#</th>
                                         <th scope="col">{{ $t("Name") }}</th>
                                         <th scope="col">{{ $t("Time") }}</th>
                                         <th scope="col" class="no_print">{{ $t("Actions") }}</th>
@@ -64,7 +63,6 @@
                                     <tr @contextmenu="showContextMenu" v-for="r in this.backups_rows" :key="r.name"
                                         @click="row_click(r.name)" @click.right="row_click(r.name)" role="button"
                                         :class="{ 'selected': r.name === active_index }">
-                                        <th scope="row" id="id">{{ r.id }}</th>
                                         <td>{{ $t(r.name) }}</td>
                                         <td>{{ $t(r.time) }}</td>
 
