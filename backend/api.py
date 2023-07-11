@@ -162,9 +162,6 @@ def remove_backup_file(request):
     
 #####################################################################################
 
-
-
-
 # to delete rooms by hotel id
 
 @api_view(['GET'])

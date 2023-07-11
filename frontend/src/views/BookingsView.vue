@@ -257,7 +257,7 @@
                                                 </div>
                                                 <div class="col">
                                                     <label>{{ $t("Children Age ") + i }}</label>
-                                                    <input v-model="this_row.kids_ages[i - 1]" type="text"
+                                                    <input v-model="this_row.kids_ages[i - 1]" type="number"
                                                         class="form-control"
                                                         :class="{ 'is-invalid': !this_row.kids_ages[i - 1] && validate, 'is-valid': this_row.kids_ages[i - 1] && validate }">
                                                     <div v-if="!this_row.kids_ages[i - 1] && validate"
@@ -569,7 +569,6 @@ export default {
 
         await this.get_booking_rows();
         await this.get_hotels();
-        //await this.get_monitor();
 
         //to remove modal background on auto vue js reload
         const elements = document.getElementsByClassName("modal-backdrop fade show");
@@ -578,20 +577,6 @@ export default {
         }////
 
 
-        //loop on open rooms dates and create button on monitoring table
-        // this.all_rooms_dates.forEach(item => {
-        //     item.dates.forEach(d => {// loop on all dates for all rooms
-        //         var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
-        //         var button = document.createElement("button");
-        //         button.className = "btn btn-success"; // Set button text
-        //         div.appendChild(button);
-        //     });
-
-        //     // Select the element by its ID
-
-        //     // Create the button element
-
-        // });
         this.isLoading = false;
     },
 
@@ -648,54 +633,6 @@ export default {
                 .catch(err => { alert(err) });
         },
 
-        async get_monitor() {
-
-            await this.get_open_rooms();
-
-            //get all booked dates for all rooms
-            this.booking_rows.forEach(item => {
-                const minDateParts = item.dates.split(',')[0].split('/');
-                const maxDateParts = item.dates.split(',')[1].split('/');
-                const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
-                const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
-
-                const currentDate = new Date(startDate);
-                const datesArray = [];
-
-                while (currentDate < endDate) {
-                    datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
-                    currentDate.setDate(currentDate.getDate() + 1);
-                }
-
-                const existingEntry = this.all_rooms_booked_dates.find(entry => entry.name === item.room_id + ' - ' + item.hotel);
-
-                if (existingEntry) {
-                    existingEntry.dates = existingEntry.dates.concat(datesArray);
-                } else {
-                    this.all_rooms_booked_dates.push({
-                        name: item.room_id + ' - ' + item.hotel,
-                        dates: datesArray
-                    });
-                }
-
-
-            });
-
-
-            for (let roomBooked of this.all_rooms_booked_dates) {
-                let roomBookedId = roomBooked.room_id;
-                let roomBookedHotel = roomBooked.hotel;
-                let roomBookedDates = roomBooked.dates;
-
-                for (let room of this.all_rooms_dates) {
-                    if (room.room_id === roomBookedId && room.hotel === roomBookedHotel) {
-                        room.dates = room.dates.filter(date => !roomBookedDates.includes(date));
-                    }
-                }
-            }
-
-
-        },
 
         get_open_rooms() {
             return axios({
@@ -741,9 +678,13 @@ export default {
                 this.booked_dates.forEach((element) => {
                     const minDateParts = element.split(',')[0].split('/');
                     const maxDateParts = element.split(',')[1].split('/');
+                    
                     const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
                     const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
                     const currentDate = new Date(startDate);
+
+                    currentDate.setDate(currentDate.getDate() + 1);//to skip in_date from booking dates list
+                    
                     while (currentDate < endDate) {
                         this.all_booked_dates.push(currentDate.toLocaleDateString("en-GB"));
                         currentDate.setDate(currentDate.getDate() + 1);
