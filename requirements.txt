@@ -1,4 +1,4 @@
-#Django ~> 4.1.9
+Django==4.2.3
 asgiref==3.6.0
 astroid==2.13.2
 async-generator==1.10

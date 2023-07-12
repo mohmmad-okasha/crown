@@ -93,7 +93,10 @@ def get_backup_files(backup_folder):
     for file in backup_files:
         file_name = os.path.basename(file)
         creation_time = datetime.fromtimestamp(os.path.getctime(file))
-        backup_file_info.append({"name":os.path.splitext(file_name)[0], "time":creation_time.strftime('%d/%m/%Y %H:%M')})
+        three_hours_in_seconds = 3 * 60 * 60
+        creation_time = creation_time + timedelta(seconds=three_hours_in_seconds)
+        size= os.path.getsize(file)
+        backup_file_info.append({"name":os.path.splitext(file_name)[0], "time":creation_time.strftime('%d/%m/%Y %H:%M'), "size": str(size/1000000)[:4] +" MB"})
     return Response({'data': backup_file_info})
 
 #####################################################################################

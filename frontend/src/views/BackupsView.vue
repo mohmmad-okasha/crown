@@ -56,6 +56,7 @@
                                     <tr>
                                         <th scope="col">{{ $t("Name") }}</th>
                                         <th scope="col">{{ $t("Time") }}</th>
+                                        <th scope="col">{{ $t("Size") }}</th>
                                         <th scope="col" class="no_print">{{ $t("Actions") }}</th>
                                     </tr>
                                 </thead>
@@ -65,6 +66,7 @@
                                         :class="{ 'selected': r.name === active_index }">
                                         <td>{{ $t(r.name) }}</td>
                                         <td>{{ $t(r.time) }}</td>
+                                        <td>{{ $t(r.size) }}</td>
 
                                         <td class="no_print">
 

@@ -77,7 +77,7 @@
                                         @click.right="row_click(booking.id)" @dblclick="open_edit_modal" role="button"
                                         :class="{ 'selected': booking.id === active_index }">
                                         <th scope="row" id="id">{{ booking.id }}</th>
-                                        <td>{{ booking.book_date }}</td>
+                                        <td>{{ formatDate(booking.book_date) }}</td>
                                         <td>{{ $t(booking.persons_names + ' , ' + booking.kids_names) }}</td>
                                         <td>{{ $t(booking.persons_number + booking.kids_number) }}</td>
                                         <td>{{ $t(booking.hotel) }}</td>
@@ -602,6 +602,18 @@ export default {
     ////////////////////
 
     methods: {
+
+        formatDate(date) {
+            const formattedDate = new Date(date);
+            const day = String(formattedDate.getDate()).padStart(2, '0');
+            const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
+            const year = formattedDate.getFullYear();
+            const hours = String(formattedDate.getHours()).padStart(2, '0');
+            const minutes = String(formattedDate.getMinutes()).padStart(2, '0');
+
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        },
+
         async get_roles() {
             return my_api.get('backend/get_roles/?user_name=' + this.this_row.user, { auth: { username: "admin", password: "123", } })
                 .then((response) => (this.user_roles = response.data))
@@ -678,13 +690,13 @@ export default {
                 this.booked_dates.forEach((element) => {
                     const minDateParts = element.split(',')[0].split('/');
                     const maxDateParts = element.split(',')[1].split('/');
-                    
+
                     const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
                     const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
                     const currentDate = new Date(startDate);
 
                     currentDate.setDate(currentDate.getDate() + 1);//to skip in_date from booking dates list
-                    
+
                     while (currentDate < endDate) {
                         this.all_booked_dates.push(currentDate.toLocaleDateString("en-GB"));
                         currentDate.setDate(currentDate.getDate() + 1);
@@ -725,16 +737,16 @@ export default {
 
         async open_edit_modal() {
             if (this.user_roles.hotels) {
-                
+
                 this.edit_mode = true;
                 this.add_mode = false;
 
                 // remove this booked dates from disable_dates to enable edit booked dates
                 this.this_row.all_dates = [];
-                
-                if (this.this_row.dates.length<2){
+
+                if (this.this_row.dates.length < 2) {
                     this.this_row.dates.push(this.this_row.dates[0]);
-                }else{
+                } else {
                     await this.get_booked_dates(); // to disable other booked dates 
                 }
                 const minDateParts = this.this_row.dates[0].split('/');
