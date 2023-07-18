@@ -99,6 +99,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+    },
+    'logs_db': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'logs/logs_db.sqlite3',
     }
 
     # 'default': {
@@ -110,6 +114,8 @@ DATABASES = {
     #     'PORT': '3306',
     # }
 }
+
+DATABASE_ROUTERS = ['base_app.routers.Log_db_Router']
 
 
 # Password validation

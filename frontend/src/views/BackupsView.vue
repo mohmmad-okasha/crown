@@ -228,7 +228,7 @@ export default {
 
             try {
                 my_api.get('/backend/save_backup/')
-                    .then(swal(this.$t("Saved!"), { buttons: false, icon: "success", timer: 2000, }))
+                    .then(swal(this.$t("Saved!"), { buttons: false, icon: "success", timer: 2000, }),axios.post(domain_url + '/backend/logs/', {user_name: this.$parent.user_name, log: 'save backup',time: new Date()}) )
                     .catch(err => { swal(err, { icon: 'error' }) });
 
             } catch (error) { console.error(); }
@@ -250,7 +250,10 @@ export default {
                                 .then(swal(this.$t("Restored!"), { buttons: false, icon: "success", timer: 2000, }))
                                 .catch(err => { swal(err, { icon: 'error' }) });
 
-                        } catch (error) { console.error(); }
+                                //save log
+                                axios.post(domain_url + '/backend/logs/', {user_name: this.$parent.user_name, log: 'restore backup :'+ backup_name,time: new Date()})
+                        
+                            } catch (error) { console.error(); }
                         await this.get_backups()
                         this.isLoading = false;
                     }

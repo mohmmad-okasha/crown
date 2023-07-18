@@ -6,6 +6,7 @@ import Available_hotelView from "../views/Available_hotelView.vue";
 import HotelsView from "../views/HotelsView.vue";
 import Hotels_reportView from "../views/Hotels_reportView.vue";
 import BackupsView from "../views/BackupsView.vue";
+import LogsView from "../views/LogsView.vue";
 import DashboardView from "../views/DashboardView.vue";
 
 //import HomeView from "../views/HomeView.vue";
@@ -88,6 +89,14 @@ const routes = [
     path: "/backups",
     name: "BackupsView",
     component: BackupsView,
+    meta: {
+      requiresAuth: true, // add this meta field to routes that require authentication
+    },
+  },
+  {
+    path: "/logs",
+    name: "LogsView",
+    component: LogsView,
     meta: {
       requiresAuth: true, // add this meta field to routes that require authentication
     },

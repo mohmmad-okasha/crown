@@ -7,6 +7,7 @@ from . import api
 router = routers.DefaultRouter()
 router.register('flights', api.flights)
 router.register('bookings', api.bookings)
+router.register('logs', api.logs)
 router.register('hotels', api.hotels)
 router.register('rooms', api.rooms)
 router.register('roles', api.roles)
@@ -46,6 +47,7 @@ urlpatterns += [
     path("get_all_roles/", api.get_all_roles, name="get_all_roles"),
 
     path("get_hotels/", api.get_hotels, name="get_hotels"),
+    path("get_users/", api.get_users, name="get_users"),
 
     path("get_room_info/", api.get_room_info, name="get_room_info"),
 

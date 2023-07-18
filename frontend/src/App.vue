@@ -228,9 +228,7 @@ export default {
     await this.get_settings();
     this.dark_mode();
     this.set_lang();
-
     this.get_roles();
-
   },
   methods: {
     async loginUser() {
@@ -244,8 +242,9 @@ export default {
         localStorage.setItem('token_time', new Date())
         localStorage.setItem('user_name', this.username)
 
-        window.location.reload();
+        axios.post(domain_url + '/backend/logs/', {user_name: this.username, log: 'login',time: new Date()})
 
+        window.location.reload();
 
         // redirect to dashboard or homepage after successful login
         this.error = false;

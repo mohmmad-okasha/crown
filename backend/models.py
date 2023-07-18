@@ -148,6 +148,7 @@ class Roles(models.Model):
     available_hotel = models.IntegerField(default=0)
     hotels_report = models.IntegerField(default=0)
     backups = models.IntegerField(default=0)
+    logs = models.IntegerField(default=0)
 
 #####################################################################################
 
@@ -156,6 +157,16 @@ class Settings(models.Model):
     lang = models.CharField(max_length=50)
     primary_color = models.CharField(max_length=50)
     back_color = models.CharField(max_length=50)
+
+#####################################################################################
+class SecondDBManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().using('second_db')
+    
+class Logs(models.Model):
+    log = models.CharField(max_length=50)
+    user_name = models.CharField(max_length=50)
+    time = models.DateTimeField(max_length=50)
 
 #####################################################################################
 

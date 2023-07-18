@@ -234,6 +234,14 @@ def get_rooms(request):
 
 #####################################################################################
 
+# to get users
+
+@api_view(['GET'])
+def get_users(request):
+    users = set(User.objects.values_list('username', flat=True))
+    return Response(list(users))
+#####################################################################################
+
 # to get hotels
 
 @api_view(['GET'])
@@ -521,7 +529,6 @@ class UserDataView(APIView):
 #####################################################################################
 
 class roles(ModelViewSet, mixins.DestroyModelMixin):
-
     queryset = Roles.objects.all()
     serializer_class = serializers.roles_serializer
 
@@ -536,7 +543,6 @@ class roles(ModelViewSet, mixins.DestroyModelMixin):
 
         return queryset
     
-
     def put(self, request, *args, **kwargs):
         user_name_id = request.data.get('user_name')
         roles_instance = self.get_object()  # Get the Roles instance based on the provided ID
@@ -622,24 +628,6 @@ def get_messages(request):
 
 #####################################################################################
 
-# class save_all_rooms(APIView):
-#     def post(self, request, format=None):
-#         rooms = request.data
-#         room_ids = []
-#         for room in rooms:
-
-#             new_room = Rooms.objects.create(
-#                 hotel_id=room['hotel'],
-#                 user_id=room['user'],
-#                 room_id=room['room_id'],
-#                 range=room['range']
-#             )
-#             room_ids.append(new_room.id)
-
-#         return Response({"room_ids": room_ids}, status=201)
-
-#####################################################################################
-
 class bookings(ModelViewSet, mixins.DestroyModelMixin):
 
     queryset = Bookings.objects.all()
@@ -661,6 +649,47 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
                 | Q(notes__contains=search)
                 | Q(persons_names__contains=search)
                 | Q(user__contains=search) )
+        return queryset
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+#####################################################################################
+
+class logs(ModelViewSet, mixins.DestroyModelMixin):
+
+    queryset = Logs.objects.all()
+    serializer_class = serializers.logs_serializer
+
+    def get_queryset(self):
+        queryset = Logs.objects.order_by('-id').all()
+        id = self.request.query_params.get('id')
+        if id is not None:
+            queryset = queryset.filter(id=id)
+        search = self.request.query_params.get('search')
+        if search is not None:
+            queryset = queryset.filter(
+                Q(id__contains=search) 
+                | Q(time__contains=search) 
+                | Q(log__contains=search) 
+                | Q(user_name__contains=search) )
+            
+        user = self.request.query_params.get('user')
+        range = self.request.query_params.get('range')
+            
+        if user is not None and range is None:
+            queryset = queryset.filter(Q(user_name__contains=user))
+        elif range is not None and user is None:
+            start_date_str, end_date_str = range.split(',')
+            start_date = datetime.strptime(start_date_str, '%d/%m/%Y')
+            end_date = datetime.strptime(end_date_str, '%d/%m/%Y')
+            queryset = queryset.filter(time__gte=start_date, time__lt=end_date)
+        elif range is not None and user is not None:
+            start_date_str, end_date_str = range.split(',')
+            start_date = datetime.strptime(start_date_str, '%d/%m/%Y')
+            end_date = datetime.strptime(end_date_str, '%d/%m/%Y')
+            queryset = queryset.filter(Q(user_name__contains=user), time__gte=start_date, time__lt=end_date)
+
         return queryset
 
     def put(self, request, *args, **kwargs):

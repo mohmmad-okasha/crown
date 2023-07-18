@@ -49,6 +49,13 @@ class bookings_serializer(serializers.ModelSerializer):
 
 #####################################################################################
 
+class logs_serializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Logs
+        fields = '__all__'
+
+#####################################################################################
+
 class accounts_serializer(serializers.ModelSerializer):
     class Meta:
         model = models.Accounts
