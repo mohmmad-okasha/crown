@@ -154,14 +154,17 @@
 
                                 <div class="form-group col-md">
                                     <label for="country"> {{ $t("country") }}</label>
-                                    <select id="country" v-model="hotel.country"
+                                    <input id="country" v-model="hotel.country"
                                         :class="{ 'is-invalid': !this.hotel.country && this.validate, 'is-valid': this.hotel.country && this.validate }"
-                                        type="text" class="form-control">
+                                        type="text" class="form-control" list="country-list">
+
+                                    <datalist id="country-list">
                                         <option v-for="country in countries" :value="country.name.common"
                                             :key="country.name.common">
                                             {{ country.name.common }}
                                         </option>
-                                    </select>
+                                    </datalist>
+
                                     <div v-if="!this.hotel.country && this.validate" class="invalid-feedback hidden">
                                         {{ $t("Please Enter The country") }}
                                     </div>
@@ -634,8 +637,13 @@ export default {
                         };
 
                         swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
-                        this.get_Hotels();
+
                         await this.get_max_id();
+
+                        //save log
+                        axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add hotel:' + this.max_id, time: new Date() })
+
+                        this.get_Hotels();
                         this.closeModal();
                     }
                     this.saving = false;
@@ -733,6 +741,10 @@ export default {
                         };
 
                         swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
+
+                        //save log
+                        axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'update hotel:' + id, time: new Date() })
+
                         this.max_id = this.hotel.id
                         this.get_Hotels();
                         this.closeModal();
@@ -771,6 +783,10 @@ export default {
                             } else {
                                 // Request was successful
                                 swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+
+                                //save log
+                                axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete hotel:' + id, time: new Date() })
+
                                 this.clear_form();
                                 await this.get_Hotels();
                                 this.closeModal();
@@ -892,6 +908,7 @@ export default {
             this.validate = true; //to change inputs color 'red/green'
 
             if (
+                this.hotel.allotment > 0 &&
                 this.hotel.name &&
                 this.hotel.country &&
                 this.hotel.rate

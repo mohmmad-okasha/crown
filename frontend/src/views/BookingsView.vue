@@ -476,7 +476,7 @@ export default {
             isLoading: false,
             fullPage: true,
             is_range: true,
-
+            max_id:'',
             user_roles: "",
             print: false, //to print after save
             validate: false, //for check forms
@@ -596,8 +596,6 @@ export default {
         },
     },
 
-    created() {
-    },
 
     ////////////////////
 
@@ -644,7 +642,6 @@ export default {
                 .then((response) => (this.hotels = response.data))
                 .catch(err => { alert(err) });
         },
-
 
         get_open_rooms() {
             return axios({
@@ -816,10 +813,16 @@ export default {
 
                     swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 1500, });
 
+                    await this.get_max_id();
+
+                    //save log
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add booking :' + this.max_id, time: new Date() })
+
+
                     window.location.reload();
 
                     this.get_booking_rows();
-                    this.get_max_id();
+                    
                     this.closeModal();
                 }
             } catch (error) { console.error(); }
@@ -835,6 +838,11 @@ export default {
                     if (willDelete) {
                         await my_api.delete(`/backend/bookings/${id}/`);
                         swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+
+                        //save log
+                        axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete booking :' + id, time: new Date() })
+
+
                         this.get_booking_rows();
                         this.closeModal();
                     }
@@ -864,6 +872,9 @@ export default {
                     }
                     );
                     swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
+                    //save log
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'update booking :' + id, time: new Date() })
+
                     //this.max_id = this.this_row.id
                     this.get_booking_rows();
                     this.closeModal();

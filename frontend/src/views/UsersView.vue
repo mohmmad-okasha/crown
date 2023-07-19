@@ -410,6 +410,10 @@ export default {
             // Request was successful
 
             swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
+
+            //save log
+            axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add user:' + this.user.username, time: new Date() })
+
             this.get_users();
             this.closeModal();
           }
@@ -422,6 +426,7 @@ export default {
 
     async delete_user(id) {
       try {
+        const deleted_user= this.user.username
         await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, })
           .then(async (willDelete) => {
             if (willDelete) {
@@ -436,6 +441,10 @@ export default {
               } else {
                 // Request was successful
                 swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 1500, });
+                
+                //save log
+                axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete user:' + deleted_user, time: new Date() })
+
                 this.clear_form();
                 await this.get_users();
                 this.closeModal();
@@ -447,7 +456,7 @@ export default {
     },
 
     update_user(id) {
-      
+
 
       try {
         if (this.check_form()) {

@@ -164,7 +164,7 @@ class SecondDBManager(models.Manager):
         return super().get_queryset().using('second_db')
     
 class Logs(models.Model):
-    log = models.CharField(max_length=50)
+    log = models.CharField(max_length=500)
     user_name = models.CharField(max_length=50)
     time = models.DateTimeField(max_length=50)
 

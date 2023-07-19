@@ -274,7 +274,12 @@ export default {
             this.isLoading = true;
             // we using return first of the function for 'await' 
             return my_api.get('/backend/booking_report/?hotel=' + this.hotel + '&from_date=' + this.range[0] + '&to_date=' + this.range[1])
-                .then((response) => (this.bookings = response.data,this.isLoading = false))
+                .then((response) => (
+                    this.bookings = response.data,
+                    this.isLoading = false,
+                    //save log
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'get report for:' +  this.hotel +' from :'+this.range[0] + ' to :' + this.range[1], time: new Date() })
+                ))
                 .catch(err => { alert(err) });
 
             
