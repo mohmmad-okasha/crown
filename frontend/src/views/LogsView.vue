@@ -37,7 +37,7 @@
                             <div class="row">
                                 <div class="col-sm-2"></div>
 
-                                <div class="col-sm-3 m-1">
+                                <div class="col-sm-2 m-1">
                                     <label class="col-form-label">{{ $t("User") }}</label>
                                     <select class="form-control" placeholder="user" v-model="user" @change="filter_data()">
                                         <option v-for="u in this.users" :key="u" :value="u"> {{ u }}</option>

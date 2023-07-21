@@ -11,7 +11,41 @@
                     <h6 class="m-0 font-weight-bold text-primary">{{ $t("Available Hotel") }} </h6>
                 </div>
                 <div id="table" class="card-body">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-sm-2"></div>
 
+                                <div class="col-sm-2 m-1">
+                                    <label for="inputPassword6" class="col-form-label">{{ $t("Hotel") }}</label>
+                                    <select class="form-control" placeholder="Hotel" v-model="hotel">
+                                        <option v-for="h in this.hotels" :key="h" :value="h"> {{ h }}</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="col-sm-3 m-1">
+                                    <label for="inputPassword6" class="col-form-label">{{ $t("Date Range") }}</label>
+                                    <input type="text" class="custom-input form-control" placeholder="Range"
+                                        aria-label="Range">
+                                    <date-picker v-model="date_range" type="year-month" clearable locale="en"
+                                        :auto-submit="true" color="#098290" input-format="MM/YYYY" format="MM/YYYY"
+                                        display-format="jYYYY-jMM" custom-input=".custom-input" />
+                                </div>
+
+
+                                <div class="col-sm-2 m-1">
+                                    <label for="inputPassword6" class="col-form-label">{{ $t("Room Type") }}</label>
+
+                                    <select id="room_type" class="form-control" placeholder="Room Type" v-model="room_type">
+                                        <option value="SGL"> SGL</option>
+                                        <option value="DBL"> DBL</option>
+                                        <option value="TRPL"> TRPL</option>
+                                        <option value="QAD"> QAD</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <br>
                     <div id="monitor_table" class="table-responsive">
                         <table class="table-sm table ">

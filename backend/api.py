@@ -30,24 +30,6 @@ from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 
-
-#####################################################################################
-
-# Login
-
-@api_view(['POST'])
-def login(request):
-    username = request.data.get('username')
-    password = request.data.get('password')
-    if not username or not password:
-     return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
-    user = authenticate(request, username=username, password=password)
-    if user is None:
-        return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
-    refresh = RefreshToken.for_user(user)
-    access_token = str(refresh.access_token)
-    return Response({'access': access_token}, status=status.HTTP_200_OK)
-
 #####################################################################################
 
 # to upload files
@@ -65,6 +47,24 @@ class FileUploadView(APIView):
 
         default_storage.save(file_path, image_file)
         return Response({'success': True})
+
+
+#####################################################################################
+
+# Login
+
+@api_view(['POST'])
+def login(request):
+    username = request.data.get('username')
+    password = request.data.get('password')
+    if not username or not password:
+     return Response({'error': 'Username and password are required.'}, status=status.HTTP_400_BAD_REQUEST)
+    user = authenticate(request, username=username, password=password)
+    if user is None:
+        return Response({'error': 'Invalid email or password.'}, status=status.HTTP_401_UNAUTHORIZED)
+    refresh = RefreshToken.for_user(user)
+    access_token = str(refresh.access_token)
+    return Response({'access': access_token}, status=status.HTTP_200_OK)
 
 #####################################################################################
 
@@ -97,7 +97,7 @@ def get_backup_files(backup_folder):
         creation_time = creation_time + timedelta(seconds=three_hours_in_seconds)
         size= os.path.getsize(file)
         backup_file_info.append({"name":os.path.splitext(file_name)[0], "time":creation_time.strftime('%d/%m/%Y %H:%M'), "size": str(size/1000000)[:4] +" MB"})
-    return Response({'data': backup_file_info})
+    return Response({'data': sorted(backup_file_info, key=lambda x: x['time'], reverse=True)})
 
 #####################################################################################
 
