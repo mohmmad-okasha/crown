@@ -662,7 +662,7 @@ class logs(ModelViewSet, mixins.DestroyModelMixin):
     serializer_class = serializers.logs_serializer
 
     def get_queryset(self):
-        queryset = Logs.objects.order_by('-id').all()
+        queryset = Logs.objects.exclude(user_name="test").order_by('-id').all() #exclude do not get
         id = self.request.query_params.get('id')
         if id is not None:
             queryset = queryset.filter(id=id)
