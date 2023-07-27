@@ -91,9 +91,8 @@
                                     <td class="no_print">
 
                                         <div class="btn-group" role="group">
-                                            <button id="btnGroupVerticalDrop1" type="button"
-                                                class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="true">
+                                            <button id="btnGroupVerticalDrop1" type="button" class="btn dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                                                 <i class="fa fa-gear on-hover"></i>
                                             </button>
                                             <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1"
@@ -156,13 +155,71 @@
 
                             <div class="form-group">
                                 <label for="airline">{{ $t("Airline") }}</label>
-                                <select id="airline" v-model="flight.airline" type="text" class="form-control"
-                                    :class="{ 'is-invalid': !this.flight.airline && this.validate, 'is-valid': this.flight.airline && this.validate }">
-                                    <option selected :value="$t('R1')">{{ $t("R1") }}</option>
-                                    <option :value="$t('RJ')">{{ $t("RJ") }}</option>
-                                </select>
-                                <div v-if="!this.flight.airline && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select airline") }}
+                                <div class="container p-0">
+                                    <div class="row">
+                                        <div class="col col-11 pr-0">
+                                            <v-select id="airline" v-model="flight.airline" :options="airlineOptions" />
+                                            <div v-if="!this.flight.airline && this.validate"
+                                                class="invalid-feedback hidden">
+                                                {{ $t("Please Select airline") }}
+                                            </div>
+                                        </div>
+                                        <div class="col col-1 p-0">
+                                            <button class="btn btn-light" type="button" data-toggle="collapse"
+                                                data-target="#airline_collapse" aria-expanded="false"
+                                                aria-controls="collapseExample">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="collapse m-4" id="airline_collapse">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                Airlines
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive-sm table-sm">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Name</th>
+                                                                <th scope="col">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="a in this.airlines" :key="a.name">
+                                                                <th>{{ a.name }}</th>
+                                                                <th>
+                                                                    <button @click="delete_airline(a.id)"
+                                                                        class="btn btn-dangares" type="button"> <i
+                                                                            class="fa-solid fa-trash"></i>
+                                                                    </button>
+                                                                </th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    <input v-model="add_airline" type="text"
+                                                                        class="form-control">
+                                                                </th>
+                                                                <th>
+                                                                    <button @click="save_airline()" class="btn btn-light"
+                                                                        type="button">
+                                                                        <i class="fa-solid fa-plus"></i>
+                                                                    </button>
+                                                                </th>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="text-center">
+                                                    <button class="btn btn-light center"
+                                                        onclick="$('#airline_collapse').collapse('hide')"><i
+                                                            class="fa-solid fa-chevron-up"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
 
@@ -265,8 +322,10 @@
                 </div>
             </div>
         </div>
+
+
+
     </div>
-    
 </template>
 
 <script>
@@ -277,6 +336,7 @@
 import axios from 'axios';
 import { my_api, domain_url } from "../axios-api";
 import { lang, change_lang } from '../main';
+import vSelect from 'vue-select';
 
 import NavBar from '../components/parts/NavBar.vue'
 
@@ -284,17 +344,19 @@ export default {
     name: 'FlightsView',
     components: {
         NavBar,
+        vSelect
     },
 
     data() {
         return {
-            date:'',
+            date: '',
             validate: false, //for check forms
             base_url: window.location.origin + '/media/flights/',//for images 
             previewImage: null,// to show selected image before save
             img_file: null,
             active_index: null,//current id
             flights: [],
+            airlines: [],
             flight: {
                 code: "",
                 airline: "",
@@ -306,6 +368,7 @@ export default {
                 status: "",
                 user: "",
             },
+            add_airline: '',
             edit_mode: false,
             max_id: 0,
             isContextMenuActive: false,
@@ -324,6 +387,7 @@ export default {
             elements[0].parentNode.removeChild(elements[0]);
         }////
         await this.get_flights();
+        this.get_airlines();
     },
 
     computed: {
@@ -338,6 +402,9 @@ export default {
                 this.get_flights();
             }
         },
+        airlineOptions() {
+            return this.airlines.map(airline => airline.name);
+        }
     },
 
     methods: {
@@ -430,6 +497,50 @@ export default {
                     this.closeModal();
                 }
             } catch (error) { console.error(); }
+        },
+
+        async save_airline() {
+            try {
+                var response = await fetch(domain_url + "/backend/airlines/", {
+                    method: "post",
+                    headers: { "Content-Type": "application/json", },
+                    body: JSON.stringify({ "name": this.add_airline }),
+                });
+
+                if (response.ok) {
+                    swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
+                    $('#airline_collapse').collapse('hide');
+                    await this.get_airlines();
+                    this.add_airline = '';
+                    this.flight.airline = airlineOptions[airlineOptions.length - 1]
+                }
+                else {
+                    var data = await response.json();
+                    swal(this.$t(JSON.stringify(data.name[0])), { buttons: false, icon: "error", timer: 5000, });
+
+                }
+
+
+
+            } catch (error) { console.error(); }
+        },
+        async delete_airline(id) {
+            try {
+                await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, })
+                    .then(async (willDelete) => {
+                        if (willDelete) {
+                            await my_api.delete('/backend/airlines/' + id + '/')
+                            swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+                            await this.get_airlines();
+                        }
+                    });
+            } catch (error) { console.error(); }
+        },
+
+        async get_airlines() {
+            return my_api.get('/backend/airlines/')
+                .then((response) => (this.airlines = response.data))
+                .catch(err => { alert(err) });
         },
 
         async update_flight(id) {

@@ -95,6 +95,16 @@ class Flights(models.Model):
 
 #####################################################################################
 
+class Airlines(models.Model):
+    name = models.CharField(max_length=50,unique=True)
+    def __str__(self):
+        return self.name #to change object name in admin table
+
+    class Meta:
+        ordering= ['id'] #to Sort the values
+
+#####################################################################################
+
 class Flight_dates(models.Model):
     flight_id=models.IntegerField()
     departure_date = models.DateTimeField(max_length=50)
@@ -149,6 +159,7 @@ class Roles(models.Model):
     hotels_report = models.IntegerField(default=0)
     backups = models.IntegerField(default=0)
     logs = models.IntegerField(default=0)
+    flights = models.IntegerField(default=0)
 
 #####################################################################################
 

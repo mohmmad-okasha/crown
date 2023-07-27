@@ -6,6 +6,7 @@ from . import api
 
 router = routers.DefaultRouter()
 router.register('flights', api.flights)
+router.register('airlines', api.airlines)
 router.register('bookings', api.bookings)
 router.register('logs', api.logs)
 router.register('hotels', api.hotels)

@@ -34,6 +34,7 @@
                         <div class="col-sm-3 m-1">
                             <label for="hotel">{{ $t("Hotel") }}</label>
                             <v-select id="hotel" v-model="hotel" :options="hotels" />
+                        
                         </div>
 
                         <div class="col-sm-3 m-1">

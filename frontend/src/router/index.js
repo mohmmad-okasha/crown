@@ -7,6 +7,7 @@ import HotelsView from "../views/HotelsView.vue";
 import Hotels_reportView from "../views/Hotels_reportView.vue";
 import BackupsView from "../views/BackupsView.vue";
 import LogsView from "../views/LogsView.vue";
+import FlightsView from "../views/FlightsView.vue";
 import DashboardView from "../views/DashboardView.vue";
 
 //import HomeView from "../views/HomeView.vue";
@@ -35,14 +36,14 @@ const routes = [
   //     requiresAuth: true, 
   //   },
   // },
-  // {
-  //   path: "/Flights",
-  //   name: "FlightsView",
-  //   component: FlightsView,
-  //   meta: {
-  //     requiresAuth: true, 
-  //   },
-  // },
+  {
+    path: "/flights",
+    name: "FlightsView",
+    component: FlightsView,
+    meta: {
+      requiresAuth: true, 
+    },
+  },
   // {
   //   path: "/rooms",
   //   name: "RoomsView",

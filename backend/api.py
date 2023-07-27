@@ -150,6 +150,7 @@ def restore_backup(request):
     shutil.copy2(backup_file_path, destination_db_path)
 
     return Response({'data': f'Successfully restored the SQLite database from the backup file: {backup_file_path}'})
+
 #####################################################################################
 @api_view(['GET'])
 def remove_backup_file(request):
@@ -828,8 +829,8 @@ class flights(ModelViewSet, mixins.DestroyModelMixin):
     serializer_class = serializers.flights_serializer
 
     def get_queryset(self):
-        # queryset = Flights.objects.all()
-        queryset = Flights.objects.raw("select * from backend_flights,backend_settings")
+        queryset = Flights.objects.all()
+        #queryset = Flights.objects.raw("select * from backend_flights,backend_settings")
         id = self.request.query_params.get('id')
         if id is not None:
             queryset = queryset.filter(id=id)
@@ -837,6 +838,23 @@ class flights(ModelViewSet, mixins.DestroyModelMixin):
         if search is not None:
             queryset = queryset.filter(Q(code__contains=search) | Q(airline__contains=search) | Q(from_airport__contains=search) | Q(
                 to_airport__contains=search) | Q(seats__contains=search) | Q(status__contains=search))
+        return queryset
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+#####################################################################################
+
+class airlines(ModelViewSet, mixins.DestroyModelMixin):
+
+    queryset = Airlines.objects.all()
+    serializer_class = serializers.airlines_serializer
+
+    def get_queryset(self):
+        queryset = Airlines.objects.all()
+        id = self.request.query_params.get('id')
+        if id is not None:
+            queryset = queryset.filter(id=id)
         return queryset
 
     def put(self, request, *args, **kwargs):
