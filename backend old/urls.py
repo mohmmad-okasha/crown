@@ -79,8 +79,6 @@ urlpatterns += [
 
     path("restore_backup/", api.restore_backup, name="restore_backup"),
 
-
-
     #path('save_all_rooms/', api.save_all_rooms.as_view()),
 
     path('send-message/', api.send_message, name='send_message'),

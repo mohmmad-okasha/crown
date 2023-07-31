@@ -21,6 +21,7 @@ class airlines_serializer(serializers.ModelSerializer):
     class Meta:
         model = models.Airlines
         fields = '__all__'
+
 #####################################################################################
 
 class airports_serializer(serializers.ModelSerializer):

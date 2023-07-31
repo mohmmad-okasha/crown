@@ -5,8 +5,6 @@ from os import path
 from django.http import HttpResponse, JsonResponse
 from .models import Flights
 from .models import Flight_dates
-from .models import Airports
-from .models import Airlines
 from .models import Accounts
 from .models import Dashboard_buttons
 from .models import Settings
@@ -861,7 +859,7 @@ class airlines(ModelViewSet, mixins.DestroyModelMixin):
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)
-    
+
 #####################################################################################
 
 class airports(ModelViewSet, mixins.DestroyModelMixin):

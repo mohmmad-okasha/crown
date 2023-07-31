@@ -20,7 +20,6 @@
             </ul>
         </div>
 
-
         <!-- Table Card -->
         <div class="col-xl-12 center">
             <div class="card shadow mb-4">
@@ -78,8 +77,8 @@
                                     <td>{{ $t(flight.airline) }}</td>
                                     <td>{{ $t(flight.from_airport) }}</td>
                                     <td>{{ $t(flight.to_airport) }}</td>
-                                    <td>{{ $t(flight.departure_date) }}</td>
-                                    <td>{{ $t(flight.arrival_date) }}</td>
+                                    <td>{{ formatDate(flight.departure_date) }}</td>
+                                    <td>{{ formatDate(flight.arrival_date) }}</td>
                                     <td>{{ $t(flight.seats) }}</td>
                                     <td>
                                         <img v-if="flight.status == 'enable'" width="30px" height="30px"
@@ -124,9 +123,6 @@
             </div>
         </div>
         <date-picker multiple type="datetime" compact-time v-model="date" />
-
-        <!-- to get search value from navbar -->
-        <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
 
         <!-- modal -->
         <div class="modal fade" id="addModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
@@ -225,36 +221,153 @@
 
                             <div class="form-group">
                                 <label for="from_airport">{{ $t("From Airport") }}</label>
-                                <select id="from_airport" v-model="flight.from_airport" type="text" class="form-control"
-                                    :class="{ 'is-invalid': !this.flight.from_airport && this.validate, 'is-valid': this.flight.from_airport && this.validate }">
-                                    <option selected :value="$t('AMM')">{{ $t("AMM") }}</option>
-                                    <option :value="$t('IST')">{{ $t("IST") }}</option>
-                                    <option :value="$t('TZX')">{{ $t("TZX") }}</option>
-                                </select>
-                                <div v-if="!this.flight.from_airport && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select from airport") }}
+                                <div class="container p-0">
+                                    <div class="row">
+                                        <div class="col col-11 pr-0">
+                                            <v-select id="from_airport" v-model="flight.from_airport"
+                                                :options="airportOptions" />
+                                            <div v-if="!this.flight.airport && this.validate"
+                                                class="invalid-feedback hidden">
+                                                {{ $t("Please Select airport") }}
+                                            </div>
+                                        </div>
+                                        <div class="col col-1 p-0">
+                                            <button class="btn btn-light" type="button" data-toggle="collapse"
+                                                data-target="#airports_collapse" aria-expanded="false"
+                                                aria-controls="collapseExample">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="collapse m-4" id="airports_collapse">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                Airports
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive-sm table-sm">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Name</th>
+                                                                <th scope="col">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="a in this.airports" :key="a.name">
+                                                                <th>{{ a.name }}</th>
+                                                                <th>
+                                                                    <button @click="delete_airport(a.id)"
+                                                                        class="btn btn-dangares" type="button"> <i
+                                                                            class="fa-solid fa-trash"></i>
+                                                                    </button>
+                                                                </th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    <input v-model="add_airport" type="text"
+                                                                        class="form-control">
+                                                                </th>
+                                                                <th>
+                                                                    <button @click="save_airport()" class="btn btn-light"
+                                                                        type="button">
+                                                                        <i class="fa-solid fa-plus"></i>
+                                                                    </button>
+                                                                </th>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="text-center">
+                                                    <button class="btn btn-light center"
+                                                        onclick="$('#airports_collapse').collapse('hide')"><i
+                                                            class="fa-solid fa-chevron-up"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
                                 <label for="to_airport">{{ $t("To Airport") }}</label>
-                                <select id="to_airport" v-model="flight.to_airport" type="text" class="form-control"
-                                    :class="{ 'is-invalid': !this.flight.to_airport && this.validate, 'is-valid': this.flight.to_airport && this.validate }">
-                                    <option selected :value="$t('AMM')">{{ $t("AMM") }}</option>
-                                    <option :value="$t('IST')">{{ $t("IST") }}</option>
-                                    <option :value="$t('TZX')">{{ $t("TZX") }}</option>
-                                </select>
-                                <div v-if="!this.flight.to_airport && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select to airport") }}
+                                <div class="container p-0">
+                                    <div class="row">
+                                        <div class="col col-11 pr-0">
+                                            <v-select id="to_airport" v-model="flight.to_airport"
+                                                :options="airportOptions" />
+                                            <div v-if="!this.flight.airport && this.validate"
+                                                class="invalid-feedback hidden">
+                                                {{ $t("Please Select airport") }}
+                                            </div>
+                                        </div>
+                                        <div class="col col-1 p-0">
+                                            <button class="btn btn-light" type="button" data-toggle="collapse"
+                                                data-target="#airports_collapse2" aria-expanded="false"
+                                                aria-controls="collapseExample">
+                                                <i class="fa-solid fa-pen-to-square"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="collapse m-4" id="airports_collapse2">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                Airports
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="table-responsive-sm table-sm">
+                                                    <table class="table">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">Name</th>
+                                                                <th scope="col">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr v-for="a in this.airports" :key="a.name">
+                                                                <th>{{ a.name }}</th>
+                                                                <th>
+                                                                    <button @click="delete_airport(a.id)"
+                                                                        class="btn btn-dangares" type="button"> <i
+                                                                            class="fa-solid fa-trash"></i>
+                                                                    </button>
+                                                                </th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th>
+                                                                    <input v-model="add_airport" type="text"
+                                                                        class="form-control">
+                                                                </th>
+                                                                <th>
+                                                                    <button @click="save_airport()" class="btn btn-light"
+                                                                        type="button">
+                                                                        <i class="fa-solid fa-plus"></i>
+                                                                    </button>
+                                                                </th>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="text-center">
+                                                    <button class="btn btn-light center"
+                                                        onclick="$('#airports_collapse2').collapse('hide')"><i
+                                                            class="fa-solid fa-chevron-up"></i></button>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
                                 </div>
                             </div>
 
                             <div class="form-group mb-2">
                                 <label for="departure_date">{{ $t("Departure date") }}</label>
                                 <!-- datetime-local -->
-                                <input id="departure_date" v-model="flight.departure_date" type="date"
+                                <input id="departure_date" v-model="flight.departure_date" type="datetime-local"
                                     :class="{ 'is-invalid': !this.flight.departure_date && this.validate, 'is-valid': this.flight.departure_date && this.validate }"
                                     class="form-control">
+
                                 <div v-if="!this.flight.type && this.validate" class="invalid-feedback hidden">
                                     {{ $t("Please Enter departure_date") }}
                                 </div>
@@ -264,7 +377,7 @@
                                 <label for="arrival_date"> {{ $t("Arrival date") }}</label>
                                 <input id="arrival_date" v-model="flight.arrival_date"
                                     :class="{ 'is-invalid': !this.flight.arrival_date && this.validate, 'is-valid': this.flight.arrival_date && this.validate }"
-                                    type="date" class="form-control">
+                                    type="datetime-local" class="form-control">
                                 <div v-if="!this.flight.arrival_date && this.validate" class="invalid-feedback hidden">
                                     {{ $t("Please Enter The arrival date") }}
                                 </div>
@@ -323,7 +436,8 @@
             </div>
         </div>
 
-
+        <!-- to get search value from navbar -->
+        <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
 
     </div>
 </template>
@@ -357,6 +471,7 @@ export default {
             active_index: null,//current id
             flights: [],
             airlines: [],
+            airports: [],
             flight: {
                 code: "",
                 airline: "",
@@ -369,6 +484,7 @@ export default {
                 user: "",
             },
             add_airline: '',
+            add_airport: '',
             edit_mode: false,
             max_id: 0,
             isContextMenuActive: false,
@@ -388,6 +504,8 @@ export default {
         }////
         await this.get_flights();
         this.get_airlines();
+        this.get_airports();
+
     },
 
     computed: {
@@ -404,10 +522,36 @@ export default {
         },
         airlineOptions() {
             return this.airlines.map(airline => airline.name);
+        },
+        airportOptions() {
+            return this.airports.map(airport => airport.name);
+        },
+        format_dates() {
+            //this.flight.arrival_date = this.formatDate(this.flight.arrival_date);
+            //this.flight.departure_date = this.formatDate(this.flight.departure_date);
         }
     },
 
+
+
     methods: {
+        formatDate(date) {
+            const formattedDate = new Date(date);
+            const day = String(formattedDate.getDate()).padStart(2, '0');
+            const month = String(formattedDate.getMonth() + 1).padStart(2, '0');
+            const year = formattedDate.getFullYear();
+            let hours = formattedDate.getHours();
+            const minutes = String(formattedDate.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+
+            // Convert hours to 12-hour format and add leading zeros
+            hours = String((hours % 12) || 12).padStart(2, '0');
+
+            return `${month}/${day}/${year} ${hours}:${minutes} ${ampm}`;
+        },
+
+
+
         showContextMenu(event) {
             event.preventDefault();
             this.isContextMenuActive = true;
@@ -499,6 +643,12 @@ export default {
             } catch (error) { console.error(); }
         },
 
+        async get_airlines() {
+            return my_api.get('/backend/airlines/')
+                .then((response) => (this.airlines = response.data))
+                .catch(err => { alert(err) });
+        },
+
         async save_airline() {
             try {
                 var response = await fetch(domain_url + "/backend/airlines/", {
@@ -524,6 +674,7 @@ export default {
 
             } catch (error) { console.error(); }
         },
+
         async delete_airline(id) {
             try {
                 await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, })
@@ -537,10 +688,50 @@ export default {
             } catch (error) { console.error(); }
         },
 
-        async get_airlines() {
-            return my_api.get('/backend/airlines/')
-                .then((response) => (this.airlines = response.data))
+        async get_airports() {
+            return my_api.get('/backend/airports/')
+                .then((response) => (this.airports = response.data))
                 .catch(err => { alert(err) });
+        },
+
+        async save_airport() {
+            try {
+                var response = await fetch(domain_url + "/backend/airports/", {
+                    method: "post",
+                    headers: { "Content-Type": "application/json", },
+                    body: JSON.stringify({ "name": this.add_airport }),
+                });
+
+                if (response.ok) {
+                    swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
+                    $('#airports_collapse').collapse('hide');
+                    $('#airports_collapse2').collapse('hide');
+                    await this.get_airports();
+                    this.add_airport = '';
+                    this.flight.airport = airportOptions[airportOptions.length - 1]
+                }
+                else {
+                    var data = await response.json();
+                    swal(this.$t(JSON.stringify(data.name[0])), { buttons: false, icon: "error", timer: 5000, });
+
+                }
+
+
+
+            } catch (error) { console.error(); }
+        },
+
+        async delete_airport(id) {
+            try {
+                await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, })
+                    .then(async (willDelete) => {
+                        if (willDelete) {
+                            await my_api.delete('/backend/airports/' + id + '/')
+                            swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+                            await this.get_airports();
+                        }
+                    });
+            } catch (error) { console.error(); }
         },
 
         async update_flight(id) {

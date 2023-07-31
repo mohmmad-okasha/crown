@@ -101,15 +101,22 @@ class Airlines(models.Model):
         return self.name #to change object name in admin table
 
     class Meta:
-        ordering= ['id'] #to Sort the values#####################################################################################
+        ordering= ['id'] #to Sort the values
+
+#####################################################################################
+STATUS_ENABLED = (
+    (0, "Disabled"),
+    (1, "Enabled")
+)
 
 class Airports(models.Model):
-    name = models.CharField(max_length=50,unique=True)
+    name = models.CharField(max_length=200)
+    
     def __str__(self):
-        return self.name #to change object name in admin table
+        return self.name
 
     class Meta:
-        ordering= ['id'] #to Sort the values
+        ordering= ['id']
 
 #####################################################################################
 
@@ -168,7 +175,6 @@ class Roles(models.Model):
     backups = models.IntegerField(default=0)
     logs = models.IntegerField(default=0)
     flights = models.IntegerField(default=0)
-    logs = models.IntegerField(default=0)
 
 #####################################################################################
 
