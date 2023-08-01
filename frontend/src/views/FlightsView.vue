@@ -178,13 +178,17 @@
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
+                                                                <th scope="col">Code</th>
                                                                 <th scope="col">Name</th>
+                                                                <th scope="col">City</th>
                                                                 <th scope="col">Actions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr v-for="a in this.airlines" :key="a.name">
-                                                                <th>{{ a.name }}</th>
+                                                            <tr v-for="a in this.airlines" :key="a.code">
+                                                                <th>{{ a.code }}</th>
+                                                                <th>{{ a.name_en }}</th>
+                                                                <th>{{ a.city }}</th>
                                                                 <th>
                                                                     <button @click="delete_airline(a.id)"
                                                                         class="btn btn-dangares" type="button"> <i
@@ -192,29 +196,45 @@
                                                                     </button>
                                                                 </th>
                                                             </tr>
-                                                            <tr>
-                                                                <th>
-                                                                    <input v-model="add_airline" type="text"
-                                                                        class="form-control">
-                                                                </th>
-                                                                <th>
-                                                                    <button @click="save_airline()" class="btn btn-light"
-                                                                        type="button">
-                                                                        <i class="fa-solid fa-plus"></i>
-                                                                    </button>
-                                                                </th>
-                                                            </tr>
                                                         </tbody>
+
                                                     </table>
+                                                    <hr>
+                                                    <div class="center">
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <input v-model="airline.name_ar" type="text"
+                                                                    placeholder="Name ar" class="form-control">
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <input v-model="airline.name_en" type="text"
+                                                                    placeholder="Name en" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <input v-model="airline.code" type="text" placeholder="Code"
+                                                                    class="form-control">
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <input v-model="airline.city" type="text" placeholder="City"
+                                                                    class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <button @click="save_airline()" class=" btn btn-light"
+                                                            type="button">
+                                                            <i class="fa-solid fa-plus"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div class="text-center">
-                                                    <button class="btn btn-light center"
-                                                        onclick="$('#airline_collapse').collapse('hide')"><i
-                                                            class="fa-solid fa-chevron-up"></i></button>
+                                                <div class="text-center mt-4">
+                                                    <a class="center" onclick="$('#airline_collapse').collapse('hide')"><i
+                                                            class="fa-solid fa-chevron-up"></i></a>
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -483,6 +503,12 @@ export default {
                 status: "",
                 user: "",
             },
+            airline: {
+                name_ar:'',
+                name_en:'',
+                code:'',
+                city:''
+            },
             add_airline: '',
             add_airport: '',
             edit_mode: false,
@@ -521,7 +547,7 @@ export default {
             }
         },
         airlineOptions() {
-            return this.airlines.map(airline => airline.name);
+            return this.airlines.map(airline => airline.code);
         },
         airportOptions() {
             return this.airports.map(airport => airport.name);
@@ -654,7 +680,7 @@ export default {
                 var response = await fetch(domain_url + "/backend/airlines/", {
                     method: "post",
                     headers: { "Content-Type": "application/json", },
-                    body: JSON.stringify({ "name": this.add_airline }),
+                    body: JSON.stringify(this.airline),
                 });
 
                 if (response.ok) {

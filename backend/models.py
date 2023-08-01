@@ -96,17 +96,31 @@ class Flights(models.Model):
 #####################################################################################
 
 class Airlines(models.Model):
-    name = models.CharField(max_length=50,unique=True)
+    name_en = models.CharField(max_length=200,null=True)
+    name_ar = models.CharField(max_length=200,null=True)
+    code = models.CharField(max_length=200, unique=True,default='',null=True)
+    city = models.CharField(max_length=200,default='',null=True)
+    status = models.IntegerField(default=1,null=True)
+    created_on = models.DateTimeField(auto_now_add=True,null=True)
+    updated_on = models.DateTimeField(auto_now=True,null=True)    
+    
     def __str__(self):
-        return self.name #to change object name in admin table
+        return self.name_en #to change object name in admin table
 
     class Meta:
         ordering= ['id'] #to Sort the values#####################################################################################
 
 class Airports(models.Model):
-    name = models.CharField(max_length=50,unique=True)
+    name_en = models.CharField(max_length=200,null=True)
+    name_ar = models.CharField(max_length=200,null=True)
+    code = models.CharField(max_length=200, unique=True,default='',null=True)
+    city = models.CharField(max_length=200,default='',null=True)
+    status = models.IntegerField(default=1,null=True)
+    created_on = models.DateTimeField(auto_now_add=True,null=True)
+    updated_on = models.DateTimeField(auto_now=True,null=True)
+
     def __str__(self):
-        return self.name #to change object name in admin table
+        return self.name_en #to change object name in admin table
 
     class Meta:
         ordering= ['id'] #to Sort the values
