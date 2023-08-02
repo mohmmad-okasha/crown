@@ -58,6 +58,25 @@
         </div>
       </li>
 
+      <!-- system Menu -->
+      <li class="nav-item" v-if="this.$parent.user_roles['backups']">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#admin_menu" aria-expanded="true"
+          aria-controls="admin_menu">
+          <i class="fas fa fa-toolbox"></i>
+          <span>{{ $t("Admin") }}</span>
+        </a>
+        <div id="admin_menu" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <router-link v-if="this.$parent.user_roles['backups']" tag="a" class="collapse-item" to="/backups"> {{
+              $t("Backups") }} </router-link>
+
+            <router-link v-if="this.$parent.user_roles['logs']" tag="a" class="collapse-item" to="/logs"> {{
+              $t("Logs") }} </router-link>
+          </div>
+        </div>
+
+      </li>
+
       <!-- <li class="nav-item">
         <router-link tag="a" aria-controls="collapseTwo" aria-expanded="true" class="nav-link collapsed" to="/flights">
           <i class="fa fa-plane"></i>

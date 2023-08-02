@@ -22,7 +22,7 @@
                                         <option v-for="h in this.hotels" :key="h" :value="h"> {{ h }}</option>
                                     </select>
                                 </div>
-                                
+
                                 <div class="col-sm-3 m-1">
                                     <label for="inputPassword6" class="col-form-label">{{ $t("Date Range") }}</label>
                                     <input type="text" class="custom-input form-control" placeholder="Range"
@@ -57,10 +57,12 @@
                             </thead>
                             <tbody>
                                 <tr v-for="r in this.open_dates" :key="r.name">
-                                    <td><p>{{ r.categ + '/' +r.name }}</p></td>
+                                    <td>
+                                        <p>{{ r.categ + '/' + r.name }}</p>
+                                    </td>
                                     <td v-for="ii in 31" :key="ii" :id="r.name + '_' + ii.toString().padStart(2, '0')">
-                                        <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)" :title="r.categ + '/' +r.name"
-                                            type="button" class="btn btn-success"></button>
+                                        <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)"
+                                            :title="r.categ + '/' + r.name" type="button" class="btn btn-success"></button>
                                     </td>
                                     <br><br>
                                 </tr>
@@ -116,7 +118,7 @@ export default {
         }
     },
     async mounted() {
-        
+
         await new Promise(resolve => setTimeout(resolve, 500)); // wait
         await this.get_roles();
         if (this.user_roles[this.$route.path.substring(1)] == 0) {
@@ -131,7 +133,7 @@ export default {
         while (elements.length > 0) {
             elements[0].parentNode.removeChild(elements[0]);
         }////
-        
+
     },
     ////////////////////
     computed: {
@@ -194,29 +196,42 @@ export default {
             })
         },
         no_show_dates: function (newValue) {//to get all dates in the booked ranges
-            
             newValue.forEach(item => {
                 const datesArray = [];
                 const ranges = item.dates.split(' / ');
                 ranges.forEach(r => {
                     const minDateParts = r.split(',')[0].split('/');
-                    const maxDateParts='';
-                    try {
-                         maxDateParts = r.split(',')[1].split('/');
-                    } catch (error) {
-                         
-                    }
+                    const maxDateParts = r.split(',')[1].split('/');
                     const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
-                    const endDate =startDate;
-                    if(maxDateParts){ endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);}
+                    const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
                     const currentDate = new Date(startDate);
-                    while (currentDate <= endDate) {
+                    while (currentDate <= endDate) { // <= only for no show dates
                         datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
                         currentDate.setDate(currentDate.getDate() + 1);
                     }
                 })
                 item.dates = [...new Set(datesArray)]//remove dublicated dates from array
             })
+            // newValue.forEach(item => {
+            //     const datesArray = [];
+            //     const ranges = item.dates.split(' / ');
+            //     ranges.forEach(r => {
+            //         const minDateParts = r.split(',')[0].split('/');
+            //         const maxDateParts = '';
+            //         try {
+            //             maxDateParts = r.split(',')[1].split('/');
+            //         } catch (error) {}
+            //         const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
+            //         const endDate = startDate;
+            //         if (maxDateParts) { endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]); }
+            //         const currentDate = new Date(startDate);
+            //         while (currentDate <= endDate) {
+            //             datesArray.push(currentDate.toLocaleDateString("en-GB")); // Save each date within the range to the array
+            //             currentDate.setDate(currentDate.getDate() + 1);
+            //         }
+            //     })
+            //     item.dates = [...new Set(datesArray)]//remove dublicated dates from array
+            // })
         }
     },
     ////////////////////
@@ -227,7 +242,7 @@ export default {
         },
 
         filter_dates() {// remove any date out of selected range
-            
+
             if (this.date_range) {
                 let month = this.date_range.split('/')[0];
                 let year = this.date_range.split('/')[1];
@@ -240,7 +255,7 @@ export default {
                         return parts[2] == year && parts[1] == month;
                     });
                 });
-                
+
                 this.close_dates.forEach(item => {
                     item.dates = item.dates.filter(date => {
                         const parts2 = date.split('/');
@@ -287,7 +302,7 @@ export default {
             //         });
             //     });
             // }
-            
+
         },
 
         async create_closed() {
@@ -298,7 +313,7 @@ export default {
                         var div = document.getElementById(item.name + '_' + (d.slice(0, 2)));
                         var button = document.createElement("button");
                         button.className = "btn btn-danger";
-                        button.title=item.name
+                        button.title = item.name
                         div.appendChild(button);
                     });
                 } catch (error) {
@@ -319,7 +334,7 @@ export default {
                         // Format the incremented date to match the format in datesArray
                         const formattedDate = `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1).toString().padStart(2, "0")}/${date.getFullYear()}`;
 
-                        
+
                         // check if the next date of out date is booked then the out day will be booked 
                         if (!o.dates.includes(formattedDate)) {
                             var div = document.getElementById(o.name + '_' + (d.slice(0, 2)));// select target div by date day
@@ -348,7 +363,7 @@ export default {
                 }
             });
 
-            
+
             // this.close_dates.forEach(item => {
             //     try {
             //         item.dates.forEach(d => {// loop on all dates for all rooms
@@ -405,7 +420,7 @@ export default {
 
         },
         get_no_show_rooms() {
-            
+
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_no_show_rooms/", params: { hotel: this.hotel, room_type: this.room_type, month: this.date_range },
