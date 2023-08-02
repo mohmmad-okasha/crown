@@ -2,3 +2,5 @@
 logs/
 db_backup/
 start.bat
+logs/logs_db.sqlite3
+logs/logs_db.sqlite3
