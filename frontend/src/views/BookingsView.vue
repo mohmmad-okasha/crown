@@ -794,7 +794,7 @@ export default {
                     if (this.print) {
                         this.PrintDiv('booking_data');
                     }
-                    // convert the dates array to string to save it in db
+                    // save out date
                     if (this.this_row.dates.length > 1) {
                         this.this_row.out_date = this.this_row.dates[1];
                     } else {
@@ -859,6 +859,12 @@ export default {
                 if (this.check_form()) {
                     if (this.print) {
                         await this.PrintDiv('booking_data');
+                    }
+                    // save out date
+                    if (this.this_row.dates.length > 1) {
+                        this.this_row.out_date = this.this_row.dates[1];
+                    } else {
+                        this.this_row.dates.push(this.this_row.dates[0]);
                     }
                     // convert the dates array to string to save it in db
                     this.this_row.dates = this.this_row.dates.toString();

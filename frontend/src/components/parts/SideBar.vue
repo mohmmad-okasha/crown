@@ -31,10 +31,29 @@
         </a>
         <div id="booking_menu" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
           <div class="bg-white py-2 collapse-inner rounded">
-            <router-link v-if="this.$parent.user_roles['hotels']" tag="a" class="collapse-item" to="/hotels"> {{ $t("Hotels") }} </router-link>
-            <router-link v-if="this.$parent.user_roles['bookings']" tag="a" class="collapse-item" to="/bookings"> {{ $t("Bookings") }} </router-link>
-            <router-link v-if="this.$parent.user_roles['available_hotel']" tag="a" class="collapse-item" to="/available_hotel"> {{ $t("Available Hotels") }} </router-link>
-            <router-link v-if="this.$parent.user_roles['hotels_report']" tag="a" class="collapse-item" to="/hotels_report"> {{ $t("Hotels Report") }} </router-link>
+            <router-link v-if="this.$parent.user_roles['hotels']" tag="a" class="collapse-item" to="/hotels"> {{
+              $t("Hotels") }} </router-link>
+            <router-link v-if="this.$parent.user_roles['bookings']" tag="a" class="collapse-item" to="/bookings"> {{
+              $t("Bookings") }} </router-link>
+            <router-link v-if="this.$parent.user_roles['available_hotel']" tag="a" class="collapse-item"
+              to="/available_hotel"> {{ $t("Available Hotels") }} </router-link>
+            <router-link v-if="this.$parent.user_roles['hotels_report']" tag="a" class="collapse-item"
+              to="/hotels_report"> {{ $t("Hotels Report") }} </router-link>
+          </div>
+        </div>
+      </li>
+
+      <!-- flights Menu -->
+      <li class="nav-item" v-if="this.$parent.user_roles['flights']">
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#flights_menu" aria-expanded="true"
+          aria-controls="flights_menu">
+          <i class="fas fa fa-plane"></i>
+          <span>{{ $t("Flights") }}</span>
+        </a>
+        <div id="flights_menu" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
+          <div class="bg-white py-2 collapse-inner rounded">
+            <router-link v-if="this.$parent.user_roles['flights']" tag="a" class="collapse-item" to="/flights"> {{
+              $t("Flights") }} </router-link>
           </div>
         </div>
       </li>

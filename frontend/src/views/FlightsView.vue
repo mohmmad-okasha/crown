@@ -154,7 +154,8 @@
                                 <div class="container p-0">
                                     <div class="row">
                                         <div class="col col-11 pr-0">
-                                            <v-select id="airline" v-model="flight.airline" :options="airlineOptions" />
+                                            <v-select id="airline" v-model="flight.airline" :options="airlineOptions"
+                                                :class="{ 'is-invalid': !this.flight.airline && this.validate, 'is-valid': this.flight.airline && this.validate }" />
                                             <div v-if="!this.flight.airline && this.validate"
                                                 class="invalid-feedback hidden">
                                                 {{ $t("Please Select airline") }}
@@ -247,7 +248,8 @@
                                     <div class="row">
                                         <div class="col col-11 pr-0">
                                             <v-select id="from_airport" v-model="flight.from_airport"
-                                                :options="airportOptions" />
+                                                :options="airportOptions"
+                                                :class="{ 'is-invalid': !this.flight.from_airport && this.validate, 'is-valid': this.flight.from_airport && this.validate }" />
                                             <div v-if="!this.flight.from_airport && this.validate"
                                                 class="invalid-feedback hidden">
                                                 {{ $t("Please Select from airport") }}
@@ -340,7 +342,7 @@
                                     <div class="row">
                                         <div class="col col-11 pr-0">
                                             <v-select id="to_airport" v-model="flight.to_airport"
-                                                :options="airportOptions" />
+                                                :options="airportOptions" :class="{ 'is-invalid': !this.flight.to_airport && this.validate, 'is-valid': this.flight.to_airport && this.validate }"/>
                                             <div v-if="!this.flight.to_airport && this.validate"
                                                 class="invalid-feedback hidden">
                                                 {{ $t("Please Select to airport") }}

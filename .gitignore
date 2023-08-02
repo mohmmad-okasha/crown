@@ -1,7 +1,4 @@
 
+logs/
 db_backup/
 start.bat
-
-crown-master.zip
-logs/logs_db.sqlite3
-logs/
