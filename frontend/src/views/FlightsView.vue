@@ -179,7 +179,8 @@
                                                         <thead>
                                                             <tr>
                                                                 <th scope="col">Code</th>
-                                                                <th scope="col">Name</th>
+                                                                <th scope="col">Name EN</th>
+                                                                <th scope="col">Name AR</th>
                                                                 <th scope="col">City</th>
                                                                 <th scope="col">Actions</th>
                                                             </tr>
@@ -188,6 +189,7 @@
                                                             <tr v-for="a in this.airlines" :key="a.code">
                                                                 <th>{{ a.code }}</th>
                                                                 <th>{{ a.name_en }}</th>
+                                                                <th>{{ a.name_ar }}</th>
                                                                 <th>{{ a.city }}</th>
                                                                 <th>
                                                                     <button @click="delete_airline(a.id)"
@@ -240,26 +242,26 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="from_airport">{{ $t("From Airport") }}</label>
+                                <label for="airport">{{ $t("From Airport") }}</label>
                                 <div class="container p-0">
                                     <div class="row">
                                         <div class="col col-11 pr-0">
                                             <v-select id="from_airport" v-model="flight.from_airport"
                                                 :options="airportOptions" />
-                                            <div v-if="!this.flight.airport && this.validate"
+                                            <div v-if="!this.flight.from_airport && this.validate"
                                                 class="invalid-feedback hidden">
-                                                {{ $t("Please Select airport") }}
+                                                {{ $t("Please Select from airport") }}
                                             </div>
                                         </div>
                                         <div class="col col-1 p-0">
                                             <button class="btn btn-light" type="button" data-toggle="collapse"
-                                                data-target="#airports_collapse" aria-expanded="false"
+                                                data-target="#from_airport_collapse" aria-expanded="false"
                                                 aria-controls="collapseExample">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="collapse m-4" id="airports_collapse">
+                                    <div class="collapse m-4" id="from_airport_collapse">
                                         <div class="card">
                                             <div class="card-header">
                                                 Airports
@@ -269,13 +271,19 @@
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
-                                                                <th scope="col">Name</th>
+                                                                <th scope="col">Code</th>
+                                                                <th scope="col">Name EN</th>
+                                                                <th scope="col">Name AR</th>
+                                                                <th scope="col">City</th>
                                                                 <th scope="col">Actions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr v-for="a in this.airports" :key="a.name">
-                                                                <th>{{ a.name }}</th>
+                                                            <tr v-for="a in this.airports" :key="a.code">
+                                                                <th>{{ a.code }}</th>
+                                                                <th>{{ a.name_en }}</th>
+                                                                <th>{{ a.name_ar }}</th>
+                                                                <th>{{ a.city }}</th>
                                                                 <th>
                                                                     <button @click="delete_airport(a.id)"
                                                                         class="btn btn-dangares" type="button"> <i
@@ -283,54 +291,70 @@
                                                                     </button>
                                                                 </th>
                                                             </tr>
-                                                            <tr>
-                                                                <th>
-                                                                    <input v-model="add_airport" type="text"
-                                                                        class="form-control">
-                                                                </th>
-                                                                <th>
-                                                                    <button @click="save_airport()" class="btn btn-light"
-                                                                        type="button">
-                                                                        <i class="fa-solid fa-plus"></i>
-                                                                    </button>
-                                                                </th>
-                                                            </tr>
                                                         </tbody>
                                                     </table>
+                                                    <hr>
+                                                    <div class="center">
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <input v-model="airport.name_ar" type="text"
+                                                                    placeholder="Name ar" class="form-control">
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <input v-model="airport.name_en" type="text"
+                                                                    placeholder="Name en" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <input v-model="airport.code" type="text" placeholder="Code"
+                                                                    class="form-control">
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <input v-model="airport.city" type="text" placeholder="City"
+                                                                    class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <button @click="save_airport()" class=" btn btn-light"
+                                                            type="button">
+                                                            <i class="fa-solid fa-plus"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div class="text-center">
-                                                    <button class="btn btn-light center"
-                                                        onclick="$('#airports_collapse').collapse('hide')"><i
-                                                            class="fa-solid fa-chevron-up"></i></button>
+                                                <div class="text-center mt-4">
+                                                    <a class="center"
+                                                        onclick="$('#from_airport_collapse').collapse('hide')"><i
+                                                            class="fa-solid fa-chevron-up"></i></a>
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-group">
-                                <label for="to_airport">{{ $t("To Airport") }}</label>
+                                <label for="airport">{{ $t("To Airport") }}</label>
                                 <div class="container p-0">
                                     <div class="row">
                                         <div class="col col-11 pr-0">
                                             <v-select id="to_airport" v-model="flight.to_airport"
                                                 :options="airportOptions" />
-                                            <div v-if="!this.flight.airport && this.validate"
+                                            <div v-if="!this.flight.to_airport && this.validate"
                                                 class="invalid-feedback hidden">
-                                                {{ $t("Please Select airport") }}
+                                                {{ $t("Please Select to airport") }}
                                             </div>
                                         </div>
                                         <div class="col col-1 p-0">
                                             <button class="btn btn-light" type="button" data-toggle="collapse"
-                                                data-target="#airports_collapse2" aria-expanded="false"
+                                                data-target="#to_airport_collapse" aria-expanded="false"
                                                 aria-controls="collapseExample">
                                                 <i class="fa-solid fa-pen-to-square"></i>
                                             </button>
                                         </div>
                                     </div>
-                                    <div class="collapse m-4" id="airports_collapse2">
+                                    <div class="collapse m-4" id="to_airport_collapse">
                                         <div class="card">
                                             <div class="card-header">
                                                 Airports
@@ -340,13 +364,19 @@
                                                     <table class="table">
                                                         <thead>
                                                             <tr>
-                                                                <th scope="col">Name</th>
+                                                                <th scope="col">Code</th>
+                                                                <th scope="col">Name EN</th>
+                                                                <th scope="col">Name AR</th>
+                                                                <th scope="col">City</th>
                                                                 <th scope="col">Actions</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr v-for="a in this.airports" :key="a.name">
-                                                                <th>{{ a.name }}</th>
+                                                            <tr v-for="a in this.airports" :key="a.code">
+                                                                <th>{{ a.code }}</th>
+                                                                <th>{{ a.name_en }}</th>
+                                                                <th>{{ a.name_ar }}</th>
+                                                                <th>{{ a.city }}</th>
                                                                 <th>
                                                                     <button @click="delete_airport(a.id)"
                                                                         class="btn btn-dangares" type="button"> <i
@@ -354,29 +384,45 @@
                                                                     </button>
                                                                 </th>
                                                             </tr>
-                                                            <tr>
-                                                                <th>
-                                                                    <input v-model="add_airport" type="text"
-                                                                        class="form-control">
-                                                                </th>
-                                                                <th>
-                                                                    <button @click="save_airport()" class="btn btn-light"
-                                                                        type="button">
-                                                                        <i class="fa-solid fa-plus"></i>
-                                                                    </button>
-                                                                </th>
-                                                            </tr>
                                                         </tbody>
                                                     </table>
+                                                    <hr>
+                                                    <div class="center">
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <input v-model="airport.name_ar" type="text"
+                                                                    placeholder="Name ar" class="form-control">
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <input v-model="airport.name_en" type="text"
+                                                                    placeholder="Name en" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <div class="row">
+                                                            <div class="col-6">
+                                                                <input v-model="airport.code" type="text" placeholder="Code"
+                                                                    class="form-control">
+                                                            </div>
+                                                            <div class="col-6">
+                                                                <input v-model="airport.city" type="text" placeholder="City"
+                                                                    class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <br>
+                                                        <button @click="save_airport()" class=" btn btn-light"
+                                                            type="button">
+                                                            <i class="fa-solid fa-plus"></i>
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div class="text-center">
-                                                    <button class="btn btn-light center"
-                                                        onclick="$('#airports_collapse2').collapse('hide')"><i
-                                                            class="fa-solid fa-chevron-up"></i></button>
+                                                <div class="text-center mt-4">
+                                                    <a class="center"
+                                                        onclick="$('#to_airport_collapse').collapse('hide')"><i
+                                                            class="fa-solid fa-chevron-up"></i></a>
                                                 </div>
                                             </div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -504,10 +550,16 @@ export default {
                 user: "",
             },
             airline: {
-                name_ar:'',
-                name_en:'',
-                code:'',
-                city:''
+                name_ar: '',
+                name_en: '',
+                code: '',
+                city: ''
+            },
+            airport: {
+                name_ar: '',
+                name_en: '',
+                code: '',
+                city: ''
             },
             add_airline: '',
             add_airport: '',
@@ -550,7 +602,7 @@ export default {
             return this.airlines.map(airline => airline.code);
         },
         airportOptions() {
-            return this.airports.map(airport => airport.name);
+            return this.airports.map(airport => airport.code);
         },
         format_dates() {
             //this.flight.arrival_date = this.formatDate(this.flight.arrival_date);
@@ -661,8 +713,13 @@ export default {
                     });
 
                     swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
-                    this.get_flights();
+
                     await this.get_max_id();
+
+                    //save log
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add flight :' + this.max_id, time: new Date() })
+
+                    this.get_flights();
                     await this.uploadImage();
                     this.closeModal();
                 }
@@ -686,6 +743,10 @@ export default {
                 if (response.ok) {
                     swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
                     $('#airline_collapse').collapse('hide');
+
+                    //save log
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add airline :' + this.airline.name_en, time: new Date() })
+
                     await this.get_airlines();
                     this.add_airline = '';
                     this.flight.airline = airlineOptions[airlineOptions.length - 1]
@@ -708,6 +769,10 @@ export default {
                         if (willDelete) {
                             await my_api.delete('/backend/airlines/' + id + '/')
                             swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+
+                            //save log
+                            axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete airline id:' + id, time: new Date() })
+
                             await this.get_airlines();
                         }
                     });
@@ -725,11 +790,15 @@ export default {
                 var response = await fetch(domain_url + "/backend/airports/", {
                     method: "post",
                     headers: { "Content-Type": "application/json", },
-                    body: JSON.stringify({ "name": this.add_airport }),
+                    body: JSON.stringify(this.airport),
                 });
 
                 if (response.ok) {
                     swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
+
+                    //save log
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add airport :' + this.airport.name_en, time: new Date() })
+
                     $('#airports_collapse').collapse('hide');
                     $('#airports_collapse2').collapse('hide');
                     await this.get_airports();
@@ -754,6 +823,10 @@ export default {
                         if (willDelete) {
                             await my_api.delete('/backend/airports/' + id + '/')
                             swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+
+                            //save log
+                            axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete airport id:' + id, time: new Date() })
+
                             await this.get_airports();
                         }
                     });
@@ -770,6 +843,10 @@ export default {
                     }
                     );
                     swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
+
+                    //save log
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'update flight :' + id, time: new Date() })
+
                     this.max_id = this.flight.id
                     await this.uploadImage();
                     this.get_flights();
@@ -790,6 +867,10 @@ export default {
                             await my_api.delete('/backend/flights/' + id + '/')
                             this.remove_file('/flights/' + id + '_' + this.flight.name + '.png')
                             swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+
+                            //save log
+                            axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete flight :' + id, time: new Date() })
+
                             await this.get_flights(); this.closeModal();
                         }
                     });
