@@ -341,8 +341,8 @@
                                 <div class="container p-0">
                                     <div class="row">
                                         <div class="col col-11 pr-0">
-                                            <v-select id="to_airport" v-model="flight.to_airport"
-                                                :options="airportOptions" :class="{ 'is-invalid': !this.flight.to_airport && this.validate, 'is-valid': this.flight.to_airport && this.validate }"/>
+                                            <v-select id="to_airport" v-model="flight.to_airport" :options="airportOptions"
+                                                :class="{ 'is-invalid': !this.flight.to_airport && this.validate, 'is-valid': this.flight.to_airport && this.validate }" />
                                             <div v-if="!this.flight.to_airport && this.validate"
                                                 class="invalid-feedback hidden">
                                                 {{ $t("Please Select to airport") }}
@@ -493,6 +493,11 @@
                             class="btn btn-primary on-hover-sm">
                             <i class="fa fa-floppy-disk"></i></button>
 
+                        <button type="button" title="save and add" @click="save_and_add()"
+                            class="btn btn-success on-hover-sm">
+                            <i class="fa fa-copy"></i>
+                        </button>
+
                         <button v-if="edit_mode" type="button" title="delete" @click="delete_flight(active_index)"
                             class="btn btn-danger on-hover-sm"> <i class="fa fa-trash"></i> </button>
 
@@ -612,8 +617,6 @@ export default {
         }
     },
 
-
-
     methods: {
         formatDate(date) {
             const formattedDate = new Date(date);
@@ -629,8 +632,6 @@ export default {
 
             return `${month}/${day}/${year} ${hours}:${minutes} ${ampm}`;
         },
-
-
 
         showContextMenu(event) {
             event.preventDefault();
@@ -722,8 +723,30 @@ export default {
                     axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add flight :' + this.max_id, time: new Date() })
 
                     this.get_flights();
-                    await this.uploadImage();
                     this.closeModal();
+                }
+            } catch (error) { console.error(); }
+        },
+
+        async save_and_add() {
+            try {
+                if (this.check_form()) {
+                    var response = await fetch(domain_url + "/backend/flights/", {
+                        method: "post",
+                        headers: { "Content-Type": "application/json", },
+                        body: JSON.stringify(this.flight),
+                    });
+
+                    swal(this.$t("Added!"), { buttons: false, icon: "success", timer: 2000, });
+
+                    await this.get_max_id();
+
+                    //save log
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add flight :' + this.max_id, time: new Date() })
+
+                    this.get_flights();
+
+                    this.validate = false;
                 }
             } catch (error) { console.error(); }
         },
