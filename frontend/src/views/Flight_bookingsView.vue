@@ -1,5 +1,5 @@
 <template>
-    <div class="BookingsView">
+    <div class="Flight_bookingsView">
         <loading :active.sync="isLoading" :can-cancel="false" :is-full-page="fullPage"></loading>
 
         <!-- context-menu -->
@@ -13,7 +13,7 @@
                     <i class="fa fa-pen-to-square"></i>
                     {{ $t("Edit") }}
                 </li>
-                <li class="dropdown-item" @click="PrintDiv('booking_data')">
+                <li class="dropdown-item" @click="PrintDiv('flight_booking_data')">
                     <i class="fa fa-print"></i>
                     {{ $t("Print") }}
                 </li>
@@ -26,7 +26,7 @@
             <div class="card shadow mb-4">
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">{{ $t("Bookings Table") }} </h6>
+                    <h6 class="m-0 font-weight-bold text-primary">{{ $t("Flight Bookings Table") }} </h6>
                     <div class="dropdown no-arrow">
 
                         <div class="btn-group" role="group">
@@ -58,35 +58,27 @@
                                 <thead class="sticky_header">
                                     <tr>
                                         <th scope="col">#</th>
-                                        <th scope="col">{{ $t("Booking on") }}</th>
-                                        <th scope="col">{{ $t("Names") }}</th>
-                                        <th scope="col">{{ $t("Number") }}</th>
-                                        <th scope="col">{{ $t("Hotel") }}</th>
-                                        <th scope="col">{{ $t("Duration") }}</th>
-                                        <th scope="col">{{ $t("Room ID") }}</th>
-                                        <th scope="col">{{ $t("Room Type") }}</th>
-                                        <th scope="col">{{ $t("Status") }}</th>
+                                        <th scope="col">{{ $t("Depart Date") }}</th>
+                                        <th scope="col">{{ $t("Type") }}</th>
+                                        <th scope="col">{{ $t("Seats") }}</th>
+                                        <th scope="col">{{ $t("Flight Code") }}</th>
                                         <th scope="col">{{ $t("Notes") }}</th>
                                         <th scope="col">{{ $t("User") }}</th>
                                         <th scope="col" class="no_print">{{ $t("Actions") }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr @contextmenu="showContextMenu" v-for="booking in this.booking_rows"
-                                        :key="booking.id" @click="row_click(booking.id)"
-                                        @click.right="row_click(booking.id)" @dblclick="open_edit_modal" role="button"
-                                        :class="{ 'selected': booking.id === active_index }">
-                                        <th scope="row" id="id">{{ booking.id }}</th>
-                                        <td>{{ formatDate(booking.book_date) }}</td>
-                                        <td>{{ $t(booking.persons_names + ' , ' + booking.kids_names) }}</td>
-                                        <td>{{ $t(booking.persons_number + booking.kids_number) }}</td>
-                                        <td>{{ $t(booking.hotel) }}</td>
-                                        <td>{{ $t(booking.dates) }}</td>
-                                        <td>{{ $t(booking.room_id) }}</td>
-                                        <td>{{ $t(booking.room_type) }}</td>
-                                        <td>{{ $t(booking.status) }}</td>
-                                        <td>{{ $t(booking.notes) }}</td>
-                                        <td>{{ $t(booking.user) }}</td>
+                                    <tr @contextmenu="showContextMenu" v-for="flight_booking in this.flight_booking_rows"
+                                        :key="flight_booking.id" @click="row_click(flight_booking.id)"
+                                        @click.right="row_click(flight_booking.id)" @dblclick="open_edit_modal"
+                                        role="button" :class="{ 'selected': flight_booking.id === active_index }">
+                                        <th scope="row" id="id">{{ flight_booking.id }}</th>
+                                        <td>{{ formatDate(flight_booking.depart_date) }}</td>
+                                        <td>{{ $t(flight_booking.type) }}</td>
+                                        <td>{{ $t(flight_booking.seats) }}</td>
+                                        <td>{{ $t(flight_booking.flight_code) }}</td>
+                                        <td>{{ $t(flight_booking.notes) }}</td>
+                                        <td>{{ $t(flight_booking.user) }}</td>
 
                                         <td class="no_print">
 
@@ -98,7 +90,7 @@
                                                 <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1"
                                                     x-placement="bottom-start"
                                                     style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 37px, 0px);">
-                                                    <a class="dropdown-item" @click="delete_booking(booking.id)">
+                                                    <a class="dropdown-item" @click="delete_booking(flight_booking.id)">
                                                         <i class="fa fa-trash"></i>
                                                         {{ $t("Delete") }}
                                                     </a>
@@ -106,7 +98,7 @@
                                                         <i class="fa fa-pen-to-square"></i>
                                                         {{ $t("Edit") }}
                                                     </a>
-                                                    <a class="dropdown-item" @click="PrintDiv('booking_data')">
+                                                    <a class="dropdown-item" @click="PrintDiv('flight_booking_data')">
                                                         <i class="fa fa-print"></i>
                                                         {{ $t("Print") }}
                                                     </a>
@@ -140,51 +132,88 @@
                     <div class="modal-body">
 
                         <form>
+
                             <div class="form-group">
-                                <label for="book_date">{{ $t("Booking Date") }}</label>
-                                <input id="book_date" v-model="this_row.book_date" type="datetime-local"
-                                    :class="{ 'is-invalid': !this.this_row.book_date && this.validate, 'is-valid': this.this_row.book_date && this.validate }"
+                                <label for="depart_date">{{ $t("Depart Date") }}</label>
+                                <input id="depart_date" v-model="this_row.depart_date" type="datetime-local"
+                                    :class="{ 'is-invalid': !this.this_row.depart_date && this.validate, 'is-valid': this.this_row.depart_date && this.validate }"
                                     class="form-control">
-                                <div v-if="!this.this_row.book_date && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select The Date") }}
+                                <div v-if="!this.this_row.depart_date && this.validate" class="invalid-feedback hidden">
+                                    {{ $t("Please Select The Depart Date") }}
                                 </div>
                             </div>
 
                             <div class="row g-3 form-group">
 
+                                <div class="form-group col-sm-4">
+                                    <label for="type">{{ $t("Type") }}</label>
+                                    <v-select id="type" v-model="this_row.type" :options="types"
+                                        :class="{ 'is-invalid': !this_row.type && validate, 'is-valid': this_row.type && validate }" />
 
-                                <div class="form-group col-sm-7">
-                                    <label for="hotel">{{ $t("Hotel") }}</label>
-                                    <v-select id="hotel" v-model="this_row.hotel" :options="hotels"
-                                        :class="{ 'is-invalid': !this_row.hotel && validate, 'is-valid': this_row.hotel && validate }" />
-
-                                    <div v-if="!this_row.hotel && validate" class="invalid-feedback hidden">
-                                        {{ $t("Please Select hotel") }}
+                                    <div v-if="!this_row.type && validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select type") }}
                                     </div>
                                 </div>
 
-                                <div class="form-group col-sm-3">
-                                    <label for="room_id">{{ $t("Room ID") }}</label>
-                                    <select id="room_id" v-model="this_row.room_id" type="text" class="form-control"
-                                        :class="{ 'is-invalid': !this.this_row.room_id && this.validate, 'is-valid': this.this_row.room_id && this.validate }">
-                                        <option v-for="room in rooms" v-bind:value="room" :key="room">{{
-                                            room }}</option>
-                                    </select>
-                                    <div v-if="!this.this_row.room_id && this.validate" class="invalid-feedback hidden">
-                                        {{ $t("Please Select room_id") }}
+                                <div class="form-group col-sm-4">
+                                    <label for="from_city">{{ $t("From City") }}</label>
+                                    <v-select id="from_city" v-model="this_row.from_city" :options="citys"
+                                        :class="{ 'is-invalid': !this_row.from_city && validate, 'is-valid': this_row.from_city && validate }" />
+
+                                    <div v-if="!this_row.from_city && validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select From City") }}
                                     </div>
                                 </div>
 
-                                <div class="form-group col-sm-2">
-                                    <label for="room_type">{{ $t("Type") }}</label>
-                                    <input readonly id="room_type" v-model="this_row.room_type" type="text"
-                                        class="form-control">
+                                <div class="form-group col-sm-4">
+                                    <label for="to_city">{{ $t("To City") }}</label>
+                                    <v-select id="to_city" v-model="this_row.to_city" :options="citys"
+                                        :class="{ 'is-invalid': !this_row.to_city && validate, 'is-valid': this_row.to_city && validate }" />
+
+                                    <div v-if="!this_row.to_city && validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select To City") }}
+                                    </div>
                                 </div>
+
                             </div>
 
 
-                            <label v-show="this.this_row.room_id" for="dates">{{ $t("Select Date") }}</label>
-                            <div v-show="this.this_row.room_id" class="form-group card" id="dates" style="width: 100%;">
+                            <div class="row g-3 form-group">
+
+                                <div class="form-group col-sm-4">
+                                    <label for="flight_code">{{ $t("Flight") }}</label>
+                                    <v-select id="flight_code" v-model="this_row.flight_code" :options="flights"
+                                        :class="{ 'is-invalid': !this_row.flight_code && validate, 'is-valid': this_row.flight_code && validate }" />
+
+                                    <div v-if="!this_row.flight_code && validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select flight") }}
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-4">
+                                    <label for="from_airport">{{ $t("From Airport") }}</label>
+                                    <input id="from_airport" v-model="this_row.from_airport" :options="airports" class="form-control" readonly
+                                        :class="{ 'is-invalid': !this_row.from_airport && validate, 'is-valid': this_row.from_airport && validate }" />
+
+                                    <div v-if="!this_row.from_airport && validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select From Airport") }}
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-4">
+                                    <label for="to_airport">{{ $t("To Airport") }}</label>
+                                    <input id="to_airport" v-model="this_row.to_airport" :options="airports" class="form-control" readonly
+                                        :class="{ 'is-invalid': !this_row.to_airport && validate, 'is-valid': this_row.to_airport && validate }" />
+
+                                    <div v-if="!this_row.to_airport && validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select To Airport") }}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <label v-show="this.this_row.flight_code" for="dates">{{ $t("Select Date") }}</label>
+                            <div v-show="this.this_row.flight_code" class="form-group card" id="dates" style="width: 100%;">
                                 <div class="card-body">
                                     <date-picker v-model="this_row.dates" :min="min_date" :max="max_date"
                                         :disable="disable_dates" :range="is_range" clearable locale="en" inline
@@ -200,88 +229,14 @@
                                 </div>
                             </div>
 
-                            <div class="card form-group">
-                                <div class="card-header">
-                                    {{ $t("Guests") }}
-                                </div>
-                                <div class="card-body">
 
-                                    <div class="row g-3 form-group">
-                                        <div class="col">
-                                            <label for="Adults"> {{ $t("Adults") }}</label>
-                                            <input id="Adults" v-model="this_row.persons_number" min="1" max="15"
-                                                :class="{ 'is-invalid': !this.this_row.persons_number && this.validate, 'is-valid': this.this_row.persons_number && this.validate }"
-                                                type="number" class="form-control">
-                                            <div v-if="!this.this_row.persons_number && this.validate"
-                                                class="invalid-feedback hidden">
-                                                {{ $t("Please Enter The Number of Persons") }}
-                                            </div>
-                                        </div>
-                                        <div class="col">
-                                            <label for="Children"> {{ $t("Children") }}</label>
-                                            <input id="Children" v-model="this_row.kids_number" min="0" max="10"
-                                                :class="{ 'is-invalid': this.this_row.kids_number < 0 && this.validate, 'is-valid': this.this_row.kids_number && this.validate }"
-                                                type="number" class="form-control">
-                                            <div v-if="this.this_row.kids_number < 0 && this.validate"
-                                                class="invalid-feedback hidden">
-                                                {{ $t("Please Enter The Number of Kids") }}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div v-if="this_row.persons_number > 0">
-                                        <div v-for=" i in parseInt(this_row.persons_number)" :key="i" class="form-group">
-                                            <label>{{ $t("Adult Name ") + i }}</label>
-                                            <input v-model="this_row.persons_names[i - 1]" type="text" class="form-control"
-                                                :class="{ 'is-invalid': !this_row.persons_names[i - 1] && validate, 'is-valid': this_row.persons_names[i - 1] && validate }">
-                                            <div v-if="!this_row.persons_names[i - 1] && validate"
-                                                class="invalid-feedback hidden">
-                                                {{ $t("Please Enter The Name of Person") + i }}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div v-if="this_row.kids_number > 0">
-                                        <div v-for=" i in parseInt(this_row.kids_number)" :key="i" class="form-group">
-                                            <div class="row">
-                                                <div class="col">
-                                                    <label>{{ $t("Children Name ") + i }}</label>
-                                                    <input v-model="this_row.kids_names[i - 1]" type="text"
-                                                        class="form-control"
-                                                        :class="{ 'is-invalid': !this_row.kids_names[i - 1] && validate, 'is-valid': this_row.kids_names[i - 1] && validate }">
-                                                    <div v-if="!this_row.kids_names[i - 1] && validate"
-                                                        class="invalid-feedback hidden">
-                                                        {{ $t("Please Enter Children Name") + i }}
-                                                    </div>
-                                                </div>
-                                                <div class="col">
-                                                    <label>{{ $t("Children Age ") + i }}</label>
-                                                    <input v-model="this_row.kids_ages[i - 1]" type="number"
-                                                        class="form-control"
-                                                        :class="{ 'is-invalid': !this_row.kids_ages[i - 1] && validate, 'is-valid': this_row.kids_ages[i - 1] && validate }">
-                                                    <div v-if="!this_row.kids_ages[i - 1] && validate"
-                                                        class="invalid-feedback hidden">
-                                                        {{ $t("Please Enter Children Age") + i }}
-                                                    </div>
-                                                </div>
-
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="status">{{ $t("Status") }}</label>
-                                <select id="status" v-model="this_row.status" type="text" class="form-control"
-                                    :class="{ 'is-invalid': !this.this_row.status && this.validate, 'is-valid': this.this_row.status && this.validate }">
-                                    <option selected :value="$t('Booked')">{{ $t("Booked") }} </option>
-                                    <option :value="$t('No Show')">{{ $t("No Show") }} </option>
-
-                                </select>
-                                <div v-if="!this.this_row.status && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select the status") }}
+                            <div class="form-group ">
+                                <label for="seats"> {{ $t("Seats") }}</label>
+                                <input id="seats" v-model="this_row.seats"
+                                    :class="{ 'is-invalid': !this.this_row.seats && this.validate, 'is-valid': this.this_row.seats && this.validate }"
+                                    type="number" class="form-control">
+                                <div v-if="!this.this_row.seats && this.validate" class="invalid-feedback hidden">
+                                    {{ $t("Please Enter The seats") }}
                                 </div>
                             </div>
 
@@ -325,118 +280,6 @@
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
 
-        <!-- Data Card -->
-        <div v-show="this.this_row.persons_names.length > 0" class="col-xl-12 center">
-            <div class="card shadow mb-4">
-                <!-- Card Header - Dropdown -->
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                    <h6 class="m-0 font-weight-bold text-primary">{{ $t("Details") }} </h6>
-                    <div class="dropdown no-arrow">
-                    </div>
-                </div>
-                <div id="booking_data" class="card-body">
-                    <h1>Booking #{{ this.this_row.id }}</h1>
-                    <p><b>Booking Date:</b> {{ this.this_row.book_date }} <b>User:</b> {{ this.this_row.user }}</p>
-
-                    <div class="container text-center">
-                        <div class="row">
-                            <div class="col">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Persons Name</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(person, index) in this.this_row.persons_names" :key="index">
-                                            <td>{{ person }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Kids Name</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(kids, index) in this.this_row.kids_names" :key="index">
-                                            <td>{{ kids }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>Kids Age</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr v-for="(age, index) in this.this_row.kids_ages" :key="index">
-                                            <td>{{ age }}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col">
-                                <div class="col-auto">
-                                    <label class="col-form-label"><b>Hotel:</b> {{ this.this_row.hotel }}</label>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="col-auto">
-                                    <label class="col-form-label"><b>Room:</b> {{ this.this_row.room_id }}</label>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="col-auto">
-                                    <label class="col-form-label"><b>Room Type:</b> {{ this.this_row.room_type }}</label>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="col-auto">
-                                    <label class="col-form-label"><b>Status:</b> {{ this.this_row.status }}</label>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col">
-                                <div class="col-auto">
-                                    <label class="col-form-label"><b>Date Range:</b> {{ 'From :' + this.this_row.dates[0] +
-                                        ' To :' +
-                                        this.this_row.dates[1] }}</label>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="col-auto">
-                                    <label class="col-form-label"><b>Notes:</b> {{ this.this_row.notes }}</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="modal-footer">
-                        <button type="button" title="print" @click="PrintDiv('booking_data')"
-                            class="btn btn-primary on-hover-sm no_print">
-                            <i class="fa fa-print"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div>
-
-        </div>
-
 
     </div>
 </template>
@@ -452,13 +295,12 @@ import VuePersianDatetimePicker from 'vue-persian-datetime-picker';
 import vSelect from 'vue-select';
 import 'vue-select/dist/vue-select.css';
 import Loading from 'vue-loading-overlay';
-
 import 'vue-loading-overlay/dist/vue-loading.css';
 
 // end of import block
 
 export default {
-    name: 'BookingsView',
+    name: 'Flight_bookingsView',
 
     /////////////////////
     components: {
@@ -475,44 +317,35 @@ export default {
             isLoading: false,
             fullPage: true,
             is_range: true,
-            max_id:'',
+            max_id: '',
             user_roles: "",
             print: false, //to print after save
             validate: false, //for check forms
             active_index: null,//current id
             edit_mode: false,//edit form open
             add_mode: false,//add form open
-            booking_rows: [],//all rows
-            rooms: [],//used in new & update form
-            hotels: [],//used in new & update form
+            flight_booking_rows: [],//all rows
+            flights: ['test'],//used in new & update form
             range: '',
             booked_dates: [],
             all_booked_dates: [],//all dates in booked_dates ranges for selected room
-            all_rooms_booked_dates: [],//all dates in booked_dates ranges for all room
-            all_rooms_dates: [],//all dates for all room
+            all_flights_booked_dates: [],//all dates in booked_dates ranges for all room
+            all_flights_dates: [],//all dates for all room
             min_date: '',
             max_date: '',
             disable_dates: [],
             room_id_id: '',
             //////
             this_row: {
-                book_date: new Date().toISOString().slice(0, 16),
-                hotel: "",
-                room_id: "",
-                room_type: "",
-                dates: "",
-                out_date: "",
-                all_dates: "",
-                guests: "",
-                status: "",
+                depart_date: "",
+                type: "",
+                seats: "",
+                flight_code: "",
                 notes: "",
-                persons_number: 1,
-                persons_names: [],
-                kids_number: '',
-                kids_names: [],
-                kids_ages: [],
                 user: "",
             },
+            types: ['One way', 'Two way', 'Multi'],
+            citys: ['amm', '..', '..'],
             //////
 
             //////contex menu
@@ -528,27 +361,27 @@ export default {
 
     ////////////////////
     watch: {
-        'this_row.hotel': async function (newValue) {
-            if (this.edit_mode || this.add_mode) {
-                this.this_row.room_id = '';
+        // 'this_row.hotel': async function (newValue) {
+        //     if (this.edit_mode || this.add_mode) {
+        //         this.this_row.room_id = '';
 
-                await this.get_rooms();
-                this.this_row.room_id = this.rooms[0];
+        //         await this.get_rooms();
+        //         this.this_row.room_id = this.rooms[0];
 
-            }
-        },
+        //     }
+        // },
 
-        'this_row.room_id': function (newValue) {
-            if (this.edit_mode || this.add_mode) {
-                this.get_room_info(newValue);
-                this.get_booked_dates();
-            }
-        },
+        // 'this_row.room_id': function (newValue) {
+        //     if (this.edit_mode || this.add_mode) {
+        //         this.get_room_info(newValue);
+        //         this.get_booked_dates();
+        //     }
+        // },
+
         range: async function (newValue) {
             const dateValues = newValue.split(",");
             this.min_date = dateValues[0];
             this.max_date = dateValues[1];
-            this.this_row.out_date = this.this_row.dates[1];
             this.get_booked_dates()
         }
     },
@@ -566,7 +399,7 @@ export default {
             this.$router.back()
         }
 
-        await this.get_booking_rows();
+        await this.get_flight_booking_rows();
         await this.get_hotels();
 
         //to remove modal background on auto vue js reload
@@ -587,10 +420,10 @@ export default {
             if (data && data.trim()) { // data.trim() to check data not spaces only
                 return axios({
                     method: "get",
-                    url: domain_url + "/backend/bookings/?search=" + data,
-                }).then((response) => (this.booking_rows = response.data));
+                    url: domain_url + "/backend/flight_bookings/?search=" + data,
+                }).then((response) => (this.flight_booking_rows = response.data));
             } else {
-                this.get_booking_rows();
+                this.get_flight_booking_rows();
             }
         },
     },
@@ -619,16 +452,16 @@ export default {
 
         // page load **********************************
 
-        get_booking_rows() {
+        get_flight_booking_rows() {
             // we using return first of the function for 'await' 
-            return my_api.get('/backend/bookings/')
-                .then((response) => (this.booking_rows = response.data))
+            return my_api.get('/backend/flight_bookings/')
+                .then((response) => (this.flight_booking_rows = response.data))
                 .catch(err => { alert(err) });
         },
 
         async get_booking(id) {
             try {
-                const response = await axios.get(`${domain_url}/backend/bookings/?id=${id}`);
+                const response = await axios.get(`${domain_url}/backend/flight_bookings/?id=${id}`);
                 this.this_row = response.data[0];
             } catch (error) {
                 console.error("Error fetching booking:", error);
@@ -707,7 +540,7 @@ export default {
             var divToPrint = document.getElementById(id);
             var popupWin = window.open('', '_blank', 'width=100000,height=10000');
             document.getElementById('head_txt').style.display = "block";
-            document.getElementById('head_txt').innerHTML = this.$t("Bookings");
+            document.getElementById('head_txt').innerHTML = this.$t("Flight Bookings");
             popupWin.document.write('<link href="static/css/sb-admin-2.min.css" rel="stylesheet">');
             popupWin.document.write('<link href="static/css/reports.css" rel="stylesheet">');
             popupWin.document.write('<style>body{background-color:white !important;}</style>');
@@ -791,7 +624,7 @@ export default {
             try {
                 if (this.check_form()) {
                     if (this.print) {
-                        this.PrintDiv('booking_data');
+                        this.PrintDiv('flight_booking_data');
                     }
                     // save out date
                     if (this.this_row.dates.length > 1) {
@@ -804,7 +637,7 @@ export default {
                     this.this_row.persons_names = this.this_row.persons_names.join(',');
                     this.this_row.kids_names = this.this_row.kids_names.join(',');
                     this.this_row.kids_ages = this.this_row.kids_ages.join(',');
-                    var response = await fetch(domain_url + "/backend/bookings/", {
+                    var response = await fetch(domain_url + "/backend/flight_bookings/", {
                         method: "post",
                         headers: { "Content-Type": "application/json", },
                         body: JSON.stringify(this.this_row),
@@ -820,8 +653,8 @@ export default {
 
                     window.location.reload();
 
-                    this.get_booking_rows();
-                    
+                    this.get_flight_booking_rows();
+
                     this.closeModal();
                 }
             } catch (error) { console.error(); }
@@ -835,14 +668,14 @@ export default {
                     const willDelete = await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, });
 
                     if (willDelete) {
-                        await my_api.delete(`/backend/bookings/${id}/`);
+                        await my_api.delete(`/backend/flight_bookings/${id}/`);
                         swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
 
                         //save log
                         axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete booking :' + id, time: new Date() })
 
 
-                        this.get_booking_rows();
+                        this.get_flight_booking_rows();
                         this.closeModal();
                     }
                 } catch (error) {
@@ -857,7 +690,7 @@ export default {
             try {
                 if (this.check_form()) {
                     if (this.print) {
-                        await this.PrintDiv('booking_data');
+                        await this.PrintDiv('flight_booking_data');
                     }
                     // save out date
                     if (this.this_row.dates.length > 1) {
@@ -870,7 +703,7 @@ export default {
                     this.this_row.persons_names = this.this_row.persons_names.join(',');
                     this.this_row.kids_names = this.this_row.kids_names.join(',');
                     this.this_row.kids_ages = this.this_row.kids_ages.join(',');
-                    var response = await fetch(domain_url + "/backend/bookings/" + id + "/", {
+                    var response = await fetch(domain_url + "/backend/flight_bookings/" + id + "/", {
                         method: "PUT",
                         headers: { "Content-Type": "application/json", },
                         body: JSON.stringify(this.this_row),
@@ -881,7 +714,7 @@ export default {
                     axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'update booking :' + id, time: new Date() })
 
                     //this.max_id = this.this_row.id
-                    this.get_booking_rows();
+                    this.get_flight_booking_rows();
                     this.closeModal();
                     this.edit_mode = false;
                 }
@@ -925,7 +758,7 @@ export default {
 
         async get_max_id() {
             try {
-                const response = await axios.get(`${domain_url}/backend/get_max_id/?table_name=Bookings`);
+                const response = await axios.get(`${domain_url}/backend/get_max_id/?table_name=Flight Bookings`);
                 this.max_id = response.data.data.id__max;
             } catch (error) {
                 console.error("Error fetching max ID:", error);

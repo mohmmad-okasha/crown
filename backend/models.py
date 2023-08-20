@@ -72,7 +72,23 @@ class Room_dates(models.Model):
 
     class Meta:
         ordering = ['date']
+#####################################################################################
 
+class Flight_bookings(models.Model):
+    depart_date = models.DateTimeField(max_length=50)
+    type = models.CharField(max_length=50) # one way / two way
+    seats=models.IntegerField()
+    flight_code = models.CharField(max_length=50)
+    notes=models.CharField(max_length=100,blank=True)
+    user = models.CharField(max_length=50,blank=True)
+    created_on = models.DateTimeField(auto_now_add=True,null=True)
+    updated_on = models.DateTimeField(auto_now=True,null=True)
+
+    def __str__(self):
+        return self.id #to change object name in admin table
+
+    class Meta:
+        ordering= ['id'] #to Sort the values
 #####################################################################################
 
 class Flights(models.Model):
@@ -182,6 +198,7 @@ class Roles(models.Model):
     backups = models.IntegerField(default=0)
     logs = models.IntegerField(default=0)
     flights = models.IntegerField(default=0)
+    flight_bookings = models.IntegerField(default=0)
     logs = models.IntegerField(default=0)
 
 #####################################################################################

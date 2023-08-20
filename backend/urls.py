@@ -6,6 +6,7 @@ from . import api
 
 router = routers.DefaultRouter()
 router.register('flights', api.flights)
+router.register('flight_bookings', api.flight_bookings)
 router.register('airlines', api.airlines)
 router.register('airports', api.airports)
 router.register('bookings', api.bookings)
@@ -78,8 +79,6 @@ urlpatterns += [
     path("remove_backup_file/", api.remove_backup_file, name="remove_backup_file"),
 
     path("restore_backup/", api.restore_backup, name="restore_backup"),
-
-
 
     #path('save_all_rooms/', api.save_all_rooms.as_view()),
 

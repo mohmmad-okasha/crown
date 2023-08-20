@@ -7,6 +7,7 @@ from .models import Flights
 from .models import Flight_dates
 from .models import Airports
 from .models import Airlines
+from .models import Flight_bookings
 from .models import Accounts
 from .models import Dashboard_buttons
 from .models import Settings
@@ -903,3 +904,25 @@ class flight_dates(ModelViewSet, mixins.DestroyModelMixin):
 
 #####################################################################################
 
+
+class flight_bookings(ModelViewSet, mixins.DestroyModelMixin):
+
+    queryset = Flight_bookings.objects.all()
+    serializer_class = serializers.flight_bookings_serializer
+
+    def get_queryset(self):
+        queryset = Flight_bookings.objects.all()
+        #queryset = Flights.objects.raw("select * from backend_flights,backend_settings")
+        id = self.request.query_params.get('id')
+        if id is not None:
+            queryset = queryset.filter(id=id)
+        search = self.request.query_params.get('search')
+        if search is not None:
+            queryset = queryset.filter(Q(depart_date__contains=search) | Q(type__contains=search) | Q(seats__contains=search) | Q(
+                flight_code__contains=search) | Q(notes__contains=search))
+        return queryset
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+#####################################################################################
