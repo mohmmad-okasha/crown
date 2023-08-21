@@ -50,6 +50,7 @@ urlpatterns += [
     path("get_all_roles/", api.get_all_roles, name="get_all_roles"),
 
     path("get_hotels/", api.get_hotels, name="get_hotels"),
+
     path("get_users/", api.get_users, name="get_users"),
 
     path("get_room_info/", api.get_room_info, name="get_room_info"),
@@ -79,6 +80,8 @@ urlpatterns += [
     path("remove_backup_file/", api.remove_backup_file, name="remove_backup_file"),
 
     path("restore_backup/", api.restore_backup, name="restore_backup"),
+
+    path("get_flight/", api.get_flight, name="get_flight"),
 
     #path('save_all_rooms/', api.save_all_rooms.as_view()),
 

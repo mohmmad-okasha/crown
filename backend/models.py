@@ -75,9 +75,11 @@ class Room_dates(models.Model):
 #####################################################################################
 
 class Flight_bookings(models.Model):
-    depart_date = models.DateTimeField(max_length=50)
     type = models.CharField(max_length=50) # one way / two way
-    seats=models.IntegerField()
+    depart_date = models.DateTimeField(max_length=50)
+    return_date = models.DateTimeField(max_length=50,null=True)
+    persons=models.IntegerField(default=1)
+    infants=models.IntegerField(default=0)#kids
     flight_code = models.CharField(max_length=50)
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)
@@ -96,8 +98,8 @@ class Flights(models.Model):
     airline = models.CharField(max_length=50)
     from_airport = models.CharField(max_length=50)
     to_airport = models.CharField(max_length=50)
-    departure_date = models.DateTimeField(max_length=50)
-    arrival_date=models.DateTimeField(max_length=50)
+    departure_date = models.DateField(max_length=50)
+    arrival_date=models.DateField(max_length=50)
     seats=models.IntegerField()
     status=models.CharField(max_length=100)
     notes=models.CharField(max_length=100,blank=True)
@@ -124,8 +126,9 @@ class Airlines(models.Model):
         return self.name_en #to change object name in admin table
 
     class Meta:
-        ordering= ['id'] #to Sort the values#####################################################################################
+        ordering= ['id'] #to Sort the values
 
+#####################################################################################
 class Airports(models.Model):
     name_en = models.CharField(max_length=200,null=True)
     name_ar = models.CharField(max_length=200,null=True)

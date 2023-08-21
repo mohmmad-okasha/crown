@@ -123,8 +123,8 @@
             <div class="modal-dialog ">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 v-if="!this.edit_mode" class="modal-title" id="modal_label">{{ $t("Add booking") }}</h5>
-                        <h5 v-if="this.edit_mode" class="modal-title" id="modal_label">{{ $t("Edit booking") }}</h5>
+                        <h5 v-if="!this.edit_mode" class="modal-title" id="modal_label">{{ $t("Add Flight Booking") }}</h5>
+                        <h5 v-if="this.edit_mode" class="modal-title" id="modal_label">{{ $t("Edit Flight Booking") }}</h5>
                         <button type="button" class="close on-hover" @click="this.closeModal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -133,15 +133,7 @@
 
                         <form>
 
-                            <div class="form-group">
-                                <label for="depart_date">{{ $t("Depart Date") }}</label>
-                                <input id="depart_date" v-model="this_row.depart_date" type="datetime-local"
-                                    :class="{ 'is-invalid': !this.this_row.depart_date && this.validate, 'is-valid': this.this_row.depart_date && this.validate }"
-                                    class="form-control">
-                                <div v-if="!this.this_row.depart_date && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select The Depart Date") }}
-                                </div>
-                            </div>
+
 
                             <div class="row g-3 form-group">
 
@@ -175,13 +167,58 @@
                                     </div>
                                 </div>
 
-                            </div>
+                                <div class="form-group"
+                                    :class="{ 'col-sm-6': this_row.type == '2 way', 'col-sm-12': this_row.type != '2 way' }">
+                                    <label for="depart_date">{{ $t("Depart Date") }}</label>
+                                    <input id="depart_date" v-model="this_row.depart_date" type="date"
+                                        @change="get_flight(this_row.depart_date, this_row.from_city, this_row.to_city)"
+                                        :class="{ 'is-invalid': !this.this_row.depart_date && this.validate, 'is-valid': this.this_row.depart_date && this.validate }"
+                                        class="form-control">
+                                    <div v-if="!this.this_row.depart_date && this.validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select The Depart Date") }}
+                                    </div>
+                                </div>
 
+                                <div v-show="this_row.type == '2 way'" class="form-group col-sm-6">
+                                    <label for="return_date">{{ $t("Return Date") }}</label>
+                                    <input id="return_date" v-model="this_row.return_date" type="date"
+                                        :class="{ 'is-invalid': !this.this_row.return_date && this.validate, 'is-valid': this.this_row.return_date && this.validate }"
+                                        class="form-control">
+                                    <div v-if="!this.this_row.return_date && this.validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select The Depart Date") }}
+                                    </div>
+                                </div>
+
+                            </div>
 
                             <div class="row g-3 form-group">
 
-                                <div class="form-group col-sm-4">
-                                    <label for="flight_code">{{ $t("Flight") }}</label>
+                                <div class="form-group col-sm-6">
+                                    <label for="persons"> {{ $t("Persons") }}</label>
+                                    <input id="persons" v-model="this_row.persons"
+                                        :class="{ 'is-invalid': !this.this_row.persons && this.validate, 'is-valid': this.this_row.persons && this.validate }"
+                                        type="number" class="form-control">
+                                    <div v-if="!this.this_row.persons && this.validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Enter The Number Of Persons") }}
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-6">
+                                    <label for="infants"> {{ $t("Infants") }}</label>
+                                    <input id="infants" v-model="this_row.infants"
+                                        :class="{ 'is-invalid': !this.this_row.infants && this.validate, 'is-valid': this.this_row.infants && this.validate }"
+                                        type="number" class="form-control">
+                                    <div v-if="!this.this_row.infants && this.validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Enter The Number Of infants") }}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row g-3 form-group">
+
+                                <div class="form-group col-sm-6">
+                                    <label for="flight_code">{{ $t("Go Flight") }}</label>
                                     <v-select id="flight_code" v-model="this_row.flight_code" :options="flights"
                                         :class="{ 'is-invalid': !this_row.flight_code && validate, 'is-valid': this_row.flight_code && validate }" />
 
@@ -190,9 +227,20 @@
                                     </div>
                                 </div>
 
-                                <div class="form-group col-sm-4">
+                                <div class="form-group col-sm-6">
+                                    <label for="flight_code">{{ $t("Back Flight") }}</label>
+                                    <v-select id="flight_code" v-model="this_row.flight_code" :options="flights"
+                                        :class="{ 'is-invalid': !this_row.flight_code && validate, 'is-valid': this_row.flight_code && validate }" />
+
+                                    <div v-if="!this_row.flight_code && validate" class="invalid-feedback hidden">
+                                        {{ $t("Please Select flight") }}
+                                    </div>
+                                </div>
+
+                                <!-- <div class="form-group col-sm-4">
                                     <label for="from_airport">{{ $t("From Airport") }}</label>
-                                    <input id="from_airport" v-model="this_row.from_airport" :options="airports" class="form-control" readonly
+                                    <input id="from_airport" v-model="this_row.from_airport" :options="airports"
+                                        class="form-control" readonly
                                         :class="{ 'is-invalid': !this_row.from_airport && validate, 'is-valid': this_row.from_airport && validate }" />
 
                                     <div v-if="!this_row.from_airport && validate" class="invalid-feedback hidden">
@@ -202,43 +250,19 @@
 
                                 <div class="form-group col-sm-4">
                                     <label for="to_airport">{{ $t("To Airport") }}</label>
-                                    <input id="to_airport" v-model="this_row.to_airport" :options="airports" class="form-control" readonly
+                                    <input id="to_airport" v-model="this_row.to_airport" :options="airports"
+                                        class="form-control" readonly
                                         :class="{ 'is-invalid': !this_row.to_airport && validate, 'is-valid': this_row.to_airport && validate }" />
 
                                     <div v-if="!this_row.to_airport && validate" class="invalid-feedback hidden">
                                         {{ $t("Please Select To Airport") }}
                                     </div>
-                                </div>
+                                </div> -->
 
                             </div>
 
-                            <label v-show="this.this_row.flight_code" for="dates">{{ $t("Select Date") }}</label>
-                            <div v-show="this.this_row.flight_code" class="form-group card" id="dates" style="width: 100%;">
-                                <div class="card-body">
-                                    <date-picker v-model="this_row.dates" :min="min_date" :max="max_date"
-                                        :disable="disable_dates" :range="is_range" clearable locale="en" inline
-                                        :auto-submit="false" custom-input="none" color="#098290" input-format="DD/MM/YYYY"
-                                        format="DD/MM/YYYY" />
-                                </div>
-
-                                <input readonly id="dates" v-model="this_row.dates" type="text"
-                                    :class="{ 'is-invalid': !this.this_row.dates && this.validate, 'is-valid': this.this_row.dates && this.validate }"
-                                    class="form-control">
-                                <div v-if="!this.this_row.dates && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Select The Date") }}
-                                </div>
-                            </div>
 
 
-                            <div class="form-group ">
-                                <label for="seats"> {{ $t("Seats") }}</label>
-                                <input id="seats" v-model="this_row.seats"
-                                    :class="{ 'is-invalid': !this.this_row.seats && this.validate, 'is-valid': this.this_row.seats && this.validate }"
-                                    type="number" class="form-control">
-                                <div v-if="!this.this_row.seats && this.validate" class="invalid-feedback hidden">
-                                    {{ $t("Please Enter The seats") }}
-                                </div>
-                            </div>
 
                             <div class="form-group ">
                                 <label for="cutomer_notes"> {{ $t("Notes") }}</label>
@@ -326,25 +350,18 @@ export default {
             add_mode: false,//add form open
             flight_booking_rows: [],//all rows
             flights: ['test'],//used in new & update form
-            range: '',
-            booked_dates: [],
-            all_booked_dates: [],//all dates in booked_dates ranges for selected room
-            all_flights_booked_dates: [],//all dates in booked_dates ranges for all room
-            all_flights_dates: [],//all dates for all room
-            min_date: '',
-            max_date: '',
-            disable_dates: [],
-            room_id_id: '',
             //////
             this_row: {
-                depart_date: "",
                 type: "",
-                seats: "",
+                depart_date: "",
+                return_date: "",
+                persons: "",
+                infants: "",
                 flight_code: "",
                 notes: "",
                 user: "",
             },
-            types: ['One way', 'Two way', 'Multi'],
+            types: ['1 way', '2 way'],
             citys: ['amm', '..', '..'],
             //////
 
@@ -497,13 +514,15 @@ export default {
                 }).then((response) => (this.rooms = response.data));
         },
 
-        get_room_info(value) {
+        get_flight(date, from_city, to_city) {
+            this.flights = []; this.this_row.flight_code = '';
             return axios({
                 method: "get",
-                url: domain_url + "/backend/get_room_info/", params: { room_id: value, hotel: this.this_row.hotel },
-                //auth: { username: "admin", password: "123", },
-            }).then((response) => (this.this_row.room_type = response.data.type, this.room_id_id = response.data.id, this.range = response.data.range));
+                url: domain_url + "/backend/get_flight/", params: { date: date, from_city: from_city, to_city: to_city },
+            }).then((response) => (this.flights = response.data[0].code));
         },
+
+
 
         async get_booked_dates() {
             if (this.this_row.room_id && this.this_row.hotel) {

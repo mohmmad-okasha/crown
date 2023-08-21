@@ -166,8 +166,30 @@ def remove_backup_file(request):
         return Response({'data':f"Successfully removed backup file: {file_name}"})
     else:
         return Response({'data':f"Backup file not found: {file_name}"})
+
+
+   
     
 #####################################################################################
+
+# to get flights by date + path
+
+@api_view(['GET'])
+def get_flight(request):
+    date = request.query_params['date']
+    from_city = request.query_params['from_city']
+    to_city = request.query_params['to_city']
+    from_airports_list=Airports.objects.filter(city=from_city).values_list('code', flat=True)
+    to_airports_list=Airports.objects.filter(city=to_city).values_list('code', flat=True)
+
+    flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date).values('code')
+    return Response(flights)
+
+    #hotel_id= Hotels.objects.filter(name=hotel).first().id
+    #unique_rooms = set(room['room_id'] for room in rooms)
+
+#####################################################################################
+
 
 # to delete rooms by hotel id
 
