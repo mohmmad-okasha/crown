@@ -54,6 +54,8 @@
           <div class="bg-white py-2 collapse-inner rounded">
             <router-link v-if="this.$parent.user_roles['flights']" tag="a" class="collapse-item" to="/flights"> {{
               $t("Flights") }} </router-link>
+            <router-link v-if="this.$parent.user_roles['flight_bookings']" tag="a" class="collapse-item" to="/flight_bookings"> {{
+              $t("Flight Bookings") }} </router-link>
           </div>
         </div>
       </li>

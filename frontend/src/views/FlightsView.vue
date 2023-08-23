@@ -77,8 +77,8 @@
                                     <td>{{ $t(flight.airline) }}</td>
                                     <td>{{ $t(flight.from_airport) }}</td>
                                     <td>{{ $t(flight.to_airport) }}</td>
-                                    <td>{{ formatDate(flight.departure_date) }}</td>
-                                    <td>{{ formatDate(flight.arrival_date) }}</td>
+                                    <td>{{ (flight.departure_date) }}</td>
+                                    <td>{{ (flight.arrival_date) }}</td>
                                     <td>{{ $t(flight.seats) }}</td>
                                     <td>
                                         <img v-if="flight.status == 'enable'" width="30px" height="30px"
@@ -432,7 +432,7 @@
                             <div class="form-group mb-2">
                                 <label for="departure_date">{{ $t("Departure date") }}</label>
                                 <!-- datetime-local -->
-                                <input id="departure_date" v-model="flight.departure_date" type="datetime-local"
+                                <input id="departure_date" v-model="flight.departure_date" type="date"
                                     :class="{ 'is-invalid': !this.flight.departure_date && this.validate, 'is-valid': this.flight.departure_date && this.validate }"
                                     class="form-control">
 
@@ -445,7 +445,7 @@
                                 <label for="arrival_date"> {{ $t("Arrival date") }}</label>
                                 <input id="arrival_date" v-model="flight.arrival_date"
                                     :class="{ 'is-invalid': !this.flight.arrival_date && this.validate, 'is-valid': this.flight.arrival_date && this.validate }"
-                                    type="datetime-local" class="form-control">
+                                    type="date" class="form-control">
                                 <div v-if="!this.flight.arrival_date && this.validate" class="invalid-feedback hidden">
                                     {{ $t("Please Enter The arrival date") }}
                                 </div>

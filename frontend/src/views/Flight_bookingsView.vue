@@ -5,7 +5,7 @@
         <!-- context-menu -->
         <div id="context-menu" class="context-menu" :style="menuStyle">
             <ul>
-                <li class="dropdown-item" @click="delete_booking(this_row.id)">
+                <li class="dropdown-item" @click="delete_flight_booking(this_row.id)">
                     <i class="fa fa-trash"></i>
                     {{ $t("Delete") }}
                 </li>
@@ -59,9 +59,12 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">{{ $t("Depart Date") }}</th>
+                                        <th scope="col">{{ $t("Return Date") }}</th>
                                         <th scope="col">{{ $t("Type") }}</th>
-                                        <th scope="col">{{ $t("Seats") }}</th>
-                                        <th scope="col">{{ $t("Flight Code") }}</th>
+                                        <th scope="col">{{ $t("Persons") }}</th>
+                                        <th scope="col">{{ $t("Infants") }}</th>
+                                        <th scope="col">{{ $t("Go Flight Code") }}</th>
+                                        <th scope="col">{{ $t("Back Flight Code") }}</th>
                                         <th scope="col">{{ $t("Notes") }}</th>
                                         <th scope="col">{{ $t("User") }}</th>
                                         <th scope="col" class="no_print">{{ $t("Actions") }}</th>
@@ -74,9 +77,12 @@
                                         role="button" :class="{ 'selected': flight_booking.id === active_index }">
                                         <th scope="row" id="id">{{ flight_booking.id }}</th>
                                         <td>{{ formatDate(flight_booking.depart_date) }}</td>
+                                        <td>{{ formatDate(flight_booking.return_date) }}</td>
                                         <td>{{ $t(flight_booking.type) }}</td>
-                                        <td>{{ $t(flight_booking.seats) }}</td>
-                                        <td>{{ $t(flight_booking.flight_code) }}</td>
+                                        <td>{{ $t(flight_booking.persons) }}</td>
+                                        <td>{{ $t(flight_booking.infants) }}</td>
+                                        <td>{{ $t(flight_booking.go_flight_code) }}</td>
+                                        <td>{{ $t(flight_booking.back_flight_code) }}</td>
                                         <td>{{ $t(flight_booking.notes) }}</td>
                                         <td>{{ $t(flight_booking.user) }}</td>
 
@@ -90,7 +96,7 @@
                                                 <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1"
                                                     x-placement="bottom-start"
                                                     style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 37px, 0px);">
-                                                    <a class="dropdown-item" @click="delete_booking(flight_booking.id)">
+                                                    <a class="dropdown-item" @click="delete_flight_booking(flight_booking.id)">
                                                         <i class="fa fa-trash"></i>
                                                         {{ $t("Delete") }}
                                                     </a>
@@ -150,6 +156,7 @@
                                 <div class="form-group col-sm-4">
                                     <label for="from_city">{{ $t("From City") }}</label>
                                     <v-select id="from_city" v-model="this_row.from_city" :options="citys"
+                                        @change="get_go_flight(); get_back_flight()"
                                         :class="{ 'is-invalid': !this_row.from_city && validate, 'is-valid': this_row.from_city && validate }" />
 
                                     <div v-if="!this_row.from_city && validate" class="invalid-feedback hidden">
@@ -160,6 +167,7 @@
                                 <div class="form-group col-sm-4">
                                     <label for="to_city">{{ $t("To City") }}</label>
                                     <v-select id="to_city" v-model="this_row.to_city" :options="citys"
+                                        @change="get_go_flight(); get_back_flight()"
                                         :class="{ 'is-invalid': !this_row.to_city && validate, 'is-valid': this_row.to_city && validate }" />
 
                                     <div v-if="!this_row.to_city && validate" class="invalid-feedback hidden">
@@ -171,7 +179,7 @@
                                     :class="{ 'col-sm-6': this_row.type == '2 way', 'col-sm-12': this_row.type != '2 way' }">
                                     <label for="depart_date">{{ $t("Depart Date") }}</label>
                                     <input id="depart_date" v-model="this_row.depart_date" type="date"
-                                        @change="get_flight(this_row.depart_date, this_row.from_city, this_row.to_city)"
+                                        @change="get_go_flight()"
                                         :class="{ 'is-invalid': !this.this_row.depart_date && this.validate, 'is-valid': this.this_row.depart_date && this.validate }"
                                         class="form-control">
                                     <div v-if="!this.this_row.depart_date && this.validate" class="invalid-feedback hidden">
@@ -182,6 +190,7 @@
                                 <div v-show="this_row.type == '2 way'" class="form-group col-sm-6">
                                     <label for="return_date">{{ $t("Return Date") }}</label>
                                     <input id="return_date" v-model="this_row.return_date" type="date"
+                                        @change="get_back_flight()"
                                         :class="{ 'is-invalid': !this.this_row.return_date && this.validate, 'is-valid': this.this_row.return_date && this.validate }"
                                         class="form-control">
                                     <div v-if="!this.this_row.return_date && this.validate" class="invalid-feedback hidden">
@@ -196,6 +205,7 @@
                                 <div class="form-group col-sm-6">
                                     <label for="persons"> {{ $t("Persons") }}</label>
                                     <input id="persons" v-model="this_row.persons"
+                                        @change="get_go_flight(); get_back_flight()"
                                         :class="{ 'is-invalid': !this.this_row.persons && this.validate, 'is-valid': this.this_row.persons && this.validate }"
                                         type="number" class="form-control">
                                     <div v-if="!this.this_row.persons && this.validate" class="invalid-feedback hidden">
@@ -217,22 +227,23 @@
 
                             <div class="row g-3 form-group">
 
-                                <div class="form-group col-sm-6">
-                                    <label for="flight_code">{{ $t("Go Flight") }}</label>
-                                    <v-select id="flight_code" v-model="this_row.flight_code" :options="flights"
-                                        :class="{ 'is-invalid': !this_row.flight_code && validate, 'is-valid': this_row.flight_code && validate }" />
-
-                                    <div v-if="!this_row.flight_code && validate" class="invalid-feedback hidden">
+                                <div class="form-group"
+                                :class="{ 'col-sm-6': this_row.type == '2 way', 'col-sm-12': this_row.type != '2 way' }"
+                                >
+                                    <label for="go_flight_code">{{ $t("Go Flight") }}</label>
+                                    <v-select id="go_flight_code" v-model="this_row.go_flight_code" :options="go_flights"
+                                        :class="{ 'is-invalid': !this_row.go_flight_code && validate, 'is-valid': this_row.go_flight_code && validate }" />
+                                    <div v-if="!this_row.go_flight_code && validate" class="invalid-feedback hidden">
                                         {{ $t("Please Select flight") }}
                                     </div>
                                 </div>
 
-                                <div class="form-group col-sm-6">
-                                    <label for="flight_code">{{ $t("Back Flight") }}</label>
-                                    <v-select id="flight_code" v-model="this_row.flight_code" :options="flights"
-                                        :class="{ 'is-invalid': !this_row.flight_code && validate, 'is-valid': this_row.flight_code && validate }" />
-
-                                    <div v-if="!this_row.flight_code && validate" class="invalid-feedback hidden">
+                                <div v-show="this_row.type == '2 way'" class="form-group col-sm-6">
+                                    <label for="back_flight_code">{{ $t("Back Flight") }}</label>
+                                    <v-select id="back_flight_code" v-model="this_row.back_flight_code"
+                                        :options="back_flights"
+                                        :class="{ 'is-invalid': !this_row.back_flight_code && validate, 'is-valid': this_row.back_flight_code && validate }" />
+                                    <div v-if="!this_row.back_flight_code && validate" class="invalid-feedback hidden">
                                         {{ $t("Please Select flight") }}
                                     </div>
                                 </div>
@@ -286,14 +297,14 @@
                             <i class="fa fa-xmark"></i>
                         </button>
 
-                        <button v-if="!edit_mode" type="button" title="save" @click="save_booking()"
+                        <button v-if="!edit_mode" type="button" title="save" @click="save_flight_booking()"
                             class="btn btn-primary on-hover-sm">
                             <i class="fa fa-floppy-disk"></i></button>
 
-                        <button v-if="edit_mode" type="button" title="delete" @click="delete_booking(active_index)"
+                        <button v-if="edit_mode" type="button" title="delete" @click="delete_flight_booking(active_index)"
                             class="btn btn-danger on-hover-sm"> <i class="fa fa-trash"></i> </button>
 
-                        <button v-if="edit_mode" type="button" title="save" @click="update_booking(active_index)"
+                        <button v-if="edit_mode" type="button" title="save" @click="update_flight_booking(active_index)"
                             class="btn btn-primary on-hover-sm"> <i class="fa fa-floppy-disk"></i> </button>
 
                     </div>
@@ -349,7 +360,8 @@ export default {
             edit_mode: false,//edit form open
             add_mode: false,//add form open
             flight_booking_rows: [],//all rows
-            flights: ['test'],//used in new & update form
+            go_flights: [],
+            back_flights: [],
             //////
             this_row: {
                 type: "",
@@ -357,7 +369,8 @@ export default {
                 return_date: "",
                 persons: "",
                 infants: "",
-                flight_code: "",
+                go_flight_code: "",
+                back_flight_code: "",
                 notes: "",
                 user: "",
             },
@@ -395,12 +408,9 @@ export default {
         //     }
         // },
 
-        range: async function (newValue) {
-            const dateValues = newValue.split(",");
-            this.min_date = dateValues[0];
-            this.max_date = dateValues[1];
-            this.get_booked_dates()
-        }
+        // 'this_row.depart_date': function (newValue) {
+        //     this.this_row.depart_date=this.formatDate(newValue)
+        // }
     },
 
     ////////////////////
@@ -417,14 +427,12 @@ export default {
         }
 
         await this.get_flight_booking_rows();
-        await this.get_hotels();
 
         //to remove modal background on auto vue js reload
         const elements = document.getElementsByClassName("modal-backdrop fade show");
         while (elements.length > 0) {
             elements[0].parentNode.removeChild(elements[0]);
         }////
-
 
         this.isLoading = false;
     },
@@ -458,7 +466,7 @@ export default {
             const hours = String(formattedDate.getHours()).padStart(2, '0');
             const minutes = String(formattedDate.getMinutes()).padStart(2, '0');
 
-            return `${day}/${month}/${year} ${hours}:${minutes}`;
+            return `${year}-${month}-${day}`;
         },
 
         async get_roles() {
@@ -476,7 +484,7 @@ export default {
                 .catch(err => { alert(err) });
         },
 
-        async get_booking(id) {
+        async get_flight_book(id) {
             try {
                 const response = await axios.get(`${domain_url}/backend/flight_bookings/?id=${id}`);
                 this.this_row = response.data[0];
@@ -486,73 +494,30 @@ export default {
             }
         },
 
-        get_hotels() {
-            return my_api.get('/backend/get_hotels/')
-                .then((response) => (this.hotels = response.data))
-                .catch(err => { alert(err) });
-        },
-
-        get_open_rooms() {
-            return axios({
-                method: "get",
-                url: domain_url + "/backend/get_open_rooms/",
-                //auth: { username: "admin", password: "123", },
-            }).then((response) => (this.all_rooms_dates = response.data));
-        },
 
         // end page load *******************************
 
 
         // insert form *******************************
 
-        get_rooms() {
-            if (this.this_row.hotel)
+        get_go_flight() {
+            this.go_flights = []; this.this_row.go_flight_code = '';
+            
                 return axios({
                     method: "get",
-                    url: domain_url + "/backend/get_rooms/", params: { hotel: this.this_row.hotel },
-                    //auth: { username: "admin", password: "123", },
-                }).then((response) => (this.rooms = response.data));
+                    url: domain_url + "/backend/get_flight/", params: { date: this.this_row.depart_date, from_city: this.this_row.from_city, to_city: this.this_row.to_city, persons: this.this_row.persons },
+                }).then((response) => (this.go_flights = response.data.response_data.map(item => item.code)));
+            
         },
 
-        get_flight(date, from_city, to_city) {
-            this.flights = []; this.this_row.flight_code = '';
-            return axios({
-                method: "get",
-                url: domain_url + "/backend/get_flight/", params: { date: date, from_city: from_city, to_city: to_city },
-            }).then((response) => (this.flights = response.data[0].code));
-        },
-
-
-
-        async get_booked_dates() {
-            if (this.this_row.room_id && this.this_row.hotel) {
-                this.booked_dates = [];
-                await axios({
-                    method: "get", url: domain_url + "/backend/get_booked_dates/", params: { room_id: this.this_row.room_id, hotel: this.this_row.hotel },
-                }).then((response) => (this.booked_dates = response.data[0].split(', ')));
-
-                this.all_booked_dates = [];
-                this.disable_dates = [];
-
-                //get all dates in the range
-                this.booked_dates.forEach((element) => {
-                    const minDateParts = element.split(',')[0].split('/');
-                    const maxDateParts = element.split(',')[1].split('/');
-
-                    const startDate = new Date(minDateParts[2], minDateParts[1] - 1, minDateParts[0]);
-                    const endDate = new Date(maxDateParts[2], maxDateParts[1] - 1, maxDateParts[0]);
-                    const currentDate = new Date(startDate);
-
-                    currentDate.setDate(currentDate.getDate() + 1);//to skip in_date from booking dates list
-
-                    while (currentDate < endDate) {
-                        this.all_booked_dates.push(currentDate.toLocaleDateString("en-GB"));
-                        currentDate.setDate(currentDate.getDate() + 1);
-                    }
-                });
-                //copy all dates from all_booked_dates to disable_dates
-                this.all_booked_dates.forEach(element => this.disable_dates.push(element));
-            }
+        get_back_flight() {
+            this.back_flights = []; this.this_row.back_flight_code = '';
+            
+                return axios({
+                    method: "get",
+                    url: domain_url + "/backend/get_flight/", params: { date: this.this_row.return_date, from_city: this.this_row.to_city, to_city: this.this_row.from_city, persons: this.this_row.persons },
+                }).then((response) => (this.back_flights = response.data[0].code));
+            
         },
 
         PrintDiv(id) {
@@ -615,18 +580,14 @@ export default {
         },
 
         clear_form() {
-            this.this_row.persons_names = [];
-            this.this_row.kids_names = [];
-            this.this_row.persons_number = 1;
-            this.this_row.kids_number = '';
-            this.this_row.hotel = '';
-            this.this_row.dates = '';
-            this.this_row.room_id = '';
-            this.this_row.room_type = '';
-            this.this_row.status = '';
+            this.this_row.type = "1 Way";
+            this.this_row.depart_date = '';
+            this.this_row.return_date = '';
+            this.this_row.persons = 1;
+            this.this_row.infants = 0;
+            this.this_row.go_flight_code = '';
+            this.this_row.back_flight_code = '';
             this.this_row.notes = '';
-            this.enable_dates = [];
-            this.disable_dates = [];
             this.validate = false;
         },
 
@@ -638,24 +599,16 @@ export default {
 
         // end for modals ***************************
 
-        async save_booking() {
+        async save_flight_booking() {
             this.isLoading = true;
             try {
                 if (this.check_form()) {
                     if (this.print) {
                         this.PrintDiv('flight_booking_data');
                     }
-                    // save out date
-                    if (this.this_row.dates.length > 1) {
-                        this.this_row.out_date = this.this_row.dates[1];
-                    } else {
-                        this.this_row.dates.push(this.this_row.dates[0]);
-                    }
-                    this.this_row.dates = this.this_row.dates.toString();
-                    if (!this.this_row.kids_number) { this.this_row.kids_number = 0; }
-                    this.this_row.persons_names = this.this_row.persons_names.join(',');
-                    this.this_row.kids_names = this.this_row.kids_names.join(',');
-                    this.this_row.kids_ages = this.this_row.kids_ages.join(',');
+
+                    if (!this.this_row.infants) { this.this_row.infants = 0; }
+                    this.this_row.depart_date=this.formatDate(this.this_row.depart_date)
                     var response = await fetch(domain_url + "/backend/flight_bookings/", {
                         method: "post",
                         headers: { "Content-Type": "application/json", },
@@ -667,10 +620,7 @@ export default {
                     await this.get_max_id();
 
                     //save log
-                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add booking :' + this.max_id, time: new Date() })
-
-
-                    window.location.reload();
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'add flight booking :' + this.max_id, time: new Date() })
 
                     this.get_flight_booking_rows();
 
@@ -680,8 +630,8 @@ export default {
             this.isLoading = false;
         },
 
-        async delete_booking(id) {
-            if (this.user_roles.hotels) {
+        async delete_flight_booking(id) {
+            
                 this.isLoading = true;
                 try {
                     const willDelete = await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, });
@@ -691,7 +641,7 @@ export default {
                         swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
 
                         //save log
-                        axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete booking :' + id, time: new Date() })
+                        axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete flight booking :' + id, time: new Date() })
 
 
                         this.get_flight_booking_rows();
@@ -701,27 +651,17 @@ export default {
                     console.error("Error deleting booking:", error);
                 }
                 this.isLoading = false;
-            }
+            
         },
 
-        async update_booking(id) {
+        async update_flight_booking(id) {
             this.isLoading = true;
             try {
                 if (this.check_form()) {
                     if (this.print) {
                         await this.PrintDiv('flight_booking_data');
                     }
-                    // save out date
-                    if (this.this_row.dates.length > 1) {
-                        this.this_row.out_date = this.this_row.dates[1];
-                    } else {
-                        this.this_row.dates.push(this.this_row.dates[0]);
-                    }
-                    // convert the dates array to string to save it in db
-                    this.this_row.dates = this.this_row.dates.toString();
-                    this.this_row.persons_names = this.this_row.persons_names.join(',');
-                    this.this_row.kids_names = this.this_row.kids_names.join(',');
-                    this.this_row.kids_ages = this.this_row.kids_ages.join(',');
+
                     var response = await fetch(domain_url + "/backend/flight_bookings/" + id + "/", {
                         method: "PUT",
                         headers: { "Content-Type": "application/json", },
@@ -730,7 +670,7 @@ export default {
                     );
                     swal(this.$t("Updated!"), { buttons: false, icon: "success", timer: 2000, });
                     //save log
-                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'update booking :' + id, time: new Date() })
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'update flight booking :' + id, time: new Date() })
 
                     //this.max_id = this.this_row.id
                     this.get_flight_booking_rows();
@@ -744,14 +684,7 @@ export default {
         },
 
         async row_click(index) {
-            await this.get_booking(index);//get this row data
-            this.this_row.dates = Array.from(this.this_row.dates.split(","));
-            this.this_row.persons_names = Array.from(this.this_row.persons_names.split(","));
-            this.this_row.kids_names = Array.from(this.this_row.kids_names.split(","));
-            this.this_row.kids_ages = Array.from(this.this_row.kids_ages.split(","));
-            this.get_room_info(this.this_row.room_id);
-            //await this.get_room_info(this.this_row.room_id);
-            //await this.findMinMaxDate();
+            await this.get_flight_book(index);//get this row data
             this.active_index = index; //to change row color
         },
 
@@ -759,15 +692,10 @@ export default {
             this.validate = true; //to change inputs color 'red/green'
 
             if (
-                this.this_row.book_date &&
-                this.this_row.persons_number &&
-                this.this_row.persons_names &&
-                //this.this_row.kids_number >0 &&
-                this.this_row.hotel &&
-                this.this_row.dates &&
-                this.this_row.room_id &&
-                this.this_row.room_type &&
-                this.this_row.status
+                this.this_row.type &&
+                this.this_row.depart_date &&
+                this.this_row.persons >0 &&
+                this.this_row.go_flight_code
             ) {
                 return true
             } else {
@@ -777,13 +705,12 @@ export default {
 
         async get_max_id() {
             try {
-                const response = await axios.get(`${domain_url}/backend/get_max_id/?table_name=Flight Bookings`);
+                const response = await axios.get(`${domain_url}/backend/get_max_id/?table_name=Flight_bookings`);
                 this.max_id = response.data.data.id__max;
             } catch (error) {
                 console.error("Error fetching max ID:", error);
             }
         },
-
 
         // context menu ***************************
 

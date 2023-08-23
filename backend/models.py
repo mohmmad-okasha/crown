@@ -76,11 +76,12 @@ class Room_dates(models.Model):
 
 class Flight_bookings(models.Model):
     type = models.CharField(max_length=50) # one way / two way
-    depart_date = models.DateTimeField(max_length=50)
-    return_date = models.DateTimeField(max_length=50,null=True)
+    depart_date = models.CharField(max_length=50,blank=True,null=True)
+    return_date = models.CharField(max_length=50,blank=True,null=True)
     persons=models.IntegerField(default=1)
     infants=models.IntegerField(default=0)#kids
-    flight_code = models.CharField(max_length=50)
+    go_flight_code = models.CharField(max_length=50)
+    back_flight_code = models.CharField(max_length=50,blank=True,null=True)
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)
     created_on = models.DateTimeField(auto_now_add=True,null=True)

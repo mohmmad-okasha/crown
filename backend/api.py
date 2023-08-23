@@ -167,29 +167,53 @@ def remove_backup_file(request):
     else:
         return Response({'data':f"Backup file not found: {file_name}"})
 
-
-   
     
 #####################################################################################
 
 # to get flights by date + path
+from django.db.models import F, Sum, Case, When, IntegerField
 
 @api_view(['GET'])
 def get_flight(request):
     date = request.query_params['date']
     from_city = request.query_params['from_city']
     to_city = request.query_params['to_city']
+    persons = int(request.query_params['persons'])
     from_airports_list=Airports.objects.filter(city=from_city).values_list('code', flat=True)
     to_airports_list=Airports.objects.filter(city=to_city).values_list('code', flat=True)
 
-    flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date).values('code')
-    return Response(flights)
+    flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date,seats__gte = persons).values('code').raw('''
+        SELECT 
+            bf.*,
+            bf.seats - COALESCE(
+                (SELECT SUM(bfb.persons)
+                FROM backend_flight_bookings bfb
+                WHERE bfb.go_flight_code = bf.code), 0) -
+            COALESCE(
+                (SELECT SUM(bfb.persons)
+                FROM backend_flight_bookings bfb
+                WHERE bfb.back_flight_code = bf.code), 0) AS available_seats
+        FROM
+            backend_flights bf;
+    ''')
 
-    #hotel_id= Hotels.objects.filter(name=hotel).first().id
-    #unique_rooms = set(room['room_id'] for room in rooms)
+    #flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date,seats__gte = persons).values('code')
+    #return Response(flights)
 
+    response_data = []
+
+    for flight in flights:
+        if(flight.available_seats >= persons):
+            flight_data = {
+                'code': flight.code,
+                'available_seats': flight.available_seats
+            }
+            response_data.append(flight_data)
+
+    return Response({'response_data':response_data})
+
+    # __gte >=
 #####################################################################################
-
 
 # to delete rooms by hotel id
 
@@ -210,6 +234,7 @@ def get_user_name_id(request):
     return Response({'data': user_name_id})
 
 #####################################################################################
+
 from django.db.models import Subquery, OuterRef
 
 @api_view(['GET'])
