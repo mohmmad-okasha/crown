@@ -83,6 +83,10 @@ urlpatterns += [
 
     path("get_flight/", api.get_flight, name="get_flight"),
 
+    path("get_citys/", api.get_citys, name="get_citys"),
+
+    path("update_seats/", api.update_seats, name="update_seats"),
+
     #path('save_all_rooms/', api.save_all_rooms.as_view()),
 
     path('send-message/', api.send_message, name='send_message'),

@@ -167,7 +167,23 @@ def remove_backup_file(request):
     else:
         return Response({'data':f"Backup file not found: {file_name}"})
 
+#####################################################################################
+
+# to update seats by booked flights
+
+@api_view(['POST'])
+def update_seats(request): # to update available seats by sum booked seats
     
+    all_flights= Flights.objects.values_list('code', flat=True)
+    data=[]
+    for code in all_flights:
+        booked_seats=Flight_bookings.objects.filter(Q(go_flight_code=code) | Q(back_flight_code=code)).aggregate(Sum('persons'))['persons__sum']
+        flight = Flights.objects.get(code=code)
+        if(booked_seats):
+            flight.available_seats = flight.seats - booked_seats
+            flight.save()
+
+    return Response({'data': data})
 #####################################################################################
 
 # to get flights by date + path
@@ -181,24 +197,38 @@ def get_flight(request):
     persons = int(request.query_params['persons'])
     from_airports_list=Airports.objects.filter(city=from_city).values_list('code', flat=True)
     to_airports_list=Airports.objects.filter(city=to_city).values_list('code', flat=True)
+    
+    flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date,available_seats__gte = persons).values('code')
+    return Response({'response_data':flights})
 
-    flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date,seats__gte = persons).values('code').raw('''
-        SELECT 
-            bf.*,
-            bf.seats - COALESCE(
-                (SELECT SUM(bfb.persons)
-                FROM backend_flight_bookings bfb
-                WHERE bfb.go_flight_code = bf.code), 0) -
-            COALESCE(
-                (SELECT SUM(bfb.persons)
-                FROM backend_flight_bookings bfb
-                WHERE bfb.back_flight_code = bf.code), 0) AS available_seats
-        FROM
-            backend_flights bf;
-    ''')
 
-    #flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date,seats__gte = persons).values('code')
-    #return Response(flights)
+    # flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date,seats__gte = persons).values('code').raw('''
+    #     SELECT 
+    #         bf.*,
+    #         bf.seats - COALESCE(
+    #             (SELECT SUM(bfb.persons)
+    #             FROM backend_flight_bookings bfb
+    #             WHERE bfb.go_flight_code = bf.code), 0) -
+    #         COALESCE(
+    #             (SELECT SUM(bfb.persons)
+    #             FROM backend_flight_bookings bfb
+    #             WHERE bfb.back_flight_code = bf.code), 0) AS available_seats
+    #     FROM
+    #         backend_flights bf;
+    # ''')
+
+
+    response_data = []
+
+    for flight in flights:
+        #if(Flight_bookings.objects.filter().sum('persons') >= persons):
+            flight_data = {
+                'code': flight.code,
+                'available_seats': flight.available_seats
+            }
+            response_data.append(flight_data)
+
+    return Response({'response_data':flights})
 
     response_data = []
 
@@ -213,6 +243,17 @@ def get_flight(request):
     return Response({'response_data':response_data})
 
     # __gte >=
+#####################################################################################
+
+# to get rooms by hotel
+
+@api_view(['GET'])
+def get_citys(request):
+    
+    citys = Airports.objects.values('city')
+    unique_citys = set(city['city'] for city in citys)
+    return Response(list(unique_citys))
+
 #####################################################################################
 
 # to delete rooms by hotel id
@@ -439,8 +480,7 @@ def get_close_rooms(request):
 
     return JsonResponse(response_data, safe=False)
 
-#######################################################################################################################################################################################################
-
+##################################################################################################################
 
 @api_view(['GET'])
 def get_no_show_rooms(request):

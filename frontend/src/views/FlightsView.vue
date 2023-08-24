@@ -588,6 +588,8 @@ export default {
             elements[0].parentNode.removeChild(elements[0]);
         }////
         await this.get_flights();
+        await this.update_seats();
+
         this.get_airlines();
         this.get_airports();
 
@@ -618,6 +620,11 @@ export default {
     },
 
     methods: {
+        async update_seats() {
+            return my_api.post('backend/update_seats/', { auth: { username: "admin", password: "123", } })
+                .catch(err => { });
+        },
+
         formatDate(date) {
             const formattedDate = new Date(date);
             const day = String(formattedDate.getDate()).padStart(2, '0');

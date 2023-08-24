@@ -102,6 +102,7 @@ class Flights(models.Model):
     departure_date = models.DateField(max_length=50)
     arrival_date=models.DateField(max_length=50)
     seats=models.IntegerField()
+    available_seats=models.IntegerField(default=0)
     status=models.CharField(max_length=100)
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)

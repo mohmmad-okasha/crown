@@ -96,7 +96,8 @@
                                                 <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1"
                                                     x-placement="bottom-start"
                                                     style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 37px, 0px);">
-                                                    <a class="dropdown-item" @click="delete_flight_booking(flight_booking.id)">
+                                                    <a class="dropdown-item"
+                                                        @click="delete_flight_booking(flight_booking.id)">
                                                         <i class="fa fa-trash"></i>
                                                         {{ $t("Delete") }}
                                                     </a>
@@ -138,8 +139,6 @@
                     <div class="modal-body">
 
                         <form>
-
-
 
                             <div class="row g-3 form-group">
 
@@ -225,54 +224,69 @@
 
                             </div>
 
-                            <div class="row g-3 form-group">
+                            <div class="card form-group">
+                                <div class="card-header"> {{ $t("Go Flight") }} </div>
+                                <div class="card-body">
+                                    <div class="row g-3 form-group">
 
-                                <div class="form-group"
-                                :class="{ 'col-sm-6': this_row.type == '2 way', 'col-sm-12': this_row.type != '2 way' }"
-                                >
-                                    <label for="go_flight_code">{{ $t("Go Flight") }}</label>
-                                    <v-select id="go_flight_code" v-model="this_row.go_flight_code" :options="go_flights"
-                                        :class="{ 'is-invalid': !this_row.go_flight_code && validate, 'is-valid': this_row.go_flight_code && validate }" />
-                                    <div v-if="!this_row.go_flight_code && validate" class="invalid-feedback hidden">
-                                        {{ $t("Please Select flight") }}
+                                        <div class="col">
+                                            <label for="go_flight_code">{{ $t("Flight") }}</label>
+                                            <v-select id="go_flight_code" v-model="this_row.go_flight_code"
+                                                :options="go_flights"
+                                                :class="{ 'is-invalid': !this_row.go_flight_code && validate, 'is-valid': this_row.go_flight_code && validate }" />
+                                            <div v-if="!this_row.go_flight_code && validate"
+                                                class="invalid-feedback hidden">
+                                                {{ $t("Please Select flight") }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <label for="from_airport">{{ $t("From Airport") }}</label>
+                                            <input id="from_airport" v-model="this_row.from_airport" :options="airports"
+                                                class="form-control" readonly />
+                                        </div>
+
+                                        <div class="col">
+                                            <label for="to_airport">{{ $t("To Airport") }}</label>
+                                            <input id="to_airport" v-model="this_row.to_airport" :options="airports"
+                                                class="form-control" readonly />
+                                        </div>
+
                                     </div>
                                 </div>
-
-                                <div v-show="this_row.type == '2 way'" class="form-group col-sm-6">
-                                    <label for="back_flight_code">{{ $t("Back Flight") }}</label>
-                                    <v-select id="back_flight_code" v-model="this_row.back_flight_code"
-                                        :options="back_flights"
-                                        :class="{ 'is-invalid': !this_row.back_flight_code && validate, 'is-valid': this_row.back_flight_code && validate }" />
-                                    <div v-if="!this_row.back_flight_code && validate" class="invalid-feedback hidden">
-                                        {{ $t("Please Select flight") }}
-                                    </div>
-                                </div>
-
-                                <!-- <div class="form-group col-sm-4">
-                                    <label for="from_airport">{{ $t("From Airport") }}</label>
-                                    <input id="from_airport" v-model="this_row.from_airport" :options="airports"
-                                        class="form-control" readonly
-                                        :class="{ 'is-invalid': !this_row.from_airport && validate, 'is-valid': this_row.from_airport && validate }" />
-
-                                    <div v-if="!this_row.from_airport && validate" class="invalid-feedback hidden">
-                                        {{ $t("Please Select From Airport") }}
-                                    </div>
-                                </div>
-
-                                <div class="form-group col-sm-4">
-                                    <label for="to_airport">{{ $t("To Airport") }}</label>
-                                    <input id="to_airport" v-model="this_row.to_airport" :options="airports"
-                                        class="form-control" readonly
-                                        :class="{ 'is-invalid': !this_row.to_airport && validate, 'is-valid': this_row.to_airport && validate }" />
-
-                                    <div v-if="!this_row.to_airport && validate" class="invalid-feedback hidden">
-                                        {{ $t("Please Select To Airport") }}
-                                    </div>
-                                </div> -->
-
                             </div>
 
+                            <div v-show="this_row.type == '2 way'" class="card form-group">
+                                <div class="card-header"> {{ $t("Back Flight") }} </div>
+                                <div class="card-body">
+                                    <div class="row g-3 form-group">
 
+                                        <div class="col">
+                                            <label for="back_flight_code">{{ $t("Flight") }}</label>
+                                            <v-select id="back_flight_code" v-model="this_row.back_flight_code"
+                                                :options="back_flights"
+                                                :class="{ 'is-invalid': !this_row.back_flight_code && validate, 'is-valid': this_row.back_flight_code && validate }" />
+                                            <div v-if="!this_row.back_flight_code && validate"
+                                                class="invalid-feedback hidden">
+                                                {{ $t("Please Select flight") }}
+                                            </div>
+                                        </div>
+
+                                        <div class="col">
+                                            <label for="from_airport">{{ $t("From Airport") }}</label>
+                                            <input id="from_airport" v-model="this_row.from_airport" :options="airports"
+                                                class="form-control" readonly />
+                                        </div>
+
+                                        <div class="col">
+                                            <label for="to_airport">{{ $t("To Airport") }}</label>
+                                            <input id="to_airport" v-model="this_row.to_airport" :options="airports"
+                                                class="form-control" readonly />
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
 
 
                             <div class="form-group ">
@@ -280,6 +294,7 @@
                                 <textarea class="form-control" v-model="this_row.notes" id="cutomer_notes"
                                     rows="1"></textarea>
                             </div>
+
                             <div class="form-check">
                                 <input v-model="print" class="form-check-input" type="checkbox" value=""
                                     id="flexCheckChecked" checked>
@@ -419,6 +434,8 @@ export default {
         this.isLoading = true;
         this.this_row.user = localStorage.getItem('user_name'); //to get logged in user name
 
+        await this.update_seats();
+
         //get roles
         await new Promise(resolve => setTimeout(resolve, 500)); // wait
         await this.get_roles();
@@ -427,6 +444,7 @@ export default {
         }
 
         await this.get_flight_booking_rows();
+        await this.get_citys();
 
         //to remove modal background on auto vue js reload
         const elements = document.getElementsByClassName("modal-backdrop fade show");
@@ -475,6 +493,11 @@ export default {
                 .catch(err => { });
         },
 
+        async update_seats() {
+            return my_api.post('backend/update_seats/', { auth: { username: "admin", password: "123", } })
+                .catch(err => { });
+        },
+
         // page load **********************************
 
         get_flight_booking_rows() {
@@ -502,22 +525,22 @@ export default {
 
         get_go_flight() {
             this.go_flights = []; this.this_row.go_flight_code = '';
-            
-                return axios({
-                    method: "get",
-                    url: domain_url + "/backend/get_flight/", params: { date: this.this_row.depart_date, from_city: this.this_row.from_city, to_city: this.this_row.to_city, persons: this.this_row.persons },
-                }).then((response) => (this.go_flights = response.data.response_data.map(item => item.code)));
-            
+
+            return axios({
+                method: "get",
+                url: domain_url + "/backend/get_flight/", params: { date: this.this_row.depart_date, from_city: this.this_row.from_city, to_city: this.this_row.to_city, persons: this.this_row.persons },
+            }).then((response) => (this.go_flights = response.data.response_data.map(item => item.code)));
+
         },
 
         get_back_flight() {
             this.back_flights = []; this.this_row.back_flight_code = '';
-            
-                return axios({
-                    method: "get",
-                    url: domain_url + "/backend/get_flight/", params: { date: this.this_row.return_date, from_city: this.this_row.to_city, to_city: this.this_row.from_city, persons: this.this_row.persons },
-                }).then((response) => (this.back_flights = response.data[0].code));
-            
+
+            return axios({
+                method: "get",
+                url: domain_url + "/backend/get_flight/", params: { date: this.this_row.return_date, from_city: this.this_row.to_city, to_city: this.this_row.from_city, persons: this.this_row.persons },
+            }).then((response) => (this.back_flights = response.data.response_data.map(item => item.code)));
+
         },
 
         PrintDiv(id) {
@@ -580,7 +603,7 @@ export default {
         },
 
         clear_form() {
-            this.this_row.type = "1 Way";
+            this.this_row.type = "1 way";
             this.this_row.depart_date = '';
             this.this_row.return_date = '';
             this.this_row.persons = 1;
@@ -591,7 +614,8 @@ export default {
             this.validate = false;
         },
 
-        closeModal() {
+        async closeModal() {
+            await this.update_seats();
             this.add_mode = false; this.edit_mode = false;
             $('#addModal').modal('hide');
             this.clear_form();
@@ -608,7 +632,7 @@ export default {
                     }
 
                     if (!this.this_row.infants) { this.this_row.infants = 0; }
-                    this.this_row.depart_date=this.formatDate(this.this_row.depart_date)
+                    this.this_row.depart_date = this.formatDate(this.this_row.depart_date)
                     var response = await fetch(domain_url + "/backend/flight_bookings/", {
                         method: "post",
                         headers: { "Content-Type": "application/json", },
@@ -631,27 +655,27 @@ export default {
         },
 
         async delete_flight_booking(id) {
-            
-                this.isLoading = true;
-                try {
-                    const willDelete = await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, });
 
-                    if (willDelete) {
-                        await my_api.delete(`/backend/flight_bookings/${id}/`);
-                        swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+            this.isLoading = true;
+            try {
+                const willDelete = await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, });
 
-                        //save log
-                        axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete flight booking :' + id, time: new Date() })
+                if (willDelete) {
+                    await my_api.delete(`/backend/flight_bookings/${id}/`);
+                    swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 2000, });
+
+                    //save log
+                    axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete flight booking :' + id, time: new Date() })
 
 
-                        this.get_flight_booking_rows();
-                        this.closeModal();
-                    }
-                } catch (error) {
-                    console.error("Error deleting booking:", error);
+                    this.get_flight_booking_rows();
+                    this.closeModal();
                 }
-                this.isLoading = false;
-            
+            } catch (error) {
+                console.error("Error deleting booking:", error);
+            }
+            this.isLoading = false;
+
         },
 
         async update_flight_booking(id) {
@@ -694,12 +718,21 @@ export default {
             if (
                 this.this_row.type &&
                 this.this_row.depart_date &&
-                this.this_row.persons >0 &&
+                this.this_row.persons > 0 &&
                 this.this_row.go_flight_code
             ) {
                 return true
             } else {
                 return false
+            }
+        },
+
+        async get_citys() {
+            try {
+                const response = await axios.get(`${domain_url}/backend/get_citys`);
+                this.citys = response.data;
+            } catch (error) {
+                console.error("Error :", error);
             }
         },
 
