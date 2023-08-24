@@ -243,6 +243,16 @@ def get_flight(request):
     return Response({'response_data':response_data})
 
     # __gte >=
+
+#####################################################################################
+
+@api_view(['GET'])
+def get_flight_data(request):
+    flight_code = request.query_params['flight_code']
+    flight_data= Flights.objects.filter(code=flight_code).values('from_airport','to_airport','available_seats')
+
+    return Response({'data': flight_data})
+
 #####################################################################################
 
 # to get rooms by hotel

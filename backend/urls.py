@@ -85,6 +85,8 @@ urlpatterns += [
 
     path("get_citys/", api.get_citys, name="get_citys"),
 
+    path("get_flight_data/", api.get_flight_data, name="get_flight_data"),
+
     path("update_seats/", api.update_seats, name="update_seats"),
 
     #path('save_all_rooms/', api.save_all_rooms.as_view()),

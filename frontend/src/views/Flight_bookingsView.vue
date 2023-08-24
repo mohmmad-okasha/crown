@@ -154,22 +154,20 @@
 
                                 <div class="form-group col-sm-4">
                                     <label for="from_city">{{ $t("From City") }}</label>
-                                    <v-select id="from_city" v-model="this_row.from_city" :options="citys"
-                                        @change="get_go_flight(); get_back_flight()"
-                                        :class="{ 'is-invalid': !this_row.from_city && validate, 'is-valid': this_row.from_city && validate }" />
+                                    <v-select id="from_city" v-model="from_city" :options="citys"
+                                        :class="{ 'is-invalid': !from_city && validate, 'is-valid': from_city && validate }" />
 
-                                    <div v-if="!this_row.from_city && validate" class="invalid-feedback hidden">
+                                    <div v-if="!from_city && validate" class="invalid-feedback hidden">
                                         {{ $t("Please Select From City") }}
                                     </div>
                                 </div>
 
                                 <div class="form-group col-sm-4">
                                     <label for="to_city">{{ $t("To City") }}</label>
-                                    <v-select id="to_city" v-model="this_row.to_city" :options="citys"
-                                        @change="get_go_flight(); get_back_flight()"
-                                        :class="{ 'is-invalid': !this_row.to_city && validate, 'is-valid': this_row.to_city && validate }" />
+                                    <v-select id="to_city" v-model="to_city" :options="citys"
+                                        :class="{ 'is-invalid': !to_city && validate, 'is-valid': to_city && validate }" />
 
-                                    <div v-if="!this_row.to_city && validate" class="invalid-feedback hidden">
+                                    <div v-if="!to_city && validate" class="invalid-feedback hidden">
                                         {{ $t("Please Select To City") }}
                                     </div>
                                 </div>
@@ -178,7 +176,6 @@
                                     :class="{ 'col-sm-6': this_row.type == '2 way', 'col-sm-12': this_row.type != '2 way' }">
                                     <label for="depart_date">{{ $t("Depart Date") }}</label>
                                     <input id="depart_date" v-model="this_row.depart_date" type="date"
-                                        @change="get_go_flight()"
                                         :class="{ 'is-invalid': !this.this_row.depart_date && this.validate, 'is-valid': this.this_row.depart_date && this.validate }"
                                         class="form-control">
                                     <div v-if="!this.this_row.depart_date && this.validate" class="invalid-feedback hidden">
@@ -189,7 +186,6 @@
                                 <div v-show="this_row.type == '2 way'" class="form-group col-sm-6">
                                     <label for="return_date">{{ $t("Return Date") }}</label>
                                     <input id="return_date" v-model="this_row.return_date" type="date"
-                                        @change="get_back_flight()"
                                         :class="{ 'is-invalid': !this.this_row.return_date && this.validate, 'is-valid': this.this_row.return_date && this.validate }"
                                         class="form-control">
                                     <div v-if="!this.this_row.return_date && this.validate" class="invalid-feedback hidden">
@@ -204,7 +200,6 @@
                                 <div class="form-group col-sm-6">
                                     <label for="persons"> {{ $t("Persons") }}</label>
                                     <input id="persons" v-model="this_row.persons"
-                                        @change="get_go_flight(); get_back_flight()"
                                         :class="{ 'is-invalid': !this.this_row.persons && this.validate, 'is-valid': this.this_row.persons && this.validate }"
                                         type="number" class="form-control">
                                     <div v-if="!this.this_row.persons && this.validate" class="invalid-feedback hidden">
@@ -224,13 +219,19 @@
 
                             </div>
 
+                            <div class="row g-3 form-group">
+                                <button type="button" @click="get_go_flight(); get_back_flight();"
+                                    class="btn btn-light btn-lg btn-block"><i class="fa-solid fa-magnifying-glass"></i>
+                                </button>
+                            </div>
+
                             <div class="card form-group">
                                 <div class="card-header"> {{ $t("Go Flight") }} </div>
                                 <div class="card-body">
                                     <div class="row g-3 form-group">
 
                                         <div class="col">
-                                            <label for="go_flight_code">{{ $t("Flight") }}</label>
+                                            <label for="go_flight_code">{{ $t("Flight") }} </label>
                                             <v-select id="go_flight_code" v-model="this_row.go_flight_code"
                                                 :options="go_flights"
                                                 :class="{ 'is-invalid': !this_row.go_flight_code && validate, 'is-valid': this_row.go_flight_code && validate }" />
@@ -242,17 +243,23 @@
 
                                         <div class="col">
                                             <label for="from_airport">{{ $t("From Airport") }}</label>
-                                            <input id="from_airport" v-model="this_row.from_airport" :options="airports"
+                                            <input id="from_airport" v-model="go_flight_data.from_airport"
                                                 class="form-control" readonly />
                                         </div>
 
                                         <div class="col">
                                             <label for="to_airport">{{ $t("To Airport") }}</label>
-                                            <input id="to_airport" v-model="this_row.to_airport" :options="airports"
-                                                class="form-control" readonly />
+                                            <input id="to_airport" v-model="go_flight_data.to_airport" class="form-control"
+                                                readonly />
                                         </div>
 
                                     </div>
+
+                                    <p v-show="go_flight_data.available_seats && this_row.go_flight_code">
+                                        Available Seats: <span class="badge badge-success">{{ go_flight_data.available_seats
+                                        }}</span>
+                                    </p>
+
                                 </div>
                             </div>
 
@@ -274,20 +281,24 @@
 
                                         <div class="col">
                                             <label for="from_airport">{{ $t("From Airport") }}</label>
-                                            <input id="from_airport" v-model="this_row.from_airport" :options="airports"
+                                            <input id="from_airport" v-model="back_flight_data.from_airport"
                                                 class="form-control" readonly />
                                         </div>
 
                                         <div class="col">
                                             <label for="to_airport">{{ $t("To Airport") }}</label>
-                                            <input id="to_airport" v-model="this_row.to_airport" :options="airports"
+                                            <input id="to_airport" v-model="back_flight_data.to_airport"
                                                 class="form-control" readonly />
                                         </div>
 
                                     </div>
+                                    <p v-show="back_flight_data.available_seats && this_row.back_flight_code">
+                                        Available Seats: <span class="badge badge-success">{{
+                                            back_flight_data.available_seats
+                                        }}</span>
+                                    </p>
                                 </div>
                             </div>
-
 
                             <div class="form-group ">
                                 <label for="cutomer_notes"> {{ $t("Notes") }}</label>
@@ -329,7 +340,6 @@
 
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
-
 
     </div>
 </template>
@@ -377,6 +387,8 @@ export default {
             flight_booking_rows: [],//all rows
             go_flights: [],
             back_flights: [],
+            go_flight_data: [],
+            back_flight_data: [],
             //////
             this_row: {
                 type: "",
@@ -390,7 +402,9 @@ export default {
                 user: "",
             },
             types: ['1 way', '2 way'],
-            citys: ['amm', '..', '..'],
+            citys: [],
+            from_city: '',
+            to_city: '',
             //////
 
             //////contex menu
@@ -406,7 +420,8 @@ export default {
 
     ////////////////////
     watch: {
-        // 'this_row.hotel': async function (newValue) {
+
+        // 'this_row.go_flight_code': async function (newValue) {
         //     if (this.edit_mode || this.add_mode) {
         //         this.this_row.room_id = '';
 
@@ -423,9 +438,36 @@ export default {
         //     }
         // },
 
-        // 'this_row.depart_date': function (newValue) {
-        //     this.this_row.depart_date=this.formatDate(newValue)
-        // }
+        'this_row.go_flight_code': function (newValue) {
+            if (newValue) {
+                this.get_go_flight_data(newValue)
+            }
+        },
+
+        'this_row.back_flight_code': function (newValue) {
+            if (newValue) {
+                this.get_back_flight_data(newValue)
+            }
+        },
+
+        //call get_go_flight() when any value changed
+        // "this_row.depart_date": "get_go_flight",
+        // "this_row.return_date": "get_back_flight",
+
+        // from_city: function () {
+        //     this.get_go_flight()
+        //     this.get_back_flight()
+        // },
+        // to_city: function () {
+        //     this.get_go_flight()
+        //     this.get_back_flight()
+        // },
+        // persons: function () {
+        //     this.get_go_flight()
+        //     this.get_back_flight()
+        // },
+
+
     },
 
     ////////////////////
@@ -433,8 +475,6 @@ export default {
     async mounted() {
         this.isLoading = true;
         this.this_row.user = localStorage.getItem('user_name'); //to get logged in user name
-
-        await this.update_seats();
 
         //get roles
         await new Promise(resolve => setTimeout(resolve, 500)); // wait
@@ -445,14 +485,16 @@ export default {
 
         await this.get_flight_booking_rows();
         await this.get_citys();
+        await this.update_seats();
 
+        this.isLoading = false;
         //to remove modal background on auto vue js reload
         const elements = document.getElementsByClassName("modal-backdrop fade show");
         while (elements.length > 0) {
             elements[0].parentNode.removeChild(elements[0]);
         }////
 
-        this.isLoading = false;
+
     },
 
     ////////////////////
@@ -469,8 +511,8 @@ export default {
                 this.get_flight_booking_rows();
             }
         },
-    },
 
+    },
 
     ////////////////////
 
@@ -484,7 +526,11 @@ export default {
             const hours = String(formattedDate.getHours()).padStart(2, '0');
             const minutes = String(formattedDate.getMinutes()).padStart(2, '0');
 
-            return `${year}-${month}-${day}`;
+            if (year && month && day) {
+                return `${year}-${month}-${day}`;
+            }else{
+                return '-'
+            }
         },
 
         async get_roles() {
@@ -517,30 +563,45 @@ export default {
             }
         },
 
-
         // end page load *******************************
 
 
         // insert form *******************************
 
-        get_go_flight() {
-            this.go_flights = []; this.this_row.go_flight_code = '';
-
+        get_go_flight_data(code) {
+            this.go_flight_data = [];
             return axios({
                 method: "get",
-                url: domain_url + "/backend/get_flight/", params: { date: this.this_row.depart_date, from_city: this.this_row.from_city, to_city: this.this_row.to_city, persons: this.this_row.persons },
-            }).then((response) => (this.go_flights = response.data.response_data.map(item => item.code)));
+                url: domain_url + "/backend/get_flight_data/", params: { flight_code: code },
+            }).then((response) => (this.go_flight_data = response.data.data[0]));
+        },
 
+        get_back_flight_data(code) {
+            this.back_flight_data = [];
+            return axios({
+                method: "get",
+                url: domain_url + "/backend/get_flight_data/", params: { flight_code: code },
+            }).then((response) => (this.back_flight_data = response.data.data[0]));
+        },
+
+        get_go_flight() {
+            if (this.this_row.depart_date) {
+                this.go_flights = []; this.this_row.go_flight_code = '';
+                return axios({
+                    method: "get",
+                    url: domain_url + "/backend/get_flight/", params: { date: this.this_row.depart_date, from_city: this.from_city, to_city: this.to_city, persons: this.this_row.persons },
+                }).then((response) => (this.go_flights = response.data.response_data.map(item => item.code)));
+            }
         },
 
         get_back_flight() {
-            this.back_flights = []; this.this_row.back_flight_code = '';
-
-            return axios({
-                method: "get",
-                url: domain_url + "/backend/get_flight/", params: { date: this.this_row.return_date, from_city: this.this_row.to_city, to_city: this.this_row.from_city, persons: this.this_row.persons },
-            }).then((response) => (this.back_flights = response.data.response_data.map(item => item.code)));
-
+            if (this.this_row.return_date) {
+                this.back_flights = []; this.this_row.back_flight_code = '';
+                return axios({
+                    method: "get",
+                    url: domain_url + "/backend/get_flight/", params: { date: this.this_row.return_date, from_city: this.to_city, to_city: this.from_city, persons: this.this_row.persons },
+                }).then((response) => (this.back_flights = response.data.response_data.map(item => item.code)));
+            }
         },
 
         PrintDiv(id) {
