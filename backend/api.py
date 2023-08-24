@@ -198,7 +198,7 @@ def get_flight(request):
     from_airports_list=Airports.objects.filter(city=from_city).values_list('code', flat=True)
     to_airports_list=Airports.objects.filter(city=to_city).values_list('code', flat=True)
     
-    flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date,available_seats__gte = persons).values('code')
+    flights = Flights.objects.filter(from_airport__in = from_airports_list,to_airport__in = to_airports_list,departure_date__exact=date,available_seats__gte = persons,status = 'enable').values('code')
     return Response({'response_data':flights})
 
 
