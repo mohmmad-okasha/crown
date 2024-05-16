@@ -26,26 +26,14 @@
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">{{ $t("Hotels Table") }} </h6>
-                    <div class="dropdown no-arrow">
+                    <div class="btn-group" role="group">
+                        <button type="button" title="Print" class="btn" @click="PrintDiv('table')">
+                            <i class="fa fa-print on-hover"></i>
+                        </button>
 
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupVerticalDrop1" type="button" class="btn dropdown-toggle"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                <i class="fa fa-bars on-hover"></i>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1" x-placement="bottom-start"
-                                style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 37px, 0px);">
-                                <a class="dropdown-item hand-mouse" @click="open_add_modal">
-                                    <i class="fa fa-plus"></i>
-                                    {{ $t("Add") }}
-                                </a>
-                                <a class="dropdown-item hand-mouse" @click="PrintDiv('table')">
-                                    <i class="fa fa-print"></i>
-                                    {{ $t("Print") }}
-                                </a>
-                            </div>
-                        </div>
-
+                        <button type="button" title="Add" class="btn" @click="open_add_modal">
+                            <i class="fa fa-plus on-hover"></i>
+                        </button>
                     </div>
                 </div>
                 <!-- Card Body -->

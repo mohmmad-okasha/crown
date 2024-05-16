@@ -123,8 +123,8 @@ def save_backup(request):
     # Copy the database file to the backup folder
     shutil.copy2(original_db_full_path, backup_file_full_path) 
 
-    # Remove old backup files older than one week
-    one_week_ago = datetime.now() - timedelta(days=7)
+    # Remove old backup files older than two week
+    two_week_ago = datetime.now() - timedelta(days=14)
     file_pattern = os.path.join(backup_folder, 'backup_*.sqlite3')
     
     # Get a list of all backup files matching the pattern
@@ -132,7 +132,7 @@ def save_backup(request):
     
     for file_path in backup_files:
         file_modified_time = datetime.fromtimestamp(os.path.getctime(file_path))
-        if file_modified_time < one_week_ago:
+        if file_modified_time < two_week_ago:
             os.remove(file_path)
             print(f'Removed old backup file: {file_path}')
 
@@ -447,7 +447,8 @@ def get_open_rooms(request):
         else:
             rooms = Rooms.objects.filter(hotel=hotel_id).all()
     else:
-        rooms = []
+        #rooms = []
+        rooms = Rooms.objects.all()
 
     
     response_data = []

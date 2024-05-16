@@ -6,17 +6,12 @@ body {
    background-color: var(--primary) !important;
 }
 
-/* #main_table {
-   height: 36vh !important;
-} */
-
-
-/* .sticky_header{
-   position:sticky;
-   top: 0 ;
-   background-color: #ffffff;
-   z-index: 1;
-} */
+.header {
+   position: sticky;
+   top: 0;
+   background-color: rgba(0, 0, 0, 0.05); /* Semi-transparent black background */
+   backdrop-filter: blur(3px); /* Adjust blur amount as desired */ 
+}
 
 .hand-mouse {
    cursor: pointer;

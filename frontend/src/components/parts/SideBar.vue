@@ -12,7 +12,7 @@
       <hr class="sidebar-divider my-0" />
       <!-- Nav Item - Dashboard -->
       <li class="nav-item active">
-        <router-link tag="a" aria-controls="collapseTwo" aria-expanded="true" class="nav-link collapsed" to="/dashboard">
+        <router-link tag="a" aria-controls="collapseTwo" aria-expanded="true" class="nav-link collapsed" to="/">
           <i class="fas fa-fw fa-tachometer-alt"></i>
           <span>{{ $t("Dashboard") }}</span>
         </router-link>

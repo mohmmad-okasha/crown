@@ -17,19 +17,30 @@
                                 <div class="col-sm-2"></div>
 
                                 <div class="col-sm-2 m-1">
-                                    <label for="inputPassword6" class="col-form-label">{{ $t("Hotel") }}</label>
+                                    <label class="col-form-label">{{ $t("Hotel") }}</label>
                                     <select class="form-control" placeholder="Hotel" v-model="hotel">
                                         <option v-for="h in this.hotels" :key="h" :value="h"> {{ h }}</option>
                                     </select>
                                 </div>
 
                                 <div class="col-sm-3 m-1">
-                                    <label for="inputPassword6" class="col-form-label">{{ $t("Date Range") }}</label>
-                                    <input type="text" class="custom-input form-control" placeholder="Range"
-                                        aria-label="Range">
-                                    <date-picker v-model="date_range" type="year-month" clearable locale="en"
-                                        :auto-submit="true" color="#098290" input-format="MM/YYYY" format="MM/YYYY"
-                                        display-format="jYYYY-jMM" custom-input=".custom-input" />
+                                    <label class="col-form-label">{{ $t("Date Range") }}</label>
+
+                                    <div class="input-group mb-3">
+                                        <div class="input-group-prepend">
+                                            <button @click="show_date_range = true" class="btn btn-outline-secondary"
+                                                type="button" id="button-addon1"><i
+                                                    class="fa-solid fa-calendar-days"></i></button>
+                                        </div>
+                                        <input :value="date_range" id="my-custom-editable-input" type="text"
+                                            class="form-control" />
+                                    </div>
+
+                                    <date-picker v-model="date_range" :show="show_date_range" type="year-month" clearable
+                                        locale="en" :auto-submit="true" color="#098290" input-format="MM/YYYY"
+                                        format="MM/YYYY" display-format="jYYYY-jMM" custom-input="#my-custom-editable-input"
+                                        @close="show_date_range = false" />
+
                                 </div>
 
 
@@ -50,7 +61,7 @@
                     <div id="monitor_table" class="table-responsive">
                         <table class="table-sm table ">
                             <thead class="sticky_header">
-                                <tr>
+                                <tr class="header">
                                     <th>Room - Hotel</th>
                                     <th v-for="i in 31" :key="i" scope="col">{{ i }}</th>
                                 </tr>
@@ -72,13 +83,15 @@
                 </div>
             </div>
         </div>
+
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
     </div>
 </template>
+
 <script>
 /* eslint-disable */
-// import block
+//import block
 import axios from 'axios';
 import { my_api, domain_url } from "../axios-api";
 import NavBar from '../components/parts/NavBar.vue';
@@ -101,13 +114,21 @@ export default {
     },
     ////////////////////
     data() {
+        //to get year + month auto on start
+        function getYearMonth() {
+            const today = new Date();
+            const month = String(today.getMonth() + 1).padStart(2, '0'); // Add leading zero for single-digit months
+            const year = today.getFullYear();
+            return `${month}/${year}`;
+        }
+
         return {
+            show_date_range: false,
             isLoading: false,
             fullPage: true,
-
             user_roles: "",
             test: [],
-            date_range: [],
+            date_range: getYearMonth(),
             all_range_dates: [],
             hotel: '',
             room_type: '',
@@ -127,7 +148,10 @@ export default {
 
         await this.get_hotels();
         await this.get_monitor();
+
+        await this.filter_dates();//
         await this.create_closed();
+
         //to remove modal background on auto vue js reload
         const elements = document.getElementsByClassName("modal-backdrop fade show");
         while (elements.length > 0) {
@@ -242,7 +266,6 @@ export default {
         },
 
         filter_dates() {// remove any date out of selected range
-
             if (this.date_range) {
                 let month = this.date_range.split('/')[0];
                 let year = this.date_range.split('/')[1];
@@ -406,7 +429,6 @@ export default {
             return axios({
                 method: "get",
                 url: domain_url + "/backend/get_open_rooms/", params: { hotel: this.hotel, room_type: this.room_type },
-                //auth: { username: "admin", password: "123", },
             }).then((response) => (this.open_dates = response.data));
 
         },

@@ -8,7 +8,7 @@
     <router-view />
   </div> -->
 
-  <div class="home" id="page-top"
+  <div class="home" id="app"
     :style="{ '--primary': primary_color, '--back_color': back_color, '--primary_text': primary_text }">
 
     <!-- Login page -->
@@ -25,7 +25,7 @@
                   <form @submit.prevent="loginUser">
                     <div class="form-outline mb-4">
                       <label class="form-label" for="typeEmailX-2">User Name</label>
-                      <input type="text" v-model="username" required class="form-control form-control-lg"
+                      <input type="text" v-model="user_name" required class="form-control form-control-lg"
                         :class="{ 'is-invalid': this.error }" />
                     </div>
 
@@ -49,7 +49,6 @@
           </div>
         </div>
       </section>
-
 
     </div>
 
@@ -201,6 +200,7 @@ export default {
   },
   data() {
     return {
+
       error: false,
       settings: {
         dark_mode: '',
@@ -209,6 +209,7 @@ export default {
         back_color: '',
       },
       user_name: '',
+      password:'',
       user_name_id: '',
       auth: {
         username: '',
@@ -227,22 +228,22 @@ export default {
     this.get_user_name_id();
     await this.get_settings();
     this.dark_mode();
-    this.set_lang();
     this.get_roles();
+    this.set_lang();
   },
   methods: {
     async loginUser() {
-      const data = { username: this.username, password: this.password }
+      const data = { username: this.user_name, password: this.password }
       try {
         const response = await axios.post(domain_url + '/backend/login/', data)
         this.auth.logged_in = response.data.access
-        this.auth.username = this.username
+        this.auth.username = this.user_name
 
         localStorage.setItem('access_token', this.auth.logged_in)
         localStorage.setItem('token_time', new Date())
-        localStorage.setItem('user_name', this.username)
+        localStorage.setItem('user_name', this.user_name)
 
-        axios.post(domain_url + '/backend/logs/', {user_name: this.username, log: 'login',time: new Date()})
+        axios.post(domain_url + '/backend/logs/', {user_name: this.user_name, log: 'login',time: new Date()})
 
         window.location.reload();
 
@@ -271,6 +272,7 @@ export default {
         .catch(err => { alert(err) });
     },
     get_user_name_id() {
+      if(this.user_name)
       return axios({
         method: "get",
         url: domain_url + "/backend/get_user_name_id/?username=" + this.user_name,
@@ -278,6 +280,7 @@ export default {
       }).then((response) => (this.user_name_id = response.data.data));
     },
     async get_roles() {
+      if(this.user_name_id)
       return my_api.get('backend/get_roles/?user_id=' + this.user_name_id, { auth: { username: "admin", password: "123", } })
         .then((response) => (this.user_roles = response.data))
         .catch(err => { });

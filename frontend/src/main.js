@@ -6,20 +6,14 @@ import axios from "axios";
 import swal from 'sweetalert';
 import VueI18n from 'vue-i18n'
 import XLSX from 'xlsx/dist/xlsx.full.min';
-
-
 var currentURL = window.location.protocol + "//" + window.location.hostname + ":8000" + window.location.pathname;
 axios.defaults.baseURL =currentURL;
-
 Vue.use(VueI18n)
-
-
 
 const i18n = new VueI18n({
   locale: 'en',
   messages: {
     'ar': {
-
       //errors
       'Please Enter The Name': 'يرجى ادخال الاسم',
       'Please Select Type': 'يرجى تحديد النوع',
@@ -27,7 +21,6 @@ const i18n = new VueI18n({
       'Please Select ID Type': 'يرجى تحديد نوع الوثيقة',
       'Please Enter ID Number': 'يرجى ادخال رقم الوثيقة',
       'Please Enter The Address': 'يرجى ادخال العنوان',
-
       //settings
       'Language':'اللغة',
       'Arabic':'عربي',
@@ -35,8 +28,6 @@ const i18n = new VueI18n({
       'On':'مفعل',
       'Off':'مغلق',
       'Dark Mode':'الوضع المظلم',
-
-
       'User': 'المستخدم',
       'Profile': 'الحساب',
       'Login': 'تسجيل الدخول',
@@ -87,21 +78,14 @@ const i18n = new VueI18n({
       'Choose Picture': 'اختر صورة',
       'Add Customer': 'اضافة عميل',
       'Edit Customer': 'تعديل عميل',
-
       'Are you sure?': 'هل انت متأكد؟',
       'Deleted!': 'تم الحذف',
       'Updated!': 'تم التحديث',
       'Added!': 'تمت الاضافة',
-
     }
   }
 });
-
-
 Vue.config.productionTip = false;
-
-
-
 new Vue({
   i18n,
   router,

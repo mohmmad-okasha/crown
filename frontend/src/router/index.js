@@ -155,14 +155,14 @@ const routes = [
     },
   },
 
-  {
-    path: "/dashboard",
-    name: "DashboardView",
-    component: DashboardView,
-    meta: {
-      requiresAuth: true,
-    },
-  },
+  // {
+  //   path: "/dashboard",
+  //   name: "DashboardView",
+  //   component: DashboardView,
+  //   meta: {
+  //     requiresAuth: true,
+  //   },
+  // },
 
 ];
 
@@ -178,7 +178,7 @@ router.beforeEach((to, from, next) => {
     const token = localStorage.getItem('access_token')
     if (!token) {
       // if access token is not found, redirect to login page
-      next({ name: 'login' })
+      //next({ name: 'login' })
     } else {
       next()
     }

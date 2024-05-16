@@ -76,12 +76,18 @@ class Room_dates(models.Model):
 
 class Flight_bookings(models.Model):
     type = models.CharField(max_length=50) # one way / two way
-    depart_date = models.CharField(max_length=50,blank=True,null=True)
-    return_date = models.CharField(max_length=50,blank=True,null=True)
+    flight1_code = models.CharField(max_length=50)
+    flight2_code = models.CharField(max_length=50,blank=True,null=True)
+    flight3_code = models.CharField(max_length=50,blank=True,null=True)
+    flight4_code = models.CharField(max_length=50,blank=True,null=True)
+    flight5_code = models.CharField(max_length=50,blank=True,null=True)
+    flight1_date = models.CharField(max_length=50,blank=True,null=True)
+    flight2_date = models.CharField(max_length=50,blank=True,null=True)
+    flight3_date = models.CharField(max_length=50,blank=True,null=True)
+    flight4_date = models.CharField(max_length=50,blank=True,null=True)
+    flight5_date = models.CharField(max_length=50,blank=True,null=True)
     persons=models.IntegerField(default=1)
     infants=models.IntegerField(default=0)#kids
-    go_flight_code = models.CharField(max_length=50)
-    back_flight_code = models.CharField(max_length=50,blank=True,null=True)
     notes=models.CharField(max_length=100,blank=True)
     user = models.CharField(max_length=50,blank=True)
     created_on = models.DateTimeField(auto_now_add=True,null=True)

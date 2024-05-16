@@ -27,26 +27,14 @@
                 <!-- Card Header - Dropdown -->
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">{{ $t("Flight Bookings Table") }} </h6>
-                    <div class="dropdown no-arrow">
+                    <div class="btn-group" role="group">
+                        <button type="button" title="Print" class="btn" @click="PrintDiv('table')">
+                            <i class="fa fa-print on-hover"></i>
+                        </button>
 
-                        <div class="btn-group" role="group">
-                            <button id="btnGroupVerticalDrop1" type="button" class="btn dropdown-toggle"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                                <i class="fa fa-bars on-hover"></i>
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1" x-placement="bottom-start"
-                                style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 37px, 0px);">
-                                <a class="dropdown-item hand-mouse" @click="open_add_modal">
-                                    <i class="fa fa-plus"></i>
-                                    {{ $t("Add") }}
-                                </a>
-                                <a class="dropdown-item hand-mouse" @click="PrintDiv('table')">
-                                    <i class="fa fa-print"></i>
-                                    {{ $t("Print") }}
-                                </a>
-                            </div>
-                        </div>
-
+                        <button type="button" title="Add" class="btn" @click="open_add_modal">
+                            <i class="fa fa-plus on-hover"></i>
+                        </button>
                     </div>
                 </div>
                 <!-- Card Body -->
@@ -63,28 +51,28 @@
                                         <th scope="col">{{ $t("Type") }}</th>
                                         <th scope="col">{{ $t("Persons") }}</th>
                                         <th scope="col">{{ $t("Infants") }}</th>
-                                        <th scope="col">{{ $t("Go Flight Code") }}</th>
-                                        <th scope="col">{{ $t("Back Flight Code") }}</th>
+                                        <th scope="col">{{ $t("Flight Codes") }}</th>
                                         <th scope="col">{{ $t("Notes") }}</th>
                                         <th scope="col">{{ $t("User") }}</th>
                                         <th scope="col" class="no_print">{{ $t("Actions") }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr @contextmenu="showContextMenu" v-for="flight_booking in this.flight_booking_rows"
-                                        :key="flight_booking.id" @click="row_click(flight_booking.id)"
-                                        @click.right="row_click(flight_booking.id)" @dblclick="open_edit_modal"
-                                        role="button" :class="{ 'selected': flight_booking.id === active_index }">
-                                        <th scope="row" id="id">{{ flight_booking.id }}</th>
-                                        <td>{{ formatDate(flight_booking.depart_date) }}</td>
-                                        <td>{{ formatDate(flight_booking.return_date) }}</td>
+                                    <tr @contextmenu="showContextMenu" v-for="f in this.flight_booking_rows" :key="f.id"
+                                        @click="row_click(f.id)" @click.right="row_click(f.id)" @dblclick="open_edit_modal"
+                                        role="button" :class="{ 'selected': f.id === active_index }">
+                                        <th scope="row" id="id">{{ f.id }}</th>
+                                        <td>{{ formatDate(f.flight1_date) }}</td>
+
+                                        <td v-if="f.type == 'Roundtrip'">{{ formatDate(f.flight2_date) }}</td>
+
                                         <td>{{ $t(flight_booking.type) }}</td>
-                                        <td>{{ $t(flight_booking.persons) }}</td>
-                                        <td>{{ $t(flight_booking.infants) }}</td>
-                                        <td>{{ $t(flight_booking.go_flight_code) }}</td>
-                                        <td>{{ $t(flight_booking.back_flight_code) }}</td>
-                                        <td>{{ $t(flight_booking.notes) }}</td>
-                                        <td>{{ $t(flight_booking.user) }}</td>
+                                        <td>{{ $t(f.persons) }}</td>
+                                        <td>{{ $t(f.infants) }}</td>
+                                        <td>{{ f.flight1_code }} {{ f.flight2_code }} {{ f.flight3_code }} {{ f.flight4_code }}
+                                            {{ f.flight5_code }}</td>
+                                        <td>{{ $t(f.notes) }}</td>
+                                        <td>{{ $t(f.user) }}</td>
 
                                         <td class="no_print">
 
@@ -125,9 +113,9 @@
         </div>
 
         <!-- modal -->
-        <div class="modal  fade" id="addModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+        <div class="modal fade" id="addModal" data-backdrop="static" data-keyboard="false" tabindex="-1"
             aria-labelledby="staticBackdropLabel" aria-hidden="true">
-            <div class="modal-dialog ">
+            <div class="modal-dialog modal-xl">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 v-if="!this.edit_mode" class="modal-title" id="modal_label">{{ $t("Add Flight Booking") }}</h5>
@@ -153,7 +141,7 @@
                                 </div>
 
                                 <div class="form-group col-sm-4">
-                                    <label for="from_city">{{ $t("From City") }}</label>
+                                    <label for="from_city">{{ $t("From") }}</label>
                                     <v-select id="from_city" v-model="from_city" :options="citys"
                                         :class="{ 'is-invalid': !from_city && validate, 'is-valid': from_city && validate }" />
 
@@ -163,7 +151,7 @@
                                 </div>
 
                                 <div class="form-group col-sm-4">
-                                    <label for="to_city">{{ $t("To City") }}</label>
+                                    <label for="to_city">{{ $t("To") }}</label>
                                     <v-select id="to_city" v-model="to_city" :options="citys"
                                         :class="{ 'is-invalid': !to_city && validate, 'is-valid': to_city && validate }" />
 
@@ -172,8 +160,9 @@
                                     </div>
                                 </div>
 
+
                                 <div class="form-group"
-                                    :class="{ 'col-sm-6': this_row.type == '2 way', 'col-sm-12': this_row.type != '2 way' }">
+                                    :class="{ 'col-sm-6': this_row.type == 'Roundtrip', 'col-sm-12': this_row.type != 'Roundtrip' }">
                                     <label for="depart_date">{{ $t("Depart Date") }}</label>
                                     <input id="depart_date" v-model="this_row.depart_date" type="date"
                                         :class="{ 'is-invalid': !this.this_row.depart_date && this.validate, 'is-valid': this.this_row.depart_date && this.validate }"
@@ -183,7 +172,7 @@
                                     </div>
                                 </div>
 
-                                <div v-show="this_row.type == '2 way'" class="form-group col-sm-6">
+                                <div v-show="this_row.type == 'Roundtrip'" class="form-group col-sm-6">
                                     <label for="return_date">{{ $t("Return Date") }}</label>
                                     <input id="return_date" v-model="this_row.return_date" type="date"
                                         :class="{ 'is-invalid': !this.this_row.return_date && this.validate, 'is-valid': this.this_row.return_date && this.validate }"
@@ -226,6 +215,14 @@
                             </div>
 
                             <div class="card form-group">
+                                <div v-for="f in go_flights" :key="f.id" class="form-check">
+                                    <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1"
+                                        value="option1" checked>
+                                    <label class="form-check-label" for="exampleRadios1">
+                                        {{ f }}
+                                    </label>
+                                </div>
+
                                 <div class="card-header"> {{ $t("Go Flight") }} </div>
                                 <div class="card-body">
                                     <div class="row g-3 form-group">
@@ -263,7 +260,7 @@
                                 </div>
                             </div>
 
-                            <div v-show="this_row.type == '2 way'" class="card form-group">
+                            <div v-show="this_row.type == 'Roundtrip'" class="card form-group">
                                 <div class="card-header"> {{ $t("Back Flight") }} </div>
                                 <div class="card-body">
                                     <div class="row g-3 form-group">
@@ -401,7 +398,7 @@ export default {
                 notes: "",
                 user: "",
             },
-            types: ['1 way', '2 way'],
+            types: ['Roundtrip', 'One-way', 'Multi-city'],
             citys: [],
             from_city: '',
             to_city: '',
@@ -528,7 +525,7 @@ export default {
 
             if (year && month && day) {
                 return `${year}-${month}-${day}`;
-            }else{
+            } else {
                 return '-'
             }
         },
@@ -664,7 +661,7 @@ export default {
         },
 
         clear_form() {
-            this.this_row.type = "1 way";
+            this.this_row.type = "Roundtrip";
             this.this_row.depart_date = '';
             this.this_row.return_date = '';
             this.this_row.persons = 1;

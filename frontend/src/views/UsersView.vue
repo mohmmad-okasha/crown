@@ -25,26 +25,16 @@
         <!-- Card Header - Dropdown -->
         <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
           <h6 class="m-0 font-weight-bold text-primary">{{ $t("Users Table") }} </h6>
-          <div class="dropdown no-arrow">
 
-            <div class="btn-group" role="group">
-              <button id="btnGroupVerticalDrop1" type="button" class="btn dropdown-toggle" data-toggle="dropdown"
-                aria-haspopup="true" aria-expanded="true">
-                <i class="fa fa-bars on-hover"></i>
-              </button>
-              <div class="dropdown-menu" aria-labelledby="btnGroupVerticalDrop1" x-placement="bottom-start"
-                style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(0px, 37px, 0px);">
-                <a class="dropdown-item hand-mouse" @click="open_add_modal">
-                  <i class="fa fa-plus"></i>
-                  {{ $t("Add") }}
-                </a>
-                <a class="dropdown-item hand-mouse" @click="PrintDiv('table')">
-                  <i class="fa fa-print"></i>
-                  {{ $t("Print") }}
-                </a>
-              </div>
-            </div>
-
+          <div class="btn-group" role="group">
+            <button type="button" title="Print" class="btn" @click="PrintDiv('table')">
+              <i class="fa fa-print on-hover"></i>
+            </button>
+            
+            <button type="button" title="Add" class="btn" @click="open_add_modal">
+              <i class="fa fa-plus on-hover"></i>
+            </button>
+            
           </div>
         </div>
         <!-- Card Body -->
@@ -375,6 +365,20 @@ export default {
       }).then((response) => (this.max_user_id = response.data.data.id__max));
     },
 
+    PrintDiv(id) {
+      var divToPrint = document.getElementById(id);
+      var popupWin = window.open('', '_blank', 'width=100000,height=10000');
+      document.getElementById('head_txt').style.display = "block";
+      document.getElementById('head_txt').innerHTML = this.$t("Users");
+      popupWin.document.write('<link href="static/css/sb-admin-2.min.css" rel="stylesheet">');
+      popupWin.document.write('<link href="static/css/reports.css" rel="stylesheet">');
+      popupWin.document.write('<style>body{background-color:white !important;}</style>');
+      popupWin.document.write('<iframe src="static/parts/report_head.html" width="100%" height="200px" frameBorder="0"></iframe>');
+      popupWin.document.write('<html><body onload="window.print()"> ' + divToPrint.innerHTML + '</html>');
+      document.getElementById('head_txt').style.display = "none";
+      popupWin.document.close();
+    },
+
     async save_user() {
       try {
         if (this.check_form()) {
@@ -426,7 +430,7 @@ export default {
 
     async delete_user(id) {
       try {
-        const deleted_user= this.user.username
+        const deleted_user = this.user.username
         await swal({ title: this.$t("Are you sure to delete?"), text: "", icon: "warning", buttons: true, dangerMode: true, })
           .then(async (willDelete) => {
             if (willDelete) {
@@ -441,7 +445,7 @@ export default {
               } else {
                 // Request was successful
                 swal(this.$t("Deleted!"), { buttons: false, icon: "success", timer: 1500, });
-                
+
                 //save log
                 axios.post(domain_url + '/backend/logs/', { user_name: this.$parent.user_name, log: 'delete user:' + deleted_user, time: new Date() })
 
