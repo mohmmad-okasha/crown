@@ -8,7 +8,7 @@
     <router-view />
   </div> -->
 
-  <div class="home" id="app"
+  <div class="home" id="page-top"
     :style="{ '--primary': primary_color, '--back_color': back_color, '--primary_text': primary_text }">
 
     <!-- Login page -->

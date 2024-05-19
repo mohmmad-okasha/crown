@@ -1,6 +1,7 @@
 <template>
     <div class="row" id="page-top">
 
+        
         <!-- loading  -->
         <loading :active.sync="isLoading" :can-cancel="true" :is-full-page="fullPage"></loading>
 

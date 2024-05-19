@@ -1,3 +1,4 @@
+import calendar
 from json import dumps
 import os
 from os import path
@@ -436,6 +437,7 @@ def get_booked_rooms(request):
 @api_view(['GET'])
 def get_open_rooms(request):
     hotel = str(request.query_params['hotel'])
+    date_range = str(request.query_params['date_range'])
     if (hotel):
         hotel_id= Hotels.objects.get(name=hotel).id
 
@@ -453,15 +455,35 @@ def get_open_rooms(request):
     
     response_data = []
 
+    # Extract year and month from date_range
+    date_range = str(request.query_params['date_range'])  # e.g., "08/2024"
+    month, year = map(int, date_range.split('/'))
+
+    # Calculate the start and end dates of the month
+    start_date = datetime(year, month, 1)
+    end_date = datetime(year, month, calendar.monthrange(year, month)[1])
+
+    response_data = []
+
     for room in rooms:
-        hotel_name=Hotels.objects.filter(id=room.hotel_id).first().name
+        hotel_name = Hotels.objects.filter(id=room.hotel_id).first().name
+        
+        # Get all room dates
+        room_dates = room.room_dates_set.values_list('date', flat=True)
+        
+        # Convert string dates to datetime objects and filter them
+        filtered_dates = [
+            date for date in room_dates
+            if start_date <= datetime.strptime(date, '%d/%m/%Y') <= end_date
+        ]
+        
         room_data = {
             'categ': room.room_categ,
-            'name': room.room_id +' - '+ hotel_name,
-            'dates': list(room.room_dates_set.values_list('date', flat=True))
+            'name': f"{room.room_id} - {hotel_name}",
+            'dates': filtered_dates
         }
+        
         response_data.append(room_data)
-
     return JsonResponse(response_data, safe=False)
 
 ##################################################################################################################

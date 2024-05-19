@@ -463,7 +463,7 @@ export default {
             isLoading: false,
             fullPage: true,
             is_range: true,
-            max_id:'',
+            max_id: '',
             user_roles: "",
             print: false, //to print after save
             validate: false, //for check forms
@@ -653,11 +653,13 @@ export default {
         },
 
         get_room_info(value) {
-            return axios({
-                method: "get",
-                url: domain_url + "/backend/get_room_info/", params: { room_id: value, hotel: this.this_row.hotel },
-                //auth: { username: "admin", password: "123", },
-            }).then((response) => (this.this_row.room_type = response.data.type, this.room_id_id = response.data.id, this.range = response.data.range));
+            if (value && this.this_row.hotel) {
+                return axios({
+                    method: "get",
+                    url: domain_url + "/backend/get_room_info/", params: { room_id: value, hotel: this.this_row.hotel },
+                    //auth: { username: "admin", password: "123", },
+                }).then((response) => (this.this_row.room_type = response.data.type, this.room_id_id = response.data.id, this.range = response.data.range));
+            }
         },
 
         async get_booked_dates() {
@@ -665,8 +667,11 @@ export default {
                 this.booked_dates = [];
                 await axios({
                     method: "get", url: domain_url + "/backend/get_booked_dates/", params: { room_id: this.this_row.room_id, hotel: this.this_row.hotel },
-                }).then((response) => (this.booked_dates = response.data[0].split(', ')));
-
+                }).then((response) => {
+                    if(response.data[0])
+                    this.booked_dates = response.data[0].split(', ')
+                })
+                
                 this.all_booked_dates = [];
                 this.disable_dates = [];
 
@@ -809,7 +814,7 @@ export default {
                     window.location.reload();
 
                     this.get_booking_rows();
-                    
+
                     this.closeModal();
                 }
             } catch (error) { console.error(); }

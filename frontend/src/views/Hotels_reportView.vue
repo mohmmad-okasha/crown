@@ -307,25 +307,25 @@ export default {
             this.isLoading = false;
         },
 
-        getCities() {
-            const apiKey = '02b73423a39d9b8cac6e6d534b3f1268'; // Replace with your OpenWeatherMap API key
+        // getCities() {
+        //     const apiKey = '02b73423a39d9b8cac6e6d534b3f1268'; // Replace with your OpenWeatherMap API key
 
-            axios.get('https://api.openweathermap.org/data/2.5/find', {
-                params: {
-                    q: this.data.country,
-                    type: 'like',
-                    sort: 'population',
-                    cnt: 10,
-                    appid: apiKey
-                }
-            })
-                .then(response => {
-                    this.cities = response.data.list.map(city => city.name);
-                })
-                .catch(error => {
-                    console.log(error);
-                });
-        },
+        //     axios.get('https://api.openweathermap.org/data/2.5/find', {
+        //         params: {
+        //             q: this.data.country,
+        //             type: 'like',
+        //             sort: 'population',
+        //             cnt: 10,
+        //             appid: apiKey
+        //         }
+        //     })
+        //         .then(response => {
+        //             this.cities = response.data.list.map(city => city.name);
+        //         })
+        //         .catch(error => {
+        //             console.log(error);
+        //         });
+        // },
 
         async save_hotel() {
             try {
