@@ -519,10 +519,8 @@ export default {
         'this_row.hotel': async function (newValue) {
             if (this.edit_mode || this.add_mode) {
                 this.this_row.room_id = '';
-
                 await this.get_rooms();
                 this.this_row.room_id = this.rooms[0];
-
             }
         },
 
@@ -671,7 +669,7 @@ export default {
                     if(response.data[0])
                     this.booked_dates = response.data[0].split(', ')
                 })
-                
+
                 this.all_booked_dates = [];
                 this.disable_dates = [];
 

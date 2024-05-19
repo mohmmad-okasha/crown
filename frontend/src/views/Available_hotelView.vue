@@ -77,7 +77,7 @@
                             <tbody>
                                 <tr v-for="r in this.open_dates" :key="r.name">
                                     <td>
-                                        <p>{{ r.categ + '/' + r.name }}</p>
+                                        <p>{{ r.categ + '/' + r.name + '  ' }}</p>
                                     </td>
                                     <td v-for="ii in 31" :key="ii" :id="r.name + '_' + ii.toString().padStart(2, '0')">
                                         <button v-for="d in r.dates" :key="d" v-show="ii == d.slice(0, 2)"
@@ -102,7 +102,6 @@
 
                     </div>
                     <div class="modal-body">
-
                         <form>
                             <div class="form-group">
                                 <label for="book_date">{{ $t("Booking Date") }}</label>
@@ -337,7 +336,6 @@ export default {
                 user: "",
             },
             is_range: true,
-
             print: false, //to print after save
             validate: false, //for check forms
             show_date_range: false,
@@ -351,6 +349,7 @@ export default {
             room_type: '',
             hotels: [],
             rooms: [],
+            range: '',
             min_date: '',
             max_date: '',
             disable_dates: [],
@@ -485,9 +484,10 @@ export default {
             await this.get_rooms();
             this.this_row.room_id = this.rooms[0];
         },
+
         'this_row.room_id': async function (newValue) {
 
-            await this.get_room_info(newValue);
+            this.get_room_info(newValue);
             this.get_booked_dates();
 
         },
