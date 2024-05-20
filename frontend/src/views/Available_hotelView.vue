@@ -75,7 +75,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr v-for="r in this.open_dates" :key="r.name">
+                                <tr v-for="r in this.open_dates" v-show="r.dates.length" :key="r.name">
                                     <td>
                                         <p>{{ r.categ + '/' + r.name + '  ' }}</p>
                                     </td>
