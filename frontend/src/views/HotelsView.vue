@@ -108,7 +108,6 @@
             </div>
         </div>
 
-
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
 
@@ -279,10 +278,25 @@
                                                     <div class="form-group col-md">
                                                         <label for="cutomer_notes"> {{ $t("Date Range") }}</label>
 
-                                                        <date-picker v-model="hotel.room[i - 1].range" range clearable
-                                                            :auto-submit="true" color="#098290" input-format="DD/MM/YYYY"
-                                                            format="DD/MM/YYYY" locale="en" />
 
+
+
+
+                                                        <div class="input-group mb-3">
+                                                            <div class="input-group-prepend">
+                                                                <span class="input-group-text" id="basic-addon1"><i
+                                                                        class="fa-solid fa-calendar-days"></i></span>
+                                                            </div>
+                                                            <input type="text" :class="'custom-input' + [i - 1]"
+                                                                class=" form-control " placeholder="Date Range"
+                                                                aria-label="Range">
+                                                        </div>
+
+                                                        <date-picker v-model="hotel.room[i - 1].range" :range="true"
+                                                            clearable locale="en" :auto-submit="true" color="#098290"
+                                                            input-format="DD/MM/YYYY" format="DD/MM/YYYY"
+                                                            display-format="DD/MM/YYYY"
+                                                            :custom-input="'.custom-input' + [i - 1]" />
                                                     </div>
 
                                                     <div class="form-group col-md">
@@ -291,7 +305,12 @@
                                                             id="cutomer_notes" rows="1"></textarea>
                                                     </div>
 
+
                                                 </div>
+                                            </div>
+                                            <div v-show="i === 1" class="form-group col-md">
+                                                <button type="button" class="btn btn-sm btn-outline-info" @click="copyToAll()">copy
+                                                    to all</button>
                                             </div>
                                         </div>
                                         <br>
@@ -477,6 +496,12 @@ export default {
                     for (let i = 0; i < numberOfRoomsToAdd; i++) {
                         this.hotel.room.push({
                             // initialize new room data
+                            range: '',
+                            room_type: '',
+                            rate: '',
+                            room_categ: '',
+                            meals: '',
+                            notes: ''
                         });
                     }
                 } else if (newValue < this.hotel.room.length) {
@@ -519,10 +544,21 @@ export default {
             this.hotel.allotment = newValue.allotment
             this.hotel.notes = newValue.notes
             this.hotel.user = newValue.user
-        }
+        },
+
     },
 
     methods: {
+        copyToAll() {
+            for (let r = 1 ; r < this.hotel.room.length; r++){
+                this.hotel.room[r].range = this.hotel.room[0].range
+                this.hotel.room[r].room_type = this.hotel.room[0].room_type
+                this.hotel.room[r].room_categ = this.hotel.room[0].room_categ
+                this.hotel.room[r].meals = this.hotel.room[0].meals
+                this.hotel.room[r].notes = this.hotel.room[0].notes
+            }
+        },
+
         get_roles() {
             this.user_roles = this.$parent.user_roles;
         },
