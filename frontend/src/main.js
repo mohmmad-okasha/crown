@@ -82,6 +82,12 @@ const i18n = new VueI18n({
       'Deleted!': 'تم الحذف',
       'Updated!': 'تم التحديث',
       'Added!': 'تمت الاضافة',
+      'last week': 'اسبوع',
+      'last month': 'شهر',
+      'last year': 'سنة',
+      
+
+
     }
   }
 });

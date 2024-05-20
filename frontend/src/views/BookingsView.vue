@@ -45,11 +45,21 @@
 
                     <nav>
                         <ul class="pagination pagination-sm">
-                            <li class="page-item" :class="{active :activeNav === 1}" @click="activeNav=1"><button class="page-link">last week</button></li>
-                            <li class="page-item" :class="{active :activeNav === 2}" @click="activeNav=2"><button class="page-link">last month</button></li>
-                            <li class="page-item" :class="{active :activeNav === 3}" @click="activeNav=3"><button class="page-link">last year</button></li>
+                            <li class="page-item" :class="{ active: activeNav === 1 }" @click="activeNav = 1"><button
+                                    class="page-link">{{ $t("last week") }}</button></li>
+                            <li class="page-item" :class="{ active: activeNav === 2 }" @click="activeNav = 2"><button
+                                    class="page-link">{{ $t("last month") }}</button></li>
+                            <li class="page-item" :class="{ active: activeNav === 3 }" @click="activeNav = 3"><button
+                                    class="page-link">{{ $t("last year") }}</button></li>
                         </ul>
                     </nav>
+                    <div class="col-sm-4 m-1">
+                        <label class="col-form-label">{{ $t("Date Range") }}</label>
+                        <input type="text" class="custom-input form-control" placeholder="Range" aria-label="Range">
+                        <date-picker v-model="searchRange" :range="true" clearable locale="en" :auto-submit="true" color="#098290"
+                            input-format="DD/MM/YYYY" format="DD/MM/YYYY" display-format="DD/MM/YYYY"
+                            custom-input=".custom-input" />
+                    </div>
 
                     <div class="card-header cnter" style="display: none;" id="head_txt"></div>
                     <form class="site-form-table">
@@ -472,7 +482,7 @@ export default {
 
     data() {
         return {
-            activeNav:1, //last week or last month....
+            activeNav: 1, //last week or last month....
             isLoading: false,
             fullPage: true,
             is_range: true,
@@ -487,6 +497,7 @@ export default {
             rooms: [],//used in new & update form
             hotels: [],//used in new & update form
             range: '',
+            searchRange: '',
             booked_dates: [],
             all_booked_dates: [],//all dates in booked_dates ranges for selected room
             all_rooms_booked_dates: [],//all dates in booked_dates ranges for all room
@@ -536,7 +547,6 @@ export default {
                 this.this_row.room_id = this.rooms[0];
             }
         },
-
         'this_row.room_id': function (newValue) {
             if (this.edit_mode || this.add_mode) {
                 this.get_room_info(newValue);
@@ -550,13 +560,18 @@ export default {
             this.this_row.out_date = this.this_row.dates[1];
             this.get_booked_dates()
         },
-        activeNav: async function (newValue){
-            this.isLoading=true
+        activeNav: async function (newValue) {
+            this.isLoading = true
             return my_api.get(`/backend/bookings/?range=${this.activeNav}`)
-                .then((response) => (this.booking_rows = response.data,this.isLoading=false))
+                .then((response) => (this.booking_rows = response.data, this.isLoading = false))
+                .catch(err => { alert(err) });
+        },
+        searchRange: async function (newValue) {
+            this.isLoading = true
+            return my_api.get(`/backend/bookings/?searchRange=${this.searchRange}`)
+                .then((response) => (this.booking_rows = response.data, this.isLoading = false))
                 .catch(err => { alert(err) });
         }
-        
     },
 
     ////////////////////

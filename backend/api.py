@@ -766,11 +766,9 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
         queryset = Bookings.objects.order_by('-id').all()
         id = self.request.query_params.get('id')
         range = self.request.query_params.get('range')
+        searchRange = self.request.query_params.get('searchRange')
 
-        # Get the current date and time
         now = timezone.now()
-
-
                
         if id is not None:
             queryset = queryset.filter(id=id)
@@ -785,6 +783,14 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
 
             case '3':#year
                 queryset = Bookings.objects.filter(book_date__gte=now - timedelta(days=365), book_date__lte=now).order_by('-id')
+            
+        if (searchRange):
+            searchRange= str(searchRange).split(",")
+            start_date = datetime.strptime(searchRange[0], "%d/%m/%Y")
+            end_date = datetime.strptime(searchRange[1], "%d/%m/%Y")
+            start_date = timezone.make_aware(start_date, timezone.get_current_timezone())
+            end_date = timezone.make_aware(end_date, timezone.get_current_timezone())
+            queryset = Bookings.objects.filter(book_date__gte=start_date, book_date__lte=end_date).order_by('-id')
 
 
         if search is not None:
