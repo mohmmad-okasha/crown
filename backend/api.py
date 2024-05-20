@@ -760,11 +760,33 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
     serializer_class = serializers.bookings_serializer
 
     def get_queryset(self):
+        from django.utils import timezone
+        from datetime import timedelta
+
         queryset = Bookings.objects.order_by('-id').all()
         id = self.request.query_params.get('id')
+        range = self.request.query_params.get('range')
+
+        # Get the current date and time
+        now = timezone.now()
+
+
+               
         if id is not None:
             queryset = queryset.filter(id=id)
         search = self.request.query_params.get('search')
+        
+        match range:
+            case '1':#week
+                queryset = Bookings.objects.filter(book_date__gte=now - timedelta(days=7), book_date__lte=now).order_by('-id')
+
+            case '2':#month
+                queryset = Bookings.objects.filter(book_date__gte=now - timedelta(days=30), book_date__lte=now).order_by('-id')
+
+            case '3':#year
+                queryset = Bookings.objects.filter(book_date__gte=now - timedelta(days=365), book_date__lte=now).order_by('-id')
+
+
         if search is not None:
             queryset = queryset.filter(
                 Q(id__contains=search) 
@@ -776,6 +798,7 @@ class bookings(ModelViewSet, mixins.DestroyModelMixin):
                 | Q(persons_names__contains=search)
                 | Q(user__contains=search) )
         return queryset
+    
 
     def put(self, request, *args, **kwargs):
         return self.update(request, *args, **kwargs)

@@ -279,6 +279,7 @@
 
         <!-- to get search value from navbar -->
         <input :value="this.$parent.$refs.NavBar.search" v-bind:on-change="search" hidden>
+        
     </div>
 </template>
 

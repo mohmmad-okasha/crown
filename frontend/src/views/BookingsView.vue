@@ -35,10 +35,22 @@
                         <button type="button" title="Add" class="btn" @click="open_add_modal">
                             <i class="fa fa-plus on-hover"></i>
                         </button>
+
                     </div>
+
+
                 </div>
                 <!-- Card Body -->
                 <div id="table" class="card-body">
+
+                    <nav>
+                        <ul class="pagination pagination-sm">
+                            <li class="page-item" :class="{active :activeNav === 1}" @click="activeNav=1"><button class="page-link">last week</button></li>
+                            <li class="page-item" :class="{active :activeNav === 2}" @click="activeNav=2"><button class="page-link">last month</button></li>
+                            <li class="page-item" :class="{active :activeNav === 3}" @click="activeNav=3"><button class="page-link">last year</button></li>
+                        </ul>
+                    </nav>
+
                     <div class="card-header cnter" style="display: none;" id="head_txt"></div>
                     <form class="site-form-table">
                         <div id="main_table" class="table-responsive">
@@ -460,6 +472,7 @@ export default {
 
     data() {
         return {
+            activeNav:1, //last week or last month....
             isLoading: false,
             fullPage: true,
             is_range: true,
@@ -536,7 +549,14 @@ export default {
             this.max_date = dateValues[1];
             this.this_row.out_date = this.this_row.dates[1];
             this.get_booked_dates()
+        },
+        activeNav: async function (newValue){
+            this.isLoading=true
+            return my_api.get(`/backend/bookings/?range=${this.activeNav}`)
+                .then((response) => (this.booking_rows = response.data,this.isLoading=false))
+                .catch(err => { alert(err) });
         }
+        
     },
 
     ////////////////////
@@ -581,7 +601,6 @@ export default {
         },
     },
 
-
     ////////////////////
 
     methods: {
@@ -607,7 +626,7 @@ export default {
 
         get_booking_rows() {
             // we using return first of the function for 'await' 
-            return my_api.get('/backend/bookings/')
+            return my_api.get(`/backend/bookings/?range=${this.activeNav}`)
                 .then((response) => (this.booking_rows = response.data))
                 .catch(err => { alert(err) });
         },
@@ -666,8 +685,8 @@ export default {
                 await axios({
                     method: "get", url: domain_url + "/backend/get_booked_dates/", params: { room_id: this.this_row.room_id, hotel: this.this_row.hotel },
                 }).then((response) => {
-                    if(response.data[0])
-                    this.booked_dates = response.data[0].split(', ')
+                    if (response.data[0])
+                        this.booked_dates = response.data[0].split(', ')
                 })
 
                 this.all_booked_dates = [];
