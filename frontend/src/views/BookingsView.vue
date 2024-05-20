@@ -43,24 +43,31 @@
                 <!-- Card Body -->
                 <div id="table" class="card-body">
 
-                    <nav>
-                        <ul class="pagination pagination-sm">
-                            <li class="page-item" :class="{ active: activeNav === 1 }" @click="activeNav = 1"><button
-                                    class="page-link">{{ $t("last week") }}</button></li>
-                            <li class="page-item" :class="{ active: activeNav === 2 }" @click="activeNav = 2"><button
-                                    class="page-link">{{ $t("last month") }}</button></li>
-                            <li class="page-item" :class="{ active: activeNav === 3 }" @click="activeNav = 3"><button
-                                    class="page-link">{{ $t("last year") }}</button></li>
-                        </ul>
-                    </nav>
-                    <div class="col-sm-4 m-1">
-                        <label class="col-form-label">{{ $t("Date Range") }}</label>
-                        <input type="text" class="custom-input form-control" placeholder="Range" aria-label="Range">
-                        <date-picker v-model="searchRange" :range="true" clearable locale="en" :auto-submit="true" color="#098290"
-                            input-format="DD/MM/YYYY" format="DD/MM/YYYY" display-format="DD/MM/YYYY"
-                            custom-input=".custom-input" />
-                    </div>
+                    <div class="d-flex ">
 
+                        <nav>
+                            <ul class="pagination pagination-sm">
+                                <li class="page-item" :class="{ active: activeNav === 1 }" @click="activeNav = 1"><button
+                                        class="page-link">{{ $t("last week") }}</button></li>
+                                <li class="page-item" :class="{ active: activeNav === 2 }" @click="activeNav = 2"><button
+                                        class="page-link">{{ $t("last month") }}</button></li>
+                                <li class="page-item" :class="{ active: activeNav === 3 }" @click="activeNav = 3"><button
+                                        class="page-link">{{ $t("last year") }}</button></li>
+                                <li class="page-item" @click="activeNav = null">
+                                    <input type="text" class="custom-input form-control form-control-sm" placeholder="Custome Date Range"
+                                        aria-label="Range">
+                                    <date-picker v-model="searchRange" :range="true" clearable locale="en"
+                                        :auto-submit="true" color="#098290" input-format="DD/MM/YYYY" format="DD/MM/YYYY"
+                                        display-format="DD/MM/YYYY" custom-input=".custom-input" />
+                                </li>
+                            </ul>
+                        </nav>
+
+                        <div class="col-sm-3 m-1">
+
+                        </div>
+
+                    </div>
                     <div class="card-header cnter" style="display: none;" id="head_txt"></div>
                     <form class="site-form-table">
                         <div id="main_table" class="table-responsive">
@@ -562,6 +569,8 @@ export default {
         },
         activeNav: async function (newValue) {
             this.isLoading = true
+            if(newValue)
+                this.searchRange=''
             return my_api.get(`/backend/bookings/?range=${this.activeNav}`)
                 .then((response) => (this.booking_rows = response.data, this.isLoading = false))
                 .catch(err => { alert(err) });
