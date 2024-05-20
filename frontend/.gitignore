@@ -1,4 +1,4 @@
-#db_backup/
+db_backup/
 .DS_Store
 node_modules
 #db.sqlite3
